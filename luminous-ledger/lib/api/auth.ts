@@ -1,4 +1,3 @@
-import { createHash } from 'crypto'
 import { createClient } from '@supabase/supabase-js'
 import type { Database, ApiKeyRow } from '@/types/database'
 
@@ -10,20 +9,25 @@ function getServiceClient() {
   )
 }
 
-export function hashApiKey(rawKey: string): string {
-  return createHash('sha256').update(rawKey).digest('hex')
+// Uses Web Crypto API (works in both Edge Runtime and Node.js)
+export async function hashApiKey(rawKey: string): Promise<string> {
+  const encoded = new TextEncoder().encode(rawKey)
+  const buffer  = await crypto.subtle.digest('SHA-256', encoded)
+  return Array.from(new Uint8Array(buffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('')
 }
 
-export function generateApiKey(): { raw: string; hashed: string; prefix: string } {
+export async function generateApiKey(): Promise<{ raw: string; hashed: string; prefix: string }> {
   const raw    = `ll_${crypto.randomUUID().replace(/-/g, '')}`
-  const hashed = hashApiKey(raw)
+  const hashed = await hashApiKey(raw)
   const prefix = raw.slice(0, 8)
   return { raw, hashed, prefix }
 }
 
 export async function validateApiKey(rawKey: string) {
   const supabase = getServiceClient()
-  const hashed   = hashApiKey(rawKey)
+  const hashed   = await hashApiKey(rawKey)
 
   const { data, error } = await supabase
     .from('api_keys')

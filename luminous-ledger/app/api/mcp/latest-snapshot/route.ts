@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
 
   if (!user) return unauthorized()
 
-  const { data: row, error } = await supabase
+  const { data, error } = await supabase
     .from('finance_snapshots')
     .select('id, data, updated_at')
     .eq('user_id', user.id)
@@ -22,6 +22,8 @@ export async function GET(request: NextRequest) {
     console.error('[latest-snapshot]', error)
     return serverError('Failed to fetch snapshot.')
   }
+
+  const row = data as { id: string; data: unknown; updated_at: string } | null
 
   if (!row) return ok({ snapshot: null, updated_at: null })
 
