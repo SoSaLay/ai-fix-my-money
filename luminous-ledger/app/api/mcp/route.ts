@@ -101,15 +101,19 @@ function rpcError(id: unknown, code: number, message: string) {
   return NextResponse.json({ jsonrpc: '2.0', id, error: { code, message } })
 }
 
-// ── GET — MCP server discovery ────────────────────────────────────────────────
+// ── GET — no server-to-client streaming; tell clients POST/DELETE only ────────
 
 export async function GET() {
-  return NextResponse.json({
-    name: 'luminous-ledger',
-    version: '1.0.0',
-    description: 'Luminous Ledger finance dashboard MCP server',
-    tools: TOOLS.map(t => ({ name: t.name, description: t.description })),
+  return new NextResponse(null, {
+    status: 405,
+    headers: { Allow: 'POST, DELETE' },
   })
+}
+
+// ── DELETE — session termination ──────────────────────────────────────────────
+
+export async function DELETE() {
+  return new NextResponse(null, { status: 200 })
 }
 
 // ── POST — MCP JSON-RPC handler ───────────────────────────────────────────────
