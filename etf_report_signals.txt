@@ -1,0 +1,22 @@
+SIGNAL 1: WTI crude oil breaks $106/barrel (+3% intraday) after Iranian airstrike hits Kuwait oil tanker in Dubai port
+SIGNAL 2: Gold spot falls below $4,500 (intraday pullback after recent run-up)
+SIGNAL 3: Silver at $70/oz (near multi-year highs)
+SIGNAL 4: Bond ETFs attracted 20B+ yuan in a single week amid risk-off sentiment
+SIGNAL 5: S&P 500 futures down 0.3% on geopolitical escalation
+SIGNAL 6: Semiconductor sector entering price+volume upswing cycle (analyst consensus)
+SIGNAL 7: China Q1 2026 GDP growth expected ~5% (five major financial institutions)
+SIGNAL 8: China A-share companies paying out 700B+ yuan in dividends — "safe haven" appeal
+SIGNAL 9: EV penetration expected to accelerate on high oil prices; lithium battery sector upside
+SIGNAL 10: India relaxing bans on Chinese company procurement — supply chain normalization signal
+SIGNAL 11: SpaceX and large IPOs expected to fast-track into Nasdaq 100
+SIGNAL 12: Microsoft unveils transformative multi-model AI strategy
+SIGNAL 13: Powell: long-term inflation expectations still anchored; monetary policy in good position
+SIGNAL 14: UK March BRC store price index +1.2% YoY (below 1.3% estimate) — inflation cooling
+SIGNAL 15: Korea Feb industrial output -2.2% YoY (vs +6% expected) — manufacturing slowdown
+SIGNAL 16: Samsung destroying 73.4M shares — buyback/shareholder return signal
+SIGNAL 17: Perovskite solar cell breakthrough — efficiency + stability achieved
+SIGNAL 18: Intel facing pressure as core CPU business weakens
+SIGNAL 19: Multiple Chinese semiconductor firms filing for HK exchange listings
+SIGNAL 20: Russia-Ukraine ceasefire probability 53.5% (Polymarket, $1.4M volume)
+SIGNAL 21: China Taiwan invasion probability 51.5% (Polymarket, $1.5M volume) — tail risk
+SIGNAL 22: Bitcoin $1M probability 48.85% (Polymarket, $3.8M volume)

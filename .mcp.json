@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "financial-datasets": {
+      "command": "/Users/sosalay/.local/bin/uv",
+      "args": [
+        "--directory",
+        "/Users/sosalay/Desktop/AI_Finance/mcp-server",
+        "run",
+        "server.py"
+      ]
+    }
+  }
+}
