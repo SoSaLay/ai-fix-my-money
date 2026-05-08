@@ -101,12 +101,42 @@ function rpcError(id: unknown, code: number, message: string) {
   return NextResponse.json({ jsonrpc: '2.0', id, error: { code, message } })
 }
 
-// ── GET — no server-to-client streaming; tell clients POST/DELETE only ────────
+// ── GET — open SSE channel for Streamable HTTP transport ─────────────────────
+// Perplexity requires this endpoint to return a valid SSE stream even though
+// our server never sends server-initiated messages. We open the stream and
+// keep it alive with periodic pings until the client disconnects.
 
-export async function GET() {
-  return new NextResponse(null, {
-    status: 405,
-    headers: { Allow: 'POST, DELETE' },
+export async function GET(request: NextRequest) {
+  if (!authenticate(request)) {
+    return new NextResponse('Unauthorized', { status: 401 })
+  }
+
+  const encoder = new TextEncoder()
+  let intervalId: ReturnType<typeof setInterval>
+
+  const stream = new ReadableStream({
+    start(controller) {
+      controller.enqueue(encoder.encode(': connected\n\n'))
+      intervalId = setInterval(() => {
+        try {
+          controller.enqueue(encoder.encode(': ping\n\n'))
+        } catch {
+          clearInterval(intervalId)
+        }
+      }, 15_000)
+    },
+    cancel() {
+      clearInterval(intervalId)
+    },
+  })
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      'Connection': 'keep-alive',
+      'X-Accel-Buffering': 'no',
+    },
   })
 }
 
