@@ -5,7 +5,7 @@ import { ok, unauthorized, serverError, err } from '@/lib/api/response'
 // PUT - Update an existing savings goal
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -14,7 +14,7 @@ export async function PUT(
     return unauthorized('Authentication required.')
   }
 
-  const goalId = params.id
+  const { id: goalId } = await params
 
   try {
     const body = await request.json()
@@ -74,7 +74,7 @@ export async function PUT(
 // DELETE - Delete/archive a savings goal
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -83,7 +83,7 @@ export async function DELETE(
     return unauthorized('Authentication required.')
   }
 
-  const goalId = params.id
+  const { id: goalId } = await params
 
   try {
     // Soft delete by setting is_active to false
