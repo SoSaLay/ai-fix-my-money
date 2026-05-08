@@ -3,7 +3,7 @@
 import { type ButtonHTMLAttributes, type ReactNode } from 'react'
 import { clsx } from 'clsx'
 
-type ButtonVariant = 'primary' | 'sunset' | 'secondary' | 'ghost'
+type ButtonVariant = 'primary' | 'sunset' | 'secondary' | 'ghost' | 'outline'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant
@@ -12,6 +12,8 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
+  outline:
+    'bg-transparent border border-current text-on-surface rounded-xl px-6 py-3 font-medium text-label-lg hover:bg-surface-container active:scale-[0.98] transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed',
   primary:
     'bg-secondary text-white rounded-xl px-6 py-3 font-medium text-label-lg hover:opacity-90 active:scale-[0.98] transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed',
   sunset:
