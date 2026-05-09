@@ -75,6 +75,7 @@ const DEMO_FINANCIAL_DATA = {
 }
 import {
   parseStatement,
+  detectRecurring,
   deriveMonthlyStats,
   type ParsedStatement,
   type StatementMonth,
@@ -523,7 +524,7 @@ function stmtTxToTransaction(tx: StatementTransaction): Transaction {
     plaid_category: tx.category,
     personal_finance_category: tx.category,
     pending: false,
-    is_recurring: false,
+    is_recurring: tx.is_recurring,
     created_at: new Date().toISOString(),
   }
 }
@@ -631,22 +632,37 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       setStatements(readStorage<ParsedStatement[]>(key(STORAGE_KEY_STATEMENTS)) ?? [])
       setManualAccounts(readStorage<ManualAccount[]>(key(STORAGE_KEY_MANUAL_ACCOUNTS)) ?? [])
 
-      // Auto-load demo data for the demo account if it has no data yet
+      // Auto-load from local financial-data.json (served by /api/local-data).
+      // This is the primary data source in the local-first architecture.
+      // If the user has already pasted/imported data manually it takes precedence.
       if (!stored) {
-        try {
-          const supabase = createClient()
-          supabase.auth.getUser().then(({ data: { user } }) => {
-            if (user?.email === DEMO_EMAIL) {
-              const result = parsePerplexityData(DEMO_FINANCIAL_DATA)
+        fetch('/api/local-data')
+          .then(res => res.ok ? res.json() : null)
+          .then((json: { ok: boolean; data: unknown } | null) => {
+            if (!json?.ok || !json.data) return
+            // Check if this is a demo account — use demo override instead
+            try {
+              const supabase = createClient()
+              supabase.auth.getUser().then(({ data: { user } }) => {
+                const sourceData = user?.email === DEMO_EMAIL ? DEMO_FINANCIAL_DATA : json.data
+                const result = parsePerplexityData(sourceData)
+                if (result.success && result.data) {
+                  setFinancialData(result.data)
+                  writeStorage(key(STORAGE_KEY_FINANCIAL), result.data)
+                }
+              })
+            } catch {
+              // Supabase not configured — load local file for all users
+              const result = parsePerplexityData(json.data)
               if (result.success && result.data) {
                 setFinancialData(result.data)
                 writeStorage(key(STORAGE_KEY_FINANCIAL), result.data)
               }
             }
           })
-        } catch {
-          // Supabase not configured — skip auto-load
-        }
+          .catch(() => {
+            // /api/local-data unavailable (e.g. static export) — skip
+          })
       }
     }
 
@@ -825,8 +841,19 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
         // Replace if same filename, otherwise append
         const filtered = prev.filter(s => s.filename !== filename)
         const next = [...filtered, result.statement!]
-        writeStorage(sk(STORAGE_KEY_STATEMENTS), next)
-        return next
+
+        // Re-run recurring detection across all transactions from every file
+        // so that multi-month patterns are caught even when files are uploaded one-at-a-time.
+        const allTxns = next.flatMap(s => s.transactions)
+        const retagged = detectRecurring(allTxns)
+        const retaggedById = new Map(retagged.map(t => [t.id, t]))
+        const finalStmts: ParsedStatement[] = next.map(s => ({
+          ...s,
+          transactions: s.transactions.map(t => retaggedById.get(t.id) ?? t),
+        }))
+
+        writeStorage(sk(STORAGE_KEY_STATEMENTS), finalStmts)
+        return finalStmts
       })
     }
     return result

@@ -13,6 +13,7 @@ export interface StatementTransaction {
   category: string
   account: string       // filename/account identifier
   source: 'csv' | 'ofx'
+  is_recurring: boolean
 }
 
 export interface ParsedStatement {
@@ -274,6 +275,7 @@ export function parseCSV(
       category,
       account: filename.replace(/\.[^.]+$/, ''),
       source: 'csv',
+      is_recurring: false,
     })
   }
 
@@ -283,7 +285,8 @@ export function parseCSV(
 
   if (skipped > 0) warnings.push(`${skipped} row(s) were skipped (unrecognised format or missing fields).`)
 
-  const dates = transactions.map(t => t.date).filter(Boolean).sort()
+  const tagged = detectRecurring(transactions)
+  const dates = tagged.map(t => t.date).filter(Boolean).sort()
   const dateRange = { start: dates[0] ?? '', end: dates[dates.length - 1] ?? '' }
 
   return {
@@ -293,10 +296,10 @@ export function parseCSV(
     statement: {
       filename,
       bank,
-      transactions,
+      transactions: tagged,
       dateRange,
       importedAt: new Date().toISOString(),
-      transactionCount: transactions.length,
+      transactionCount: tagged.length,
     },
   }
 }
@@ -336,6 +339,7 @@ export function parseOFX(text: string, filename: string): StatementImportResult 
       category: categorize(desc),
       account: filename.replace(/\.[^.]+$/, ''),
       source: 'ofx',
+      is_recurring: false,
     })
   }
 
@@ -343,16 +347,17 @@ export function parseOFX(text: string, filename: string): StatementImportResult 
     return { success: false, errors: ['No transactions found in OFX/QFX file.'], warnings }
   }
 
-  const dates = transactions.map(t => t.date).sort()
+  const tagged = detectRecurring(transactions)
+  const dates = tagged.map(t => t.date).sort()
   return {
     success: true, errors: [], warnings,
     statement: {
       filename,
       bank: text.match(/ORG:([^\r\n]+)/i)?.[1]?.trim() ?? 'Bank',
-      transactions,
+      transactions: tagged,
       dateRange: { start: dates[0], end: dates[dates.length - 1] },
       importedAt: new Date().toISOString(),
-      transactionCount: transactions.length,
+      transactionCount: tagged.length,
     },
   }
 }
@@ -363,6 +368,78 @@ export function parseStatement(text: string, filename: string): StatementImportR
   const lower = filename.toLowerCase()
   if (lower.endsWith('.ofx') || lower.endsWith('.qfx')) return parseOFX(text, filename)
   return parseCSV(text, filename)
+}
+
+// ─── Recurring payment detection ──────────────────────────────────────────────
+// Two signals mark a transaction as recurring:
+//   1. The same normalised merchant name appears in 2+ distinct calendar months.
+//   2. The merchant name matches a known subscription service keyword.
+//
+// Run this over the full accumulated transaction list for an account group,
+// not just a single file, so multi-month history is used when available.
+
+const SUBSCRIPTION_KEYWORDS = [
+  // Streaming
+  'netflix', 'hulu', 'disney+', 'disney plus', 'hbo', 'max ', 'peacock', 'paramount',
+  'apple tv', 'youtube premium', 'crunchyroll', 'fubo', 'sling',
+  // Music / Podcasts
+  'spotify', 'apple music', 'tidal', 'pandora', 'amazon music', 'audible',
+  // Cloud / Software
+  'icloud', 'google one', 'google storage', 'dropbox', 'onedrive',
+  'adobe', 'creative cloud', 'figma', 'notion', 'microsoft 365', 'office 365',
+  'github', 'vercel', 'heroku', 'aws ', 'digitalocean', 'cloudflare',
+  'openai', 'chatgpt', 'claude', 'anthropic',
+  // Fitness / Health
+  'gym', 'peloton', 'equinox', 'planet fitness', 'ymca', 'anytime fitness',
+  'noom', 'calm', 'headspace',
+  // News / Reading
+  'new york times', 'nytimes', 'wall street journal', 'wsj', 'the atlantic',
+  'medium', 'substack', 'kindle unlimited',
+  // Finance / Business
+  'linkedin premium', 'quickbooks', 'freshbooks', 'slack', 'zoom',
+  // Delivery / Shopping clubs
+  'amazon prime', 'instacart', 'doordash pass', 'grubhub+', 'walmart+',
+  // Utilities / Telecom that recur predictably
+  'at&t', 'verizon', 't-mobile', 'comcast', 'xfinity', 'spectrum', 'cox',
+]
+
+function normaliseMerchant(description: string): string {
+  return description
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 40) // cap length so minor suffixes don't create separate buckets
+}
+
+function isKnownSubscription(description: string): boolean {
+  const lower = description.toLowerCase()
+  return SUBSCRIPTION_KEYWORDS.some(k => lower.includes(k))
+}
+
+export function detectRecurring(transactions: StatementTransaction[]): StatementTransaction[] {
+  // Count distinct months each normalised merchant appears in
+  const merchantMonths: Record<string, Set<string>> = {}
+  for (const tx of transactions) {
+    if (tx.amount <= 0) continue // skip credits / income
+    const key = normaliseMerchant(tx.description)
+    if (!merchantMonths[key]) merchantMonths[key] = new Set()
+    merchantMonths[key].add(tx.date.slice(0, 7)) // 'YYYY-MM'
+  }
+
+  const multiMonthMerchants = new Set(
+    Object.entries(merchantMonths)
+      .filter(([, months]) => months.size >= 2)
+      .map(([key]) => key),
+  )
+
+  return transactions.map(tx => {
+    if (tx.is_recurring) return tx // already tagged
+    if (tx.amount <= 0) return tx  // credits are not subscriptions
+    const key = normaliseMerchant(tx.description)
+    const recurring = multiMonthMerchants.has(key) || isKnownSubscription(tx.description)
+    return recurring ? { ...tx, is_recurring: true } : tx
+  })
 }
 
 // ─── Derive monthly summaries from transactions ────────────────────────────────

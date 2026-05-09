@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import {
-  Sparkles, Upload, FileText, Database, Copy, Check,
-  ExternalLink, AlertCircle, AlertTriangle, FileJson,
+  FolderOpen, Upload, FileText, Database, Copy, Check,
+  AlertCircle, AlertTriangle, FileJson,
   ArrowRight, RotateCcw, CheckCircle2, XCircle,
   FilePlus, Plus, Pencil, Trash2, ChevronRight,
 } from 'lucide-react'
@@ -12,7 +12,7 @@ import { TopNav } from '@/components/layout/top-nav'
 import { useFinancialData } from '@/contexts/financial-data-context'
 import type { ManualAccount } from '@/contexts/financial-data-context'
 import {
-  PERPLEXITY_PROMPT, SAMPLE_PERPLEXITY_JSON,
+  SAMPLE_PERPLEXITY_JSON,
   type ParsedFinancialData,
 } from '@/lib/perplexity/parser'
 
@@ -36,9 +36,9 @@ const METHODS: {
 }[] = [
   {
     id: 'ai',
-    icon: <Sparkles size={24} />,
-    title: 'AI Import',
-    subtitle: 'Use Perplexity AI to pull and structure your finances in seconds.',
+    icon: <FolderOpen size={24} />,
+    title: 'Local Data File',
+    subtitle: 'Edit financial-data.json on your machine — refreshed with Perplexity Computer.',
     color: '#4c49c9',
   },
   {
@@ -97,14 +97,90 @@ function MethodPicker({ onSelect }: { onSelect: (m: ImportMethod) => void }) {
   )
 }
 
-// ─── AI path: Step 1 — Copy prompt ────────────────────────────────────────────
+// ─── Local data file: Step 1 — Perplexity Computer instructions ───────────────
+// The prompt uses project-relative paths so it works for anyone who clones the
+// repo — no machine-specific absolute paths.
+
+const PERPLEXITY_COMPUTER_PROMPT = `You have access to my local filesystem. Your job is to gather my current financial data and write it directly to a file inside the Luminous Ledger project — do NOT return JSON in this chat.
+
+TASK:
+1. Find the Luminous Ledger project folder on this machine (it was downloaded from GitHub — search for a folder named "luminous-ledger" containing a "data" subfolder).
+2. Inside that project folder, locate the file at: data/financial-data.json
+3. Access my financial accounts, bank statements, investment portfolio, and spending history using your computer access tools.
+4. Compile everything into the exact JSON structure below. All amounts are monthly USD.
+5. Write the complete JSON to data/financial-data.json, replacing ALL existing content.
+6. Set "_last_updated" to today's date in YYYY-MM-DD format.
+7. Confirm the file was written and give a brief summary of what you found.
+
+Required JSON structure:
+{
+  "_last_updated": "YYYY-MM-DD",
+  "income": {
+    "total_monthly": <number>,
+    "sources": [{ "name": "<source>", "amount": <monthly amount> }]
+  },
+  "expenses_fixed": [
+    { "name": "<expense name>", "category": "<Housing|Utilities|Transportation|Insurance|Healthcare>", "amount": <monthly amount> }
+  ],
+  "expenses_variable": [
+    { "category": "<Food & Dining|Shopping|Entertainment|Transportation|Healthcare|Other>", "amount": <monthly average> }
+  ],
+  "subscriptions": [
+    { "name": "<service name>", "amount": <monthly amount>, "frequency": "monthly" }
+  ],
+  "accounts": [
+    { "name": "<account name>", "type": "<checking|savings|brokerage|401k|roth_ira|credit|mortgage|auto>", "balance": <balance>, "institution": "<bank or broker>" }
+  ],
+  "summary": {
+    "total_income": <number>,
+    "total_expenses": <number>,
+    "monthly_savings": <number>,
+    "savings_rate": <integer percentage>
+  }
+}
+
+Rules:
+- Investment accounts (brokerage, 401k, IRA): use current market value as balance.
+- Credit cards, mortgages, loans: use a NEGATIVE balance (e.g. -1200).
+- Annual subscriptions: divide annual cost by 12 for the monthly amount.
+- Write the file directly — do not output the JSON in chat.`
+
+const LOCAL_FILE_STEPS = [
+  { n: 1, text: 'Open Perplexity Computer on your machine.' },
+  { n: 2, text: 'Copy the prompt below and paste it into Perplexity Computer.' },
+  { n: 3, text: 'Perplexity Computer will find the project, access your accounts, and write the file directly — no copy/paste needed.' },
+  { n: 4, text: 'Click "Refresh Dashboard" below once it confirms the file is written.' },
+]
 
 function AIStepPrompt({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
+  const { importData } = useFinancialData()
   const [copied, setCopied] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
+  const [refreshResult, setRefreshResult] = useState<'success' | 'error' | null>(null)
+
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(PERPLEXITY_PROMPT)
+    await navigator.clipboard.writeText(PERPLEXITY_COMPUTER_PROMPT)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const handleRefresh = async () => {
+    setRefreshing(true)
+    setRefreshResult(null)
+    try {
+      const res = await fetch('/api/local-data')
+      const json = await res.json()
+      if (json.ok && json.data) {
+        const result = importData(json.data)
+        setRefreshResult(result.success ? 'success' : 'error')
+      } else {
+        setRefreshResult('error')
+      }
+    } catch {
+      setRefreshResult('error')
+    } finally {
+      setRefreshing(false)
+    }
   }
 
   return (
@@ -113,31 +189,86 @@ function AIStepPrompt({ onNext, onBack }: { onNext: () => void; onBack: () => vo
         <button onClick={onBack} className="flex items-center gap-1.5 text-label-sm text-on-surface-variant hover:text-on-surface mb-4 transition-colors">
           ← Back
         </button>
-        <h2 className="text-headline-lg text-on-surface font-bold">Copy the Prompt</h2>
-        <p className="text-body-md text-on-surface-variant mt-1">Paste this into Perplexity with your financial info at hand.</p>
-      </div>
-
-      <div className="bg-surface-container rounded-2xl p-5 max-h-64 overflow-y-auto">
-        <p className="text-body-sm text-on-surface font-mono whitespace-pre-wrap break-words leading-relaxed">
-          {PERPLEXITY_PROMPT}
+        <h2 className="text-headline-lg text-on-surface font-bold">Perplexity Computer Setup</h2>
+        <p className="text-body-md text-on-surface-variant mt-1">
+          Perplexity Computer runs on your machine and writes your financial data directly into the project — no copy/paste needed.
         </p>
       </div>
 
-      <button onClick={handleCopy}
+      {/* File hint */}
+      <div className="rounded-xl px-4 py-3 flex items-start gap-3" style={{ backgroundColor: 'rgba(76,73,201,0.08)' }}>
+        <FolderOpen size={15} className="flex-shrink-0 mt-0.5" style={{ color: '#4c49c9' }} />
+        <div className="min-w-0">
+          <p className="text-label-sm font-semibold mb-0.5" style={{ color: '#4c49c9' }}>Data file (relative to project root)</p>
+          <p className="text-label-sm font-mono" style={{ color: '#4c49c9' }}>luminous-ledger/data/financial-data.json</p>
+        </div>
+      </div>
+
+      {/* How-to steps */}
+      <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ backgroundColor: 'rgba(28,27,31,0.04)' }}>
+        <p className="text-label-md font-semibold text-on-surface">How it works</p>
+        <ol className="flex flex-col gap-2.5">
+          {LOCAL_FILE_STEPS.map(({ n, text }) => (
+            <li key={n} className="flex items-start gap-3">
+              <span
+                className="w-5 h-5 rounded-full flex items-center justify-center text-label-sm font-bold flex-shrink-0 mt-0.5"
+                style={{ backgroundColor: '#4c49c9', color: '#fff' }}
+              >
+                {n}
+              </span>
+              <p className="text-body-sm text-on-surface leading-snug">{text}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      {/* Prompt box */}
+      <div className="bg-surface-container rounded-2xl p-5 max-h-52 overflow-y-auto">
+        <p className="text-on-surface font-mono whitespace-pre-wrap break-words leading-relaxed" style={{ fontSize: '0.68rem' }}>
+          {PERPLEXITY_COMPUTER_PROMPT}
+        </p>
+      </div>
+
+      {/* Copy prompt */}
+      <button
+        onClick={handleCopy}
         className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-label-lg transition-all active:scale-[0.98]"
-        style={{ background: copied ? '#1a6b3a' : '#4c49c9', color: '#fff' }}>
-        {copied ? <><Check size={18} /> Copied!</> : <><Copy size={18} /> Copy Prompt</>}
+        style={{ background: copied ? '#1a6b3a' : '#4c49c9', color: '#fff' }}
+      >
+        {copied ? <><Check size={18} /> Copied!</> : <><Copy size={18} /> Copy Prompt for Perplexity Computer</>}
       </button>
 
-      <a href="https://www.perplexity.ai" target="_blank" rel="noopener noreferrer"
-        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-label-lg border transition-all hover:bg-surface-container"
-        style={{ borderColor: 'rgba(172,173,177,0.3)', color: '#5a5b60' }}>
-        Open Perplexity <ExternalLink size={16} />
-      </a>
+      {/* Refresh from file */}
+      <div className="flex flex-col gap-2">
+        <button
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-label-lg border transition-all active:scale-[0.98] disabled:opacity-50"
+          style={{ borderColor: 'rgba(172,173,177,0.4)', color: '#1c1b1f', background: 'transparent' }}
+        >
+          {refreshing
+            ? 'Reading file…'
+            : refreshResult === 'success'
+            ? <><CheckCircle2 size={18} style={{ color: '#1a6b3a' }} /> Dashboard Updated!</>
+            : refreshResult === 'error'
+            ? <><XCircle size={18} style={{ color: '#ba1a1a' }} /> File not ready yet</>
+            : '↻  Refresh Dashboard from File'}
+        </button>
+        {refreshResult === 'success' && (
+          <p className="text-label-sm text-center" style={{ color: '#1a6b3a' }}>
+            Data loaded. Head to your dashboard to see the update.
+          </p>
+        )}
+        {refreshResult === 'error' && (
+          <p className="text-label-sm text-center" style={{ color: '#ba1a1a' }}>
+            Could not read the file — make sure Perplexity Computer finished writing it.
+          </p>
+        )}
+      </div>
 
       <button onClick={onNext}
-        className="w-full flex items-center justify-center gap-2 py-3 text-label-lg font-medium text-on-surface-variant hover:text-on-surface transition-colors">
-        I have the JSON — continue <ChevronRight size={16} />
+        className="text-label-sm text-on-surface-variant hover:text-on-surface transition-colors text-center">
+        Prefer to paste JSON manually <ChevronRight size={13} className="inline" />
       </button>
     </div>
   )
