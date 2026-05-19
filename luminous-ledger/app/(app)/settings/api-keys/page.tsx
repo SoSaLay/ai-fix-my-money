@@ -115,7 +115,7 @@ export default function ApiKeysPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <p className="text-body-md text-on-surface-variant">
-            Use API keys to authenticate requests to the Luminous Ledger API.
+            Use API keys to authenticate requests to the AI Fix My Money API.
           </p>
           <Button
             variant="primary"
@@ -140,8 +140,8 @@ export default function ApiKeysPage() {
             How to use your API key
           </p>
           <pre className="text-sm font-mono text-on-surface bg-surface-container-lowest rounded-xl p-4 overflow-x-auto">
-            <code>{`curl https://api.luminousledger.com/api/v1/summary \\
-  -H "x-api-key: ll_your_key_here"`}</code>
+            <code>{`curl https://api.aifixmymoney.com/api/v1/summary \\
+  -H "x-api-key: afmm_your_key_here"`}</code>
           </pre>
         </div>
       </div>

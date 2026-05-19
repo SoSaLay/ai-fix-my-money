@@ -40,10 +40,10 @@ export function Sidebar({ pathname }: SidebarProps) {
       {/* Brand */}
       <div className="px-2 mb-8">
         <p className="text-headline-sm text-on-surface font-bold leading-tight">
-          Luminous Ledger
+          AI Fix My Money
         </p>
         <p className="text-label-sm text-on-surface-variant mt-0.5 tracking-widest uppercase">
-          Premium AI Insights
+          AI Finance
         </p>
       </div>
 

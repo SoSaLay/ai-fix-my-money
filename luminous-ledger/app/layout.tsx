@@ -9,8 +9,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Luminous Ledger',
-  description: 'Premium AI Finance Insights',
+  title: 'AI Fix My Money',
+  description: 'Fix your finances with AI',
 }
 
 export default function RootLayout({

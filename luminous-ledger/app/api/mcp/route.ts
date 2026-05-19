@@ -74,7 +74,7 @@ const TOOLS = [
   {
     name: 'save_finance_snapshot',
     description:
-      'Save a structured finance snapshot to the Luminous Ledger dashboard. ' +
+      'Save a structured finance snapshot to the AI Fix My Money dashboard. ' +
       'The dashboard will automatically update within seconds. ' +
       'Pass the normalized finance JSON as the finance_json argument.',
     inputSchema: {
@@ -174,7 +174,7 @@ export async function POST(request: NextRequest) {
     return rpcOk(id, {
       protocolVersion: '2024-11-05',
       capabilities: { tools: {} },
-      serverInfo: { name: 'luminous-ledger', version: '1.0.0' },
+      serverInfo: { name: 'ai-fix-my-money', version: '1.0.0' },
     })
   }
 
