@@ -246,7 +246,7 @@ export default function MarketingPage() {
       </section>
 
       {/* ── Story / Bridge ── */}
-      <section className="px-6 pb-48 max-w-3xl mx-auto w-full">
+      <section className="px-6 pb-72 max-w-3xl mx-auto w-full">
         <div className="flex flex-col gap-6">
           <p className="text-label-sm text-on-surface-variant uppercase tracking-widest">The Reality</p>
           <h2 className="text-display-sm text-on-surface leading-tight">
@@ -269,7 +269,7 @@ export default function MarketingPage() {
       </section>
 
       {/* ── AI Features ── */}
-      <section className="px-6 pb-40 max-w-5xl mx-auto w-full">
+      <section className="px-6 pb-52 max-w-5xl mx-auto w-full">
         <div className="text-center mb-16">
           <p className="text-label-sm text-on-surface-variant uppercase tracking-widest mb-3">Built for Your Money</p>
           <h2 className="text-display-sm text-on-surface">One app. Every corner of your financial life.</h2>
@@ -293,7 +293,7 @@ export default function MarketingPage() {
       </section>
 
       {/* ── How it works ── */}
-      <section className="px-6 pb-40 max-w-5xl mx-auto w-full">
+      <section className="px-6 pb-52 max-w-5xl mx-auto w-full">
         <div className="text-center mb-16">
           <p className="text-label-sm text-on-surface-variant uppercase tracking-widest mb-3">The Process</p>
           <h2 className="text-display-sm text-on-surface">Four steps. Ten minutes.</h2>
