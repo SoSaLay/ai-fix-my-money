@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import {
   ArrowRight, CheckCircle2, Sparkles,
-  Link2, Upload, BrainCircuit, TrendingUp, PiggyBank, Zap, MessageSquare,
+  Link2, Upload, BrainCircuit, TrendingUp, PiggyBank, Zap, MessageSquare, Github,
 } from 'lucide-react'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -126,23 +126,30 @@ function DashboardMockup() {
 const STEPS = [
   {
     number: '01',
-    icon: <Link2 size={20} />,
-    title: 'Connect via Perplexity Finance',
-    body: 'Link your accounts through Perplexity Finance. Your balances and transactions come in automatically.',
-    color: '#4c49c9',
+    icon: <Github size={20} />,
+    title: 'Clone the Repo',
+    body: 'Grab the project from GitHub and run it locally. A few commands and you\'re up.',
+    color: '#2d2f33',
   },
   {
     number: '02',
+    icon: <Link2 size={20} />,
+    title: 'Connect via Perplexity Finance',
+    body: 'Link your accounts through Perplexity Finance. Balances and transactions come in automatically.',
+    color: '#4c49c9',
+  },
+  {
+    number: '03',
     icon: <Upload size={20} />,
     title: 'Import Your Data',
     body: 'Export your statements and upload them here. Everything is parsed and categorized for you.',
     color: '#ff9817',
   },
   {
-    number: '03',
+    number: '04',
     icon: <BrainCircuit size={20} />,
     title: 'Get AI Insights',
-    body: 'AI analyzes your spending, savings, and investments — every insight grounded in your real numbers.',
+    body: 'AI analyzes your spending, savings, and investments — grounded in your real numbers.',
     color: '#1a6b3a',
   },
 ]
@@ -151,35 +158,27 @@ const AI_FEATURES = [
   {
     icon: <MessageSquare size={22} />,
     title: 'Ask your money anything',
-    body: 'Chat with an AI that knows your exact balances, spending history, and goals — not generic advice. Real answers, grounded in your real numbers.',
+    body: 'An AI adviser that knows your actual numbers — not generic tips. Ask it anything, get a real answer.',
     color: '#4c49c9',
   },
   {
     icon: <TrendingUp size={22} />,
     title: 'Know if you\'re actually building wealth',
-    body: 'Portfolio breakdowns, allocation analysis, and market context — all tied to what you actually own. No guesswork, no noise.',
+    body: 'Portfolio breakdowns and allocation analysis tied to what you own. No guesswork.',
     color: '#1a6b3a',
   },
   {
     icon: <Zap size={22} />,
     title: 'Run instant AI skills on your money',
-    body: 'One-click analysis tools built for your finances: subscription audits, spending breakdowns, waste detection, and more — all from your real data.',
+    body: 'Subscription audits, spending breakdowns, waste detection — one click, real data.',
     color: '#ff9817',
   },
   {
     icon: <PiggyBank size={22} />,
-    title: 'See exactly when you\'ll hit your goals',
-    body: 'Track savings rate, emergency fund health, and goal progress in real time. You\'ll always know how close you are and what\'s slowing you down.',
+    title: 'See exactly when and how you\'ll hit your goals',
+    body: 'Savings rate, emergency fund health, goal progress — tracked in real time.',
     color: '#4c49c9',
   },
-]
-
-const OUTCOMES = [
-  'No more "wait, where did my paycheck go?" moments',
-  'Savings that actually grow — without thinking about it',
-  'Know what you can spend before you spend it',
-  'See your investments clearly, no guesswork',
-  'Feel in control of your money — maybe for the first time',
 ]
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -247,7 +246,7 @@ export default function MarketingPage() {
       </section>
 
       {/* ── Story / Bridge ── */}
-      <section className="px-6 pb-24 max-w-3xl mx-auto w-full">
+      <section className="px-6 pb-16 max-w-3xl mx-auto w-full">
         <div className="flex flex-col gap-5">
           <p className="text-label-sm text-on-surface-variant uppercase tracking-widest">The Reality</p>
           <h2 className="text-display-sm text-on-surface leading-tight">
@@ -265,24 +264,6 @@ export default function MarketingPage() {
             <p className="text-on-surface font-medium">
               AI Fix My Money finds the leaks. You keep the money.
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Outcomes ── */}
-      <section className="px-6 pb-24 max-w-5xl mx-auto w-full">
-        <div className="bg-surface-container-lowest rounded-3xl shadow-card overflow-hidden">
-          <div className="px-8 pt-8 pb-6 border-b border-surface-container">
-            <p className="text-label-sm text-on-surface-variant uppercase tracking-widest mb-2">What Changes</p>
-            <h2 className="text-headline-lg text-on-surface">When you actually know your numbers</h2>
-          </div>
-          <div className="flex flex-col divide-y divide-surface-container">
-            {OUTCOMES.map((outcome) => (
-              <div key={outcome} className="flex items-center gap-4 px-8 py-5">
-                <CheckCircle2 size={18} style={{ color: '#4c49c9', flexShrink: 0 }} />
-                <p className="text-body-lg text-on-surface">{outcome}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
@@ -315,10 +296,10 @@ export default function MarketingPage() {
       <section className="px-6 pb-24 max-w-5xl mx-auto w-full">
         <div className="text-center mb-10">
           <p className="text-label-sm text-on-surface-variant uppercase tracking-widest mb-2">The Process</p>
-          <h2 className="text-display-sm text-on-surface">Three steps. Five minutes.</h2>
+          <h2 className="text-display-sm text-on-surface">Four steps. Ten minutes.</h2>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           {STEPS.map((step) => (
             <div key={step.number}
               className="bg-surface-container-lowest rounded-2xl shadow-card p-6 flex flex-col gap-4">
