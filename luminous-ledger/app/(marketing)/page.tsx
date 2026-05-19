@@ -206,7 +206,7 @@ export default function MarketingPage() {
       </nav>
 
       {/* ── Hero ── */}
-      <section className="flex flex-col items-center text-center gap-6 px-6 pt-14 pb-16 max-w-3xl mx-auto w-full">
+      <section className="flex flex-col items-center text-center gap-8 px-6 pt-20 pb-20 max-w-3xl mx-auto w-full">
         <h1 className="text-display-lg text-on-surface">
           Your money,{' '}
           <span style={{ background: 'linear-gradient(135deg, #4c49c9, #ff9817)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
@@ -241,13 +241,13 @@ export default function MarketingPage() {
       </section>
 
       {/* ── App Preview ── */}
-      <section className="px-6 pb-24 max-w-5xl mx-auto w-full">
+      <section className="px-6 pb-32 max-w-5xl mx-auto w-full">
         <DashboardMockup />
       </section>
 
       {/* ── Story / Bridge ── */}
-      <section className="px-6 pb-16 max-w-3xl mx-auto w-full">
-        <div className="flex flex-col gap-5">
+      <section className="px-6 pb-24 max-w-3xl mx-auto w-full">
+        <div className="flex flex-col gap-6">
           <p className="text-label-sm text-on-surface-variant uppercase tracking-widest">The Reality</p>
           <h2 className="text-display-sm text-on-surface leading-tight">
             Most people don&apos;t realize<br />they&apos;re bleeding money.
@@ -269,21 +269,21 @@ export default function MarketingPage() {
       </section>
 
       {/* ── AI Features ── */}
-      <section className="px-6 pb-24 max-w-5xl mx-auto w-full">
-        <div className="text-center mb-10">
-          <p className="text-label-sm text-on-surface-variant uppercase tracking-widest mb-2">Built for Your Money</p>
+      <section className="px-6 pb-32 max-w-5xl mx-auto w-full">
+        <div className="text-center mb-12">
+          <p className="text-label-sm text-on-surface-variant uppercase tracking-widest mb-3">Built for Your Money</p>
           <h2 className="text-display-sm text-on-surface">One app. Every corner of your financial life.</h2>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-6">
           {AI_FEATURES.map((feature) => (
             <div key={feature.title}
-              className="bg-surface-container-lowest rounded-2xl shadow-card p-7 flex flex-col gap-4">
+              className="bg-surface-container-lowest rounded-2xl shadow-card p-8 flex flex-col gap-5">
               <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
                 style={{ background: `${feature.color}10`, color: feature.color }}>
                 {feature.icon}
               </div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-3">
                 <p className="text-headline-sm text-on-surface">{feature.title}</p>
                 <p className="text-body-md text-on-surface-variant leading-relaxed">{feature.body}</p>
               </div>
@@ -293,16 +293,16 @@ export default function MarketingPage() {
       </section>
 
       {/* ── How it works ── */}
-      <section className="px-6 pb-24 max-w-5xl mx-auto w-full">
-        <div className="text-center mb-10">
-          <p className="text-label-sm text-on-surface-variant uppercase tracking-widest mb-2">The Process</p>
+      <section className="px-6 pb-32 max-w-5xl mx-auto w-full">
+        <div className="text-center mb-12">
+          <p className="text-label-sm text-on-surface-variant uppercase tracking-widest mb-3">The Process</p>
           <h2 className="text-display-sm text-on-surface">Four steps. Ten minutes.</h2>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-6">
           {STEPS.map((step) => (
             <div key={step.number}
-              className="bg-surface-container-lowest rounded-2xl shadow-card p-6 flex flex-col gap-4">
+              className="bg-surface-container-lowest rounded-2xl shadow-card p-8 flex flex-col gap-5">
               <div className="flex items-start justify-between">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center"
                   style={{ background: `${step.color}12`, color: step.color }}>
@@ -313,7 +313,7 @@ export default function MarketingPage() {
                   {step.number}
                 </span>
               </div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-3">
                 <p className="text-headline-sm text-on-surface">{step.title}</p>
                 <p className="text-body-md text-on-surface-variant leading-relaxed">{step.body}</p>
               </div>
@@ -323,7 +323,7 @@ export default function MarketingPage() {
       </section>
 
       {/* ── Final CTA ── */}
-      <section className="px-6 pb-24 max-w-2xl mx-auto w-full text-center flex flex-col items-center gap-5">
+      <section className="px-6 pb-32 max-w-2xl mx-auto w-full text-center flex flex-col items-center gap-6">
         <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
           style={{ background: 'linear-gradient(135deg, #4c49c9, #ff9817)' }}>
           <Sparkles size={22} className="text-white" />
