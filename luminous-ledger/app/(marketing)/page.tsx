@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import {
   ArrowRight, CheckCircle2, Sparkles,
-  Link2, Upload, BrainCircuit,
+  Link2, Upload, BrainCircuit, TrendingUp, PiggyBank, Zap, MessageSquare,
 } from 'lucide-react'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -147,6 +147,33 @@ const STEPS = [
   },
 ]
 
+const AI_FEATURES = [
+  {
+    icon: <MessageSquare size={22} />,
+    title: 'Ask your money anything',
+    body: 'Chat with an AI that knows your exact balances, spending history, and goals — not generic advice. Real answers, grounded in your real numbers.',
+    color: '#4c49c9',
+  },
+  {
+    icon: <TrendingUp size={22} />,
+    title: 'Know if you\'re actually building wealth',
+    body: 'Portfolio breakdowns, allocation analysis, and market context — all tied to what you actually own. No guesswork, no noise.',
+    color: '#1a6b3a',
+  },
+  {
+    icon: <Zap size={22} />,
+    title: 'Run instant AI skills on your money',
+    body: 'One-click analysis tools built for your finances: subscription audits, spending breakdowns, waste detection, and more — all from your real data.',
+    color: '#ff9817',
+  },
+  {
+    icon: <PiggyBank size={22} />,
+    title: 'See exactly when you\'ll hit your goals',
+    body: 'Track savings rate, emergency fund health, and goal progress in real time. You\'ll always know how close you are and what\'s slowing you down.',
+    color: '#4c49c9',
+  },
+]
+
 const OUTCOMES = [
   'No more "wait, where did my paycheck go?" moments',
   'Savings that actually grow — without thinking about it',
@@ -257,6 +284,30 @@ export default function MarketingPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── AI Features ── */}
+      <section className="px-6 pb-24 max-w-5xl mx-auto w-full">
+        <div className="text-center mb-10">
+          <p className="text-label-sm text-on-surface-variant uppercase tracking-widest mb-2">Built for Your Money</p>
+          <h2 className="text-display-sm text-on-surface">One app. Every corner of your financial life.</h2>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          {AI_FEATURES.map((feature) => (
+            <div key={feature.title}
+              className="bg-surface-container-lowest rounded-2xl shadow-card p-7 flex flex-col gap-4">
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: `${feature.color}10`, color: feature.color }}>
+                {feature.icon}
+              </div>
+              <div className="flex flex-col gap-2">
+                <p className="text-headline-sm text-on-surface">{feature.title}</p>
+                <p className="text-body-md text-on-surface-variant leading-relaxed">{feature.body}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
