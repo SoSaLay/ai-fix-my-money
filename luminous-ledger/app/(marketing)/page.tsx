@@ -129,6 +129,8 @@ const STEPS = [
     icon: <Github size={20} />,
     title: 'Clone the Repo',
     body: 'Grab the project from GitHub and run it locally. A few commands and you\'re up.',
+    link: 'https://github.com/SoSaLay/ai-fix-my-money',
+    linkLabel: 'View on GitHub',
     color: '#2d2f33',
   },
   {
@@ -316,6 +318,14 @@ export default function MarketingPage() {
               <div className="flex flex-col gap-3">
                 <p className="text-headline-sm text-on-surface">{step.title}</p>
                 <p className="text-body-md text-on-surface-variant leading-relaxed">{step.body}</p>
+                {'link' in step && step.link && (
+                  <a href={step.link} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-label-md font-medium hover:opacity-75 transition-opacity"
+                    style={{ color: '#4c49c9' }}>
+                    <Github size={13} />
+                    {step.linkLabel}
+                  </a>
+                )}
               </div>
             </div>
           ))}
