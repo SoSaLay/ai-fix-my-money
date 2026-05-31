@@ -44,7 +44,7 @@ const TABS: { key: SkillTab; label: string; icon: React.ReactNode; description: 
     key: 'investing',
     label: 'Investing',
     icon: <BarChart2 size={15} />,
-    description: 'Market news, sentiment, forecasts, and portfolio health — powered by Awesome Finance Skills.',
+    description: 'Track market news, sentiment, forecasts, and portfolio health.',
   },
 ]
 
@@ -357,25 +357,6 @@ export default function AdvisorPage() {
           </div>
         )}
 
-        {/* ── Alphaear attribution (investing tab only) ── */}
-        {activeTab === 'investing' && (
-          <div className="rounded-2xl p-4 flex items-center gap-4"
-            style={{ background: 'rgba(76,73,201,0.05)', border: '1px solid rgba(76,73,201,0.12)' }}>
-            <Zap size={20} style={{ color: '#4c49c9', flexShrink: 0 }} />
-            <div className="flex-1 min-w-0">
-              <p className="text-label-md font-semibold text-on-surface">Powered by Awesome Finance Skills</p>
-              <p className="text-body-sm text-on-surface-variant mt-0.5">
-                alphaear-news, sentiment, predictor, signal-tracker, and reporter — real-time market intelligence for your portfolio.
-              </p>
-            </div>
-            <a href="https://github.com/RKiding/Awesome-finance-skills"
-              target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-label-sm font-semibold px-3 py-2 rounded-xl flex-shrink-0 transition-all hover:opacity-80"
-              style={{ background: '#4c49c9', color: '#fff' }}>
-              View Skills <ExternalLink size={12} />
-            </a>
-          </div>
-        )}
 
       </div>
     </div>
