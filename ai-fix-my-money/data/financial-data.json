@@ -1,0 +1,129 @@
+{
+  "_last_updated": "2026-05-12",
+  "income": {
+    "total_monthly": 4086.86,
+    "sources": [
+      {
+        "name": "Bank of America direct deposit",
+        "amount": 4086.44
+      },
+      {
+        "name": "Savings interest",
+        "amount": 0.42
+      }
+    ]
+  },
+  "expenses_fixed": [
+    {
+      "name": "Rent (Bilt)",
+      "category": "Housing",
+      "amount": 1365.0
+    },
+    {
+      "name": "Duke Energy",
+      "category": "Utilities",
+      "amount": 69.82
+    }
+  ],
+  "expenses_variable": [
+    {
+      "category": "Food & Dining",
+      "amount": 204.43
+    },
+    {
+      "category": "Shopping",
+      "amount": 699.46
+    },
+    {
+      "category": "Transportation",
+      "amount": 59.72
+    },
+    {
+      "category": "Other",
+      "amount": 165.13
+    }
+  ],
+  "subscriptions": [
+    {
+      "name": "Claude.ai",
+      "amount": 20.0,
+      "frequency": "monthly"
+    },
+    {
+      "name": "Spotify",
+      "amount": 13.93,
+      "frequency": "monthly"
+    },
+    {
+      "name": "Amazon Web Services",
+      "amount": 38.32,
+      "frequency": "monthly"
+    },
+    {
+      "name": "Perplexity",
+      "amount": 20.0,
+      "frequency": "monthly"
+    },
+    {
+      "name": "YMCA",
+      "amount": 48.3,
+      "frequency": "monthly"
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Advantage Savings",
+      "type": "savings",
+      "balance": 17543.76,
+      "institution": "Bank of America"
+    },
+    {
+      "name": "Investing",
+      "type": "checking",
+      "balance": 47.58,
+      "institution": "Bank of America"
+    },
+    {
+      "name": "Checking",
+      "type": "checking",
+      "balance": 19.55,
+      "institution": "Bank of America"
+    },
+    {
+      "name": "OnePay Cash Rewards Card",
+      "type": "credit",
+      "balance": -338.06,
+      "institution": "OnePay"
+    },
+    {
+      "name": "CREDIT CARD (Chase - active)",
+      "type": "credit",
+      "balance": -231.85,
+      "institution": "Chase"
+    },
+    {
+      "name": "Customized Cash Rewards Visa Signature",
+      "type": "credit",
+      "balance": -48.3,
+      "institution": "Bank of America"
+    },
+    {
+      "name": "Discover it chrome Card",
+      "type": "credit",
+      "balance": -36.35,
+      "institution": "Discover"
+    },
+    {
+      "name": "CREDIT CARD (Chase - zero balance)",
+      "type": "credit",
+      "balance": 0.0,
+      "institution": "Chase"
+    }
+  ],
+  "summary": {
+    "total_income": 4086.86,
+    "total_expenses": 2704.11,
+    "monthly_savings": 1382.75,
+    "savings_rate": 34
+  }
+}
