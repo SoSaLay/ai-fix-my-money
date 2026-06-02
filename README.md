@@ -19,7 +19,7 @@ Your data stays on your machine. No subscriptions. No cloud lock-in.
 [![Local-first](https://img.shields.io/badge/data-stays_local-1a6b3a?style=flat-square)](#-what-is-this)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
 
-[**→ Setup Guide**](SETUP.md) · [**→ AI Skills**](#-ai-finance-skills)
+[**→ Setup Guide**](docs/SETUP.md) · [**→ AI Skills**](#-ai-finance-skills)
 
 </div>
 
@@ -58,7 +58,7 @@ npm run dev
 
 Open **http://localhost:3000** — you're live.
 
-> Want Docker instead? See [SETUP.md → Docker Quickstart](SETUP.md#quick-start--docker).
+> Want Docker instead? See [SETUP.md → Docker Quickstart](docs/SETUP.md#quick-start--docker).
 
 ---
 
@@ -98,7 +98,7 @@ If you use an AI coding agent, you can have it set up and deploy the entire proj
 **Just paste this into your agent:**
 
 ```
-Clone https://github.com/SoSaLay/ai-fix-my-money.git, read SETUP.md
+Clone https://github.com/SoSaLay/ai-fix-my-money.git, read docs/SETUP.md
 completely, then set up and run the app following the Node.js quickstart. Use only the minimum
 env vars (NEXT_PUBLIC_APP_URL=http://localhost:3000). Open the app at http://localhost:3000 and
 confirm it loads.
@@ -111,22 +111,17 @@ The `SETUP.md` file is written specifically for AI agents — it contains full a
 ## 📁 Project Structure
 
 ```
-ai-fix-my-money/              ← repo root (the Next.js app lives here)
-├── app/
-│   ├── (marketing)/          ← Landing page
-│   ├── (app)/                ← Dashboard, spending, savings, investing, advisor
-│   └── api/mcp/              ← MCP endpoint for AI agent data push
-├── components/               ← UI components
-├── lib/ai-skills.ts          ← All 13 AI advisor skills
+ai-fix-my-money/              ← repo root
+├── src/                      ← All app source
+│   ├── app/                  ← Routes: landing, dashboard, advisor, api/mcp…
+│   ├── components/           ← UI components
+│   ├── lib/ai-skills.ts      ← All 13 AI advisor skills
+│   └── contexts · hooks · types
 ├── data/financial-data.json  ← Your financial data goes here
-├── .env.example              ← Copy → .env.local (optional)
-├── SETUP.md                  ← Full self-hosting guide (also used by AI agents)
-│
-├── mcp-server/               ← Financial Datasets MCP server (stock/crypto data, optional)
-│   ├── server.py
-│   └── .env.example
-│
-└── reports/                  ← Sample ETF reports and signal exports
+├── public/                   ← Static assets
+├── docs/                     ← SETUP.md, design.md, sample reports
+├── mcp-server/               ← Financial Datasets MCP server (optional)
+└── .env.example              ← Copy → .env.local (optional)
 ```
 
 ---
@@ -162,7 +157,7 @@ The **AI Advisor** has 13 runnable skills across three tabs:
 
 For detailed setup instructions, Docker, Tailscale access from your phone, and troubleshooting — see the full guide:
 
-**[SETUP.md](SETUP.md)**
+**[docs/SETUP.md](docs/SETUP.md)**
 
 ---
 

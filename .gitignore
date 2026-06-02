@@ -35,4 +35,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Claude Code local artifacts
-.claude/worktrees/
+.claude/
+
+# MCP runtime snapshots
+.mcp-snapshots/

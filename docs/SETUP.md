@@ -235,19 +235,20 @@ CMD ["node", "server.js"]
 
 ```
 ai-fix-my-money/
-├── app/
-│   ├── (marketing)/page.tsx        ← Landing page
-│   ├── (app)/dashboard/            ← Main dashboard
-│   └── api/
-│       ├── mcp/route.ts            ← Perplexity Computer endpoint
-│       └── local-data/route.ts     ← Serves data/financial-data.json
-├── contexts/
-│   └── financial-data-context.tsx  ← All state + localStorage logic
+├── src/
+│   ├── app/
+│   │   ├── (marketing)/page.tsx    ← Landing page
+│   │   ├── (app)/dashboard/        ← Main dashboard
+│   │   └── api/
+│   │       ├── mcp/route.ts        ← Perplexity Computer endpoint
+│   │       └── local-data/route.ts ← Serves data/financial-data.json
+│   └── contexts/
+│       └── financial-data-context.tsx  ← All state + localStorage logic
 ├── data/
 │   ├── financial-data.json         ← Your financial data (optional method)
 │   └── DATA_GUIDE.md               ← Full JSON field reference
-├── .env.example                    ← Copy to .env.local (optional)
-└── SETUP.md                        ← This file
+├── docs/SETUP.md                   ← This file
+└── .env.example                    ← Copy to .env.local (optional)
 ```
 
 ---
