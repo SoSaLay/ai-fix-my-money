@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { parsePerplexityData } from '@/lib/perplexity/parser'
+import { writeFileSync, readFileSync, mkdirSync } from 'fs'
+import { join } from 'path'
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
@@ -11,13 +12,17 @@ function authenticate(request: NextRequest): boolean {
   return auth === `Bearer ${secret}`
 }
 
-// ── Supabase service client ───────────────────────────────────────────────────
+// ── Local snapshot file ───────────────────────────────────────────────────────
 
-function getServiceClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  )
+const SNAPSHOT_DIR = join(process.cwd(), '.mcp-snapshots')
+const SNAPSHOT_FILE = join(SNAPSHOT_DIR, 'latest.json')
+
+function writeSnapshot(data: unknown): { id: string; updated_at: string } {
+  mkdirSync(SNAPSHOT_DIR, { recursive: true })
+  const updated_at = new Date().toISOString()
+  const id = `snap_${Date.now()}`
+  writeFileSync(SNAPSHOT_FILE, JSON.stringify({ id, data, updated_at }), 'utf-8')
+  return { id, updated_at }
 }
 
 // ── MCP tool: save_finance_snapshot ──────────────────────────────────────────
@@ -27,12 +32,8 @@ async function saveFinanceSnapshot(args: Record<string, unknown>): Promise<{
   snapshot_id?: string
   updated_at?: string
   message: string
+  warnings?: string[]
 }> {
-  const userId = process.env.MCP_TARGET_USER_ID
-  if (!userId) {
-    return { success: false, message: 'MCP_TARGET_USER_ID is not configured on the server.' }
-  }
-
   const financeJson = args.finance_json ?? args
   const result = parsePerplexityData(financeJson)
 
@@ -43,28 +44,18 @@ async function saveFinanceSnapshot(args: Record<string, unknown>): Promise<{
     }
   }
 
-  const now = new Date().toISOString()
-  const supabase = getServiceClient()
-
-  const { data: row, error } = await supabase
-    .from('finance_snapshots')
-    .upsert(
-      { user_id: userId, data: result.data, updated_at: now },
-      { onConflict: 'user_id' },
-    )
-    .select('id, updated_at')
-    .single()
-
-  if (error) {
-    console.error('[MCP] Supabase upsert error:', error)
-    return { success: false, message: `Database error: ${error.message}` }
-  }
-
-  return {
-    success: true,
-    snapshot_id: row.id,
-    updated_at: row.updated_at,
-    message: 'Finance dashboard updated successfully.',
+  try {
+    const { id, updated_at } = writeSnapshot(result.data)
+    return {
+      success: true,
+      snapshot_id: id,
+      updated_at,
+      message: 'Finance dashboard updated successfully.',
+      warnings: result.warnings,
+    }
+  } catch (err) {
+    console.error('[MCP] Failed to write snapshot:', err)
+    return { success: false, message: 'Failed to write snapshot to disk.' }
   }
 }
 
@@ -102,9 +93,6 @@ function rpcError(id: unknown, code: number, message: string) {
 }
 
 // ── GET — open SSE channel for Streamable HTTP transport ─────────────────────
-// Perplexity requires this endpoint to return a valid SSE stream even though
-// our server never sends server-initiated messages. We open the stream and
-// keep it alive with periodic pings until the client disconnects.
 
 export async function GET(request: NextRequest) {
   if (!authenticate(request)) {
@@ -169,7 +157,6 @@ export async function POST(request: NextRequest) {
     params?: Record<string, unknown>
   }
 
-  // ── initialize ──────────────────────────────────────────────────────────────
   if (method === 'initialize') {
     return rpcOk(id, {
       protocolVersion: '2024-11-05',
@@ -178,12 +165,10 @@ export async function POST(request: NextRequest) {
     })
   }
 
-  // ── tools/list ──────────────────────────────────────────────────────────────
   if (method === 'tools/list') {
     return rpcOk(id, { tools: TOOLS })
   }
 
-  // ── tools/call ──────────────────────────────────────────────────────────────
   if (method === 'tools/call') {
     const name = (params as Record<string, unknown>)?.name as string
     const args = ((params as Record<string, unknown>)?.arguments ?? {}) as Record<string, unknown>
@@ -199,7 +184,6 @@ export async function POST(request: NextRequest) {
     return rpcError(id, -32601, `Unknown tool: ${name}`)
   }
 
-  // ── notifications (fire-and-forget, no response needed) ────────────────────
   if (typeof method === 'string' && method.startsWith('notifications/')) {
     return new NextResponse(null, { status: 204 })
   }

@@ -151,7 +151,7 @@ const STEPS = [
     number: '04',
     icon: <BrainCircuit size={20} />,
     title: 'Get AI Insights',
-    body: 'AI analyzes your spending, savings, and investments — grounded in your real numbers.',
+    body: 'AI analyzes your spending, savings, and investments, grounded in your real numbers.',
     color: '#1a6b3a',
   },
 ]
@@ -160,7 +160,7 @@ const AI_FEATURES = [
   {
     icon: <MessageSquare size={22} />,
     title: 'Ask your money anything',
-    body: 'An AI adviser that knows your actual numbers — not generic tips. Ask it anything, get a real answer.',
+    body: 'An AI adviser that knows your actual numbers, not generic tips. Ask it anything, get a real answer.',
     color: '#4c49c9',
   },
   {
@@ -172,13 +172,13 @@ const AI_FEATURES = [
   {
     icon: <Zap size={22} />,
     title: 'Run instant AI skills on your money',
-    body: 'Subscription audits, spending breakdowns, waste detection — one click, real data.',
+    body: 'Subscription audits, spending breakdowns, waste detection. One click, real data.',
     color: '#ff9817',
   },
   {
     icon: <PiggyBank size={22} />,
     title: 'See exactly when and how you\'ll hit your goals',
-    body: 'Savings rate, emergency fund health, goal progress — tracked in real time.',
+    body: 'Savings rate, emergency fund health, goal progress, tracked in real time.',
     color: '#4c49c9',
   },
 ]
@@ -198,10 +198,10 @@ export default function MarketingPage() {
           <p className="text-label-sm text-on-surface-variant tracking-widest uppercase">AI Finance</p>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/login">
-            <Button variant="secondary" className="px-5 py-2.5 text-label-lg">Sign In</Button>
+          <Link href="/dashboard">
+            <Button variant="secondary" className="px-5 py-2.5 text-label-lg">Open App</Button>
           </Link>
-          <Link href="/signup">
+          <Link href="/onboarding">
             <Button variant="primary" className="px-5 py-2.5 text-label-lg">Get Started</Button>
           </Link>
         </div>
@@ -218,17 +218,17 @@ export default function MarketingPage() {
 
         <p className="text-body-lg text-on-surface-variant max-w-lg">
           Connect your financial accounts through Perplexity Finance, import your data,
-          and let AI handle the rest — budgeting, saving, and investing in one place.
+          and let AI handle the rest: budgeting, saving, and investing in one place.
         </p>
 
         <div className="flex items-center gap-4">
-          <Link href="/signup">
+          <Link href="/onboarding">
             <Button variant="primary" className="px-8 py-3.5 text-body-md flex items-center gap-2">
               Get Started <ArrowRight size={16} />
             </Button>
           </Link>
-          <Link href="/login">
-            <Button variant="secondary" className="px-8 py-3.5 text-body-md">Sign In</Button>
+          <Link href="/dashboard">
+            <Button variant="secondary" className="px-8 py-3.5 text-body-md">Open App</Button>
           </Link>
         </div>
 
@@ -256,9 +256,7 @@ export default function MarketingPage() {
           </h2>
           <div className="flex flex-col gap-3 text-body-lg text-on-surface-variant max-w-xl">
             <p>
-              Not from anything obvious. From the $14 subscription you forgot about.
-              The grocery overspend that happens every month — just a little.
-              The small charges that stack up to $300 you never planned for.
+              Not from anything obvious. From the $14 subscription you forgot about. The grocery overspend that happens every month, the small charges that stack up to $300 you never planned for.
             </p>
             <p>
               Individually? Nothing. Together? Hundreds of dollars a month, quietly gone.
@@ -342,9 +340,9 @@ export default function MarketingPage() {
         <p className="text-body-lg text-on-surface-variant">
           Import your data and let AI guide every financial decision.
         </p>
-        <Link href="/signup">
+        <Link href="/onboarding">
           <Button variant="primary" className="px-10 py-4 text-body-md flex items-center gap-2">
-            Get Started — It&apos;s Free <ArrowRight size={16} />
+            Get Started, It&apos;s Free <ArrowRight size={16} />
           </Button>
         </Link>
         <p className="text-label-sm text-on-surface-variant">Your future self will thank you.</p>
@@ -357,8 +355,8 @@ export default function MarketingPage() {
           <p className="text-label-sm text-on-surface-variant">AI Finance</p>
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/login" className="text-label-sm text-on-surface-variant hover:text-on-surface transition-colors">Sign In</Link>
-          <Link href="/signup" className="text-label-sm text-secondary font-medium hover:opacity-80 transition-opacity">Get Started</Link>
+          <Link href="/dashboard" className="text-label-sm text-on-surface-variant hover:text-on-surface transition-colors">Open App</Link>
+          <Link href="/onboarding" className="text-label-sm text-secondary font-medium hover:opacity-80 transition-opacity">Get Started</Link>
         </div>
       </footer>
 

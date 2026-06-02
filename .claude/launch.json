@@ -2,9 +2,9 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "Luminous Ledger — Next.js",
+      "name": "AI Fix My Money — Next.js",
       "runtimeExecutable": "/Users/sosalay/.nvm/versions/node/v22.17.0/bin/node",
-      "runtimeArgs": ["/Users/sosalay/.nvm/versions/node/v22.17.0/bin/npm", "--prefix", "./luminous-ledger", "run", "dev"],
+      "runtimeArgs": ["/Users/sosalay/.nvm/versions/node/v22.17.0/bin/npm", "--prefix", "./ai-fix-my-money", "run", "dev"],
       "port": 3000,
       "autoPort": true,
       "env": {

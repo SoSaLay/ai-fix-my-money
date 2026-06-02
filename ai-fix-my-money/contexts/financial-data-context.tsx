@@ -6,7 +6,6 @@ import {
   useState,
   useEffect,
   useCallback,
-  useRef,
   type ReactNode,
 } from 'react'
 import { useSnapshotPoller } from '@/hooks/use-snapshot-poller'
@@ -15,64 +14,6 @@ import {
   type ParsedFinancialData,
   type ParseResult,
 } from '@/lib/perplexity/parser'
-import { createClient } from '@/lib/supabase/client'
-
-// ── Demo auto-load ─────────────────────────────────────────────────────────────
-// When the demo account logs in with no localStorage data, pre-populate it so
-// UAT works without requiring the Perplexity import step.
-
-const DEMO_EMAIL = 'demo@luminousledger.com'
-
-const DEMO_FINANCIAL_DATA = {
-  income: {
-    total_monthly: 19300,
-    sources: [
-      { name: 'Nexus Capital Partners (Salary)', amount: 15000 },
-      { name: 'Freelance Consulting (Stripe)', amount: 2500 },
-      { name: 'Rental Income', amount: 1800 },
-    ],
-  },
-  expenses_fixed: [
-    { name: 'Horizon Living LLC (Rent)', category: 'Housing', amount: 3800 },
-    { name: 'Wells Fargo Mortgage', category: 'Housing', amount: 2850 },
-    { name: 'BMW Financial Services (Car Loan)', category: 'Transport', amount: 680 },
-    { name: 'Personal Trainer', category: 'Healthcare', amount: 320 },
-    { name: 'AT&T Fiber (Internet)', category: 'Utilities', amount: 90 },
-    { name: 'PG&E Electric', category: 'Utilities', amount: 135 },
-    { name: 'Verizon Wireless', category: 'Utilities', amount: 85 },
-  ],
-  expenses_variable: [
-    { category: 'Food & Dining', amount: 2500 },
-    { category: 'Shopping', amount: 800 },
-    { category: 'Entertainment', amount: 480 },
-    { category: 'Transport', amount: 280 },
-    { category: 'Healthcare', amount: 400 },
-  ],
-  subscriptions: [
-    { name: 'Equinox Fitness', amount: 89.99, frequency: 'monthly' },
-    { name: 'Adobe Creative Cloud', amount: 59.99, frequency: 'monthly' },
-    { name: 'LinkedIn Premium', amount: 39.99, frequency: 'monthly' },
-    { name: 'Netflix', amount: 22.99, frequency: 'monthly' },
-    { name: 'Spotify', amount: 16.99, frequency: 'monthly' },
-    { name: 'New York Times', amount: 17.00, frequency: 'monthly' },
-    { name: 'Apple iCloud+', amount: 9.99, frequency: 'monthly' },
-  ],
-  accounts: [
-    { name: 'Chase Total Checking', type: 'checking', balance: 42800, institution: 'Chase' },
-    { name: 'Chase Premier Savings', type: 'savings', balance: 95400, institution: 'Chase' },
-    { name: 'Fidelity Brokerage', type: 'brokerage', balance: 185600, institution: 'Fidelity' },
-    { name: 'Vanguard 401(k)', type: 'retirement', balance: 142300, institution: 'Vanguard' },
-    { name: 'Chase Sapphire Reserve', type: 'credit', balance: -5840, institution: 'Chase' },
-    { name: 'Wells Fargo Mortgage', type: 'mortgage', balance: -485000, institution: 'Wells Fargo' },
-    { name: 'BMW Financial Services', type: 'auto loan', balance: -28500, institution: 'BMW Financial' },
-  ],
-  summary: {
-    total_income: 19300,
-    total_expenses: 12547,
-    monthly_savings: 6753,
-    savings_rate: 35,
-  },
-}
 import {
   parseStatement,
   detectRecurring,
@@ -102,6 +43,9 @@ const STORAGE_KEY_INVESTING_GOAL = 'llg_investing_goal'
 const STORAGE_KEY_GENERAL_SAVINGS = 'llg_general_savings'
 const STORAGE_KEY_STATEMENTS = 'llg_statements'
 const STORAGE_KEY_MANUAL_ACCOUNTS = 'llg_manual_accounts'
+
+// Storage key helper — no user scoping in local-only mode
+const sk = (base: string) => base
 
 // ============================================================================
 // Manual Account type
@@ -614,102 +558,21 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
   const [manualAccounts, setManualAccounts] = useState<ManualAccount[]>([])
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [lastMcpUpdate, setLastMcpUpdate] = useState<string | null>(null)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
-  // Tracks the current user ID so all storage keys are namespaced per user.
-  // Using a ref means write callbacks always see the latest value without
-  // needing to be recreated when the user changes.
-  const userIdRef = useRef<string>('anonymous')
-
-  // Returns a storage key scoped to the current user.
-  const sk = useCallback((base: string) => `${base}_${userIdRef.current}`, [])
-
+  // Load all state from localStorage once on mount
   useEffect(() => {
-    // Load all state from localStorage for a given user ID, then swap the
-    // active user so subsequent writes land in the correct bucket.
-    function loadForUser(uid: string) {
-      userIdRef.current = uid
-      setIsLoggedIn(uid !== 'anonymous')
-      const key = (base: string) => `${base}_${uid}`
-
-      const stored = readStorage<ParsedFinancialData>(key(STORAGE_KEY_FINANCIAL))
-      setFinancialData(stored)
-      setSpendingLimitState(readStorage<StoredSpendingLimit>(key(STORAGE_KEY_SPENDING_LIMIT)))
-      setSavingsGoals(readStorage<SavingsGoal[]>(key(STORAGE_KEY_SAVINGS_GOALS)) ?? [])
-      setInvestingGoalState(readStorage<InvestingGoal>(key(STORAGE_KEY_INVESTING_GOAL)))
-      setGeneralSavingsPctState(readStorage<number>(key(STORAGE_KEY_GENERAL_SAVINGS)) ?? 0)
-      setStatements(readStorage<ParsedStatement[]>(key(STORAGE_KEY_STATEMENTS)) ?? [])
-      setManualAccounts(readStorage<ManualAccount[]>(key(STORAGE_KEY_MANUAL_ACCOUNTS)) ?? [])
-
-      // Auto-load from local financial-data.json (served by /api/local-data).
-      // This is the primary data source in the local-first architecture.
-      // If the user has already pasted/imported data manually it takes precedence.
-      if (!stored) {
-        fetch('/api/local-data')
-          .then(res => res.ok ? res.json() : null)
-          .then((json: { ok: boolean; data: unknown } | null) => {
-            if (!json?.ok || !json.data) return
-            // Check if this is a demo account — use demo override instead
-            try {
-              const supabase = createClient()
-              supabase.auth.getUser().then(({ data: { user } }) => {
-                const sourceData = user?.email === DEMO_EMAIL ? DEMO_FINANCIAL_DATA : json.data
-                const result = parsePerplexityData(sourceData)
-                if (result.success && result.data) {
-                  setFinancialData(result.data)
-                  writeStorage(key(STORAGE_KEY_FINANCIAL), result.data)
-                }
-              })
-            } catch {
-              // Supabase not configured — load local file for all users
-              const result = parsePerplexityData(json.data)
-              if (result.success && result.data) {
-                setFinancialData(result.data)
-                writeStorage(key(STORAGE_KEY_FINANCIAL), result.data)
-              }
-            }
-          })
-          .catch(() => {
-            // /api/local-data unavailable (e.g. static export) — skip
-          })
-      }
-    }
-
-    let unsubscribe: (() => void) | undefined
-
-    async function init() {
-      let uid = 'anonymous'
-      try {
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        uid = user?.id ?? 'anonymous'
-      } catch {
-        // Supabase not configured — fall back to anonymous
-      }
-      loadForUser(uid)
-
-      // Re-load whenever the signed-in user changes (login / logout / switch)
-      try {
-        const supabase = createClient()
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
-          const newUid = session?.user?.id ?? 'anonymous'
-          if (newUid !== userIdRef.current) {
-            loadForUser(newUid)
-          }
-        })
-        unsubscribe = () => subscription.unsubscribe()
-      } catch {
-        // Supabase not configured — no auth listener needed
-      }
-    }
-
-    init()
-    return () => unsubscribe?.()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    setFinancialData(readStorage<ParsedFinancialData>(STORAGE_KEY_FINANCIAL))
+    setSpendingLimitState(readStorage<StoredSpendingLimit>(STORAGE_KEY_SPENDING_LIMIT))
+    setSavingsGoals(readStorage<SavingsGoal[]>(STORAGE_KEY_SAVINGS_GOALS) ?? [])
+    setInvestingGoalState(readStorage<InvestingGoal>(STORAGE_KEY_INVESTING_GOAL))
+    setGeneralSavingsPctState(readStorage<number>(STORAGE_KEY_GENERAL_SAVINGS) ?? 0)
+    setStatements(readStorage<ParsedStatement[]>(STORAGE_KEY_STATEMENTS) ?? [])
+    setManualAccounts(readStorage<ManualAccount[]>(STORAGE_KEY_MANUAL_ACCOUNTS) ?? [])
+  }, [])
 
   // ── MCP snapshot poller ───────────────────────────────────────────────────
   useSnapshotPoller({
-    enabled: isLoggedIn,
+    enabled: true,
     onRefreshing: setIsRefreshing,
     onNewSnapshot: (data, updatedAt) => {
       setFinancialData(data)
@@ -726,12 +589,12 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       writeStorage(sk(STORAGE_KEY_FINANCIAL), result.data)
     }
     return result
-  }, [sk])
+  }, [])
 
   const clearData = useCallback(() => {
     setFinancialData(null)
     localStorage.removeItem(sk(STORAGE_KEY_FINANCIAL))
-  }, [sk])
+  }, [])
 
   // ── Spending limit ────────────────────────────────────────────────────────
   const setSpendingLimit = useCallback(
@@ -747,13 +610,13 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       setSpendingLimitState(record)
       writeStorage(sk(STORAGE_KEY_SPENDING_LIMIT), record)
     },
-    [spendingLimit, sk],
+    [spendingLimit],
   )
 
   const removeSpendingLimit = useCallback(() => {
     setSpendingLimitState(null)
     localStorage.removeItem(sk(STORAGE_KEY_SPENDING_LIMIT))
-  }, [sk])
+  }, [])
 
   // ── Savings goals ─────────────────────────────────────────────────────────
   const createSavingsGoal = useCallback(
@@ -773,7 +636,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       })
       return newGoal.id
     },
-    [sk],
+    [],
   )
 
   const updateSavingsGoal = useCallback((id: string, updates: Partial<SavingsGoal>) => {
@@ -784,7 +647,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       writeStorage(sk(STORAGE_KEY_SAVINGS_GOALS), next)
       return next
     })
-  }, [sk])
+  }, [])
 
   const deleteSavingsGoal = useCallback((id: string) => {
     setSavingsGoals(prev => {
@@ -792,7 +655,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       writeStorage(sk(STORAGE_KEY_SAVINGS_GOALS), next)
       return next
     })
-  }, [sk])
+  }, [])
 
   // ── Investing goal ────────────────────────────────────────────────────────
   const setInvestingGoal = useCallback(
@@ -809,19 +672,19 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       setInvestingGoalState(record)
       writeStorage(sk(STORAGE_KEY_INVESTING_GOAL), record)
     },
-    [investingGoal, sk],
+    [investingGoal],
   )
 
   const removeInvestingGoal = useCallback(() => {
     setInvestingGoalState(null)
     localStorage.removeItem(sk(STORAGE_KEY_INVESTING_GOAL))
-  }, [sk])
+  }, [])
 
   // ── General savings ───────────────────────────────────────────────────────
   const setGeneralSavings = useCallback((pct: number) => {
     setGeneralSavingsPctState(pct)
     writeStorage(sk(STORAGE_KEY_GENERAL_SAVINGS), pct)
-  }, [sk])
+  }, [])
 
   // ── Reset all allocations ─────────────────────────────────────────────────
   const resetAllocations = useCallback(() => {
@@ -839,7 +702,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
 
     setInvestingGoalState(null)
     localStorage.removeItem(sk(STORAGE_KEY_INVESTING_GOAL))
-  }, [sk])
+  }, [])
 
   // ── Statement uploads ─────────────────────────────────────────────────────
   const importStatement = useCallback((text: string, filename: string, accountName?: string): StatementImportResult => {
@@ -866,7 +729,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       })
     }
     return result
-  }, [sk])
+  }, [])
 
   const removeStatement = useCallback((filename: string) => {
     setStatements(prev => {
@@ -874,7 +737,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       writeStorage(sk(STORAGE_KEY_STATEMENTS), next)
       return next
     })
-  }, [sk])
+  }, [])
 
   const removeStatementGroup = useCallback((accountName: string) => {
     setStatements(prev => {
@@ -882,7 +745,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       writeStorage(sk(STORAGE_KEY_STATEMENTS), next)
       return next
     })
-  }, [sk])
+  }, [])
 
   // ── Manual accounts CRUD ──────────────────────────────────────────────────
   const addManualAccount = useCallback((account: Omit<ManualAccount, 'id' | 'createdAt'>): ManualAccount => {
@@ -897,7 +760,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       return next
     })
     return newAccount
-  }, [sk])
+  }, [])
 
   const updateManualAccount = useCallback((id: string, updates: Partial<Pick<ManualAccount, 'name' | 'type' | 'balance'>>) => {
     setManualAccounts(prev => {
@@ -905,7 +768,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       writeStorage(sk(STORAGE_KEY_MANUAL_ACCOUNTS), next)
       return next
     })
-  }, [sk])
+  }, [])
 
   const removeManualAccount = useCallback((id: string) => {
     setManualAccounts(prev => {
@@ -913,7 +776,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       writeStorage(sk(STORAGE_KEY_MANUAL_ACCOUNTS), next)
       return next
     })
-  }, [sk])
+  }, [])
 
   // ── Parsed-account (financialData) edit / remove ──────────────────────────
   const updateParsedAccount = useCallback((accId: string, updates: { name?: string; balance?: number }) => {
@@ -928,7 +791,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       writeStorage(sk(STORAGE_KEY_FINANCIAL), next)
       return next
     })
-  }, [sk])
+  }, [])
 
   const removeParsedAccount = useCallback((accId: string) => {
     setFinancialData(prev => {
@@ -940,7 +803,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       writeStorage(sk(STORAGE_KEY_FINANCIAL), next)
       return next
     })
-  }, [sk])
+  }, [])
 
   // ── Subscription CRUD (operates directly on financialData.subscriptions) ──
   const addParsedSubscription = useCallback((sub: { name: string; amount: number; frequency?: string }) => {
@@ -950,7 +813,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       writeStorage(sk(STORAGE_KEY_FINANCIAL), next)
       return next
     })
-  }, [sk])
+  }, [])
 
   const updateParsedSubscription = useCallback((index: number, updates: { name?: string; amount?: number; frequency?: string }) => {
     setFinancialData(prev => {
@@ -960,7 +823,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       writeStorage(sk(STORAGE_KEY_FINANCIAL), next)
       return next
     })
-  }, [sk])
+  }, [])
 
   const removeParsedSubscription = useCallback((index: number) => {
     setFinancialData(prev => {
@@ -970,7 +833,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       writeStorage(sk(STORAGE_KEY_FINANCIAL), next)
       return next
     })
-  }, [sk])
+  }, [])
 
   // ── Derived values ────────────────────────────────────────────────────────
   const { assets: parsedAssets, debts: parsedDebts } = financialData
