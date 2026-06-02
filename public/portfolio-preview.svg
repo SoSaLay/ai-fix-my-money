@@ -1,0 +1,270 @@
+<svg width="1200" height="750" viewBox="0 0 1200 750" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f6f5ff"/>
+      <stop offset="100%" stop-color="#f0f4ff"/>
+    </linearGradient>
+    <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7c7ae8"/>
+      <stop offset="100%" stop-color="#ff9817" stop-opacity="0.8"/>
+    </linearGradient>
+    <linearGradient id="cardGrad1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4c49c9"/>
+      <stop offset="100%" stop-color="#6b69e0"/>
+    </linearGradient>
+    <linearGradient id="cardGrad2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a6b3a"/>
+      <stop offset="100%" stop-color="#2d9955"/>
+    </linearGradient>
+    <linearGradient id="cardGrad3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff9817"/>
+      <stop offset="100%" stop-color="#ffb347"/>
+    </linearGradient>
+    <filter id="cardShadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="#000" flood-opacity="0.06"/>
+    </filter>
+    <filter id="outerShadow">
+      <feDropShadow dx="0" dy="20" stdDeviation="40" flood-color="#4c49c9" flood-opacity="0.15"/>
+    </filter>
+    <clipPath id="browserClip">
+      <rect x="60" y="40" width="1080" height="670" rx="16"/>
+    </clipPath>
+  </defs>
+
+  <!-- Outer background -->
+  <rect width="1200" height="750" fill="url(#bgGrad)"/>
+
+  <!-- Decorative blobs -->
+  <circle cx="100" cy="100" r="180" fill="#4c49c9" opacity="0.04"/>
+  <circle cx="1100" cy="650" r="200" fill="#ff9817" opacity="0.05"/>
+  <circle cx="1050" cy="80" r="120" fill="#1a6b3a" opacity="0.04"/>
+
+  <!-- Browser window -->
+  <g filter="url(#outerShadow)">
+    <rect x="60" y="40" width="1080" height="670" rx="16" fill="#fff"/>
+  </g>
+
+  <!-- Browser chrome bar -->
+  <rect x="60" y="40" width="1080" height="42" rx="16" fill="#ececec"/>
+  <rect x="60" y="66" width="1080" height="16" fill="#ececec"/>
+
+  <!-- Traffic lights -->
+  <circle cx="92" cy="61" r="6" fill="#ff5f57"/>
+  <circle cx="112" cy="61" r="6" fill="#ffbd2e"/>
+  <circle cx="132" cy="61" r="6" fill="#28c840"/>
+
+  <!-- URL bar -->
+  <rect x="280" y="50" width="420" height="22" rx="11" fill="#fff" opacity="0.7"/>
+  <text x="490" y="65" font-size="11" fill="#888" text-anchor="middle">localhost:3000/dashboard</text>
+
+  <!-- App content clipped -->
+  <g clip-path="url(#browserClip)">
+
+    <!-- Main app background -->
+    <rect x="60" y="82" width="1080" height="628" fill="#f6f6fb"/>
+
+    <!-- ── SIDEBAR ── -->
+    <rect x="60" y="82" width="200" height="628" fill="#fff"/>
+    <line x1="260" y1="82" x2="260" y2="710" stroke="#e7e8ee" stroke-width="1"/>
+
+    <!-- Brand -->
+    <text x="82" y="122" font-size="13" font-weight="700" fill="#2d2f33" letter-spacing="-0.2">AI Fix My Money</text>
+    <text x="82" y="137" font-size="9" fill="#acadb1" letter-spacing="1.5">AI FINANCE</text>
+
+    <!-- Tutorial nav item -->
+    <rect x="70" y="150" width="178" height="34" rx="10" fill="transparent"/>
+    <text x="96" y="172" font-size="11.5" fill="#acadb1" font-weight="500">📖  Tutorial</text>
+
+    <!-- Divider -->
+    <line x1="82" y1="194" x2="242" y2="194" stroke="#e7e8ee" stroke-width="1"/>
+
+    <!-- Dashboard (active) -->
+    <rect x="70" y="202" width="178" height="34" rx="10" fill="rgba(76,73,201,0.10)"/>
+    <text x="96" y="224" font-size="11.5" fill="#4c49c9" font-weight="600">▦  Dashboard</text>
+
+    <!-- Accounts -->
+    <rect x="70" y="242" width="178" height="34" rx="10" fill="transparent"/>
+    <text x="96" y="264" font-size="11.5" fill="#acadb1" font-weight="500">💳  Accounts</text>
+
+    <!-- Spending -->
+    <rect x="70" y="280" width="178" height="34" rx="10" fill="transparent"/>
+    <text x="96" y="302" font-size="11.5" fill="#acadb1" font-weight="500">◔  Spending</text>
+
+    <!-- Savings -->
+    <rect x="70" y="318" width="178" height="34" rx="10" fill="transparent"/>
+    <text x="96" y="340" font-size="11.5" fill="#acadb1" font-weight="500">🐷  Savings</text>
+
+    <!-- Investing -->
+    <rect x="70" y="356" width="178" height="34" rx="10" fill="transparent"/>
+    <text x="96" y="378" font-size="11.5" fill="#acadb1" font-weight="500">↗  Investing</text>
+
+    <!-- AI Adviser -->
+    <rect x="70" y="394" width="178" height="34" rx="10" fill="transparent"/>
+    <text x="96" y="416" font-size="11.5" fill="#acadb1" font-weight="500">✦  AI Adviser</text>
+
+    <!-- Bottom sidebar -->
+    <rect x="70" y="640" width="178" height="34" rx="10" fill="transparent"/>
+    <text x="96" y="662" font-size="11.5" fill="#acadb1" font-weight="500">↑  Import Data</text>
+    <rect x="70" y="676" width="178" height="30" rx="10" fill="transparent"/>
+    <text x="96" y="696" font-size="11.5" fill="#e57373" font-weight="500">🗑  Clear Data</text>
+
+    <!-- ── MAIN CONTENT ── -->
+
+    <!-- Top nav bar -->
+    <rect x="260" y="82" width="880" height="60" fill="#fff"/>
+    <line x1="260" y1="142" x2="1140" y2="142" stroke="#e7e8ee" stroke-width="1"/>
+    <text x="288" y="118" font-size="18" font-weight="700" fill="#2d2f33">Dashboard</text>
+    <circle cx="1110" cy="112" r="18" fill="#e7e8ee"/>
+    <text x="1110" y="117" font-size="11" fill="#5a5b60" text-anchor="middle" font-weight="600">U</text>
+
+    <!-- ── METRIC CARDS ── -->
+    <!-- Net Cash Flow -->
+    <g filter="url(#cardShadow)">
+      <rect x="280" y="158" width="260" height="110" rx="16" fill="url(#cardGrad1)"/>
+    </g>
+    <text x="304" y="185" font-size="10" fill="rgba(255,255,255,0.75)" letter-spacing="0.5">NET CASH FLOW</text>
+    <text x="304" y="218" font-size="28" font-weight="700" fill="#fff">+$5,820</text>
+    <text x="304" y="240" font-size="11" fill="rgba(255,255,255,0.7)">↑ 14% vs last month</text>
+    <rect x="304" y="252" width="60" height="6" rx="3" fill="rgba(255,255,255,0.2)"/>
+    <rect x="304" y="252" width="44" height="6" rx="3" fill="rgba(255,255,255,0.7)"/>
+
+    <!-- Monthly Income -->
+    <g filter="url(#cardShadow)">
+      <rect x="556" y="158" width="260" height="110" rx="16" fill="url(#cardGrad2)"/>
+    </g>
+    <text x="580" y="185" font-size="10" fill="rgba(255,255,255,0.75)" letter-spacing="0.5">MONTHLY INCOME</text>
+    <text x="580" y="218" font-size="28" font-weight="700" fill="#fff">$19,300</text>
+    <text x="580" y="240" font-size="11" fill="rgba(255,255,255,0.7)">↑ $300 vs last month</text>
+    <rect x="580" y="252" width="60" height="6" rx="3" fill="rgba(255,255,255,0.2)"/>
+    <rect x="580" y="252" width="52" height="6" rx="3" fill="rgba(255,255,255,0.7)"/>
+
+    <!-- Monthly Spending -->
+    <g filter="url(#cardShadow)">
+      <rect x="832" y="158" width="260" height="110" rx="16" fill="url(#cardGrad3)"/>
+    </g>
+    <text x="856" y="185" font-size="10" fill="rgba(255,255,255,0.75)" letter-spacing="0.5">MONTHLY SPENDING</text>
+    <text x="856" y="218" font-size="28" font-weight="700" fill="#fff">$13,480</text>
+    <text x="856" y="240" font-size="11" fill="rgba(255,255,255,0.7)">↓ 8% vs last month</text>
+    <rect x="856" y="252" width="60" height="6" rx="3" fill="rgba(255,255,255,0.2)"/>
+    <rect x="856" y="252" width="36" height="6" rx="3" fill="rgba(255,255,255,0.7)"/>
+
+    <!-- ── BOTTOM ROW ── -->
+
+    <!-- Spending Chart card -->
+    <g filter="url(#cardShadow)">
+      <rect x="280" y="286" width="400" height="220" rx="16" fill="#fff"/>
+    </g>
+    <text x="304" y="314" font-size="13" font-weight="600" fill="#2d2f33">Spending Trend</text>
+    <text x="620" y="314" font-size="10" fill="#acadb1" text-anchor="end">8 months</text>
+
+    <!-- Bar chart bars -->
+    <rect x="308" y="398" width="32" height="52" rx="5" fill="rgba(76,73,201,0.13)"/>
+    <text x="324" y="465" font-size="9" fill="#acadb1" text-anchor="middle">Sep</text>
+    <rect x="352" y="378" width="32" height="72" rx="5" fill="rgba(76,73,201,0.13)"/>
+    <text x="368" y="465" font-size="9" fill="#acadb1" text-anchor="middle">Oct</text>
+    <rect x="396" y="408" width="32" height="42" rx="5" fill="rgba(76,73,201,0.13)"/>
+    <text x="412" y="465" font-size="9" fill="#acadb1" text-anchor="middle">Nov</text>
+    <rect x="440" y="362" width="32" height="88" rx="5" fill="rgba(76,73,201,0.13)"/>
+    <text x="456" y="465" font-size="9" fill="#acadb1" text-anchor="middle">Dec</text>
+    <rect x="484" y="388" width="32" height="62" rx="5" fill="rgba(76,73,201,0.13)"/>
+    <text x="500" y="465" font-size="9" fill="#acadb1" text-anchor="middle">Jan</text>
+    <rect x="528" y="372" width="32" height="78" rx="5" fill="rgba(76,73,201,0.13)"/>
+    <text x="544" y="465" font-size="9" fill="#acadb1" text-anchor="middle">Feb</text>
+    <rect x="572" y="395" width="32" height="55" rx="5" fill="rgba(76,73,201,0.13)"/>
+    <text x="588" y="465" font-size="9" fill="#acadb1" text-anchor="middle">Mar</text>
+    <rect x="616" y="350" width="32" height="100" rx="5" fill="url(#barGrad)"/>
+    <text x="632" y="465" font-size="9" fill="#4c49c9" font-weight="600" text-anchor="middle">Apr</text>
+
+    <!-- Allocation card — taller to give legend room -->
+    <g filter="url(#cardShadow)">
+      <rect x="696" y="286" width="192" height="220" rx="16" fill="#fff"/>
+    </g>
+    <text x="720" y="312" font-size="13" font-weight="600" fill="#2d2f33">Allocation</text>
+
+    <!-- Donut chart — moved up slightly -->
+    <circle cx="792" cy="382" r="52" fill="none" stroke="#f0f0f6" stroke-width="16"/>
+    <circle cx="792" cy="382" r="52" fill="none" stroke="#4c49c9" stroke-width="16"
+      stroke-dasharray="130 327" stroke-dashoffset="50" stroke-linecap="round"/>
+    <circle cx="792" cy="382" r="52" fill="none" stroke="#1a6b3a" stroke-width="16"
+      stroke-dasharray="65 327" stroke-dashoffset="-80" stroke-linecap="round"/>
+    <circle cx="792" cy="382" r="52" fill="none" stroke="#ff9817" stroke-width="16"
+      stroke-dasharray="32 327" stroke-dashoffset="-145" stroke-linecap="round"/>
+    <text x="792" y="377" font-size="15" font-weight="700" fill="#2d2f33" text-anchor="middle">70%</text>
+    <text x="792" y="393" font-size="9" fill="#acadb1" text-anchor="middle">allocated</text>
+
+    <!-- Legend — well below donut -->
+    <circle cx="722" cy="458" r="5" fill="#4c49c9"/>
+    <text x="732" y="462" font-size="9.5" fill="#5a5b60">Spending</text>
+    <circle cx="722" cy="476" r="5" fill="#1a6b3a"/>
+    <text x="732" y="480" font-size="9.5" fill="#5a5b60">Savings</text>
+    <circle cx="722" cy="494" r="5" fill="#ff9817"/>
+    <text x="732" y="498" font-size="9.5" fill="#5a5b60">Investing</text>
+
+    <!-- Recent Activity card — 4 transactions -->
+    <g filter="url(#cardShadow)">
+      <rect x="904" y="286" width="218" height="220" rx="16" fill="#fff"/>
+    </g>
+    <text x="928" y="314" font-size="13" font-weight="600" fill="#2d2f33">Recent Activity</text>
+
+    <!-- Transaction 1 -->
+    <line x1="920" y1="328" x2="1106" y2="328" stroke="#f0f0f6" stroke-width="1"/>
+    <circle cx="934" cy="348" r="11" fill="rgba(26,107,58,0.1)"/>
+    <text x="934" y="352" font-size="9" fill="#1a6b3a" text-anchor="middle">$</text>
+    <text x="950" y="346" font-size="10" font-weight="500" fill="#2d2f33">Direct Deposit</text>
+    <text x="950" y="358" font-size="9" fill="#acadb1">Income</text>
+    <text x="1106" y="350" font-size="11" font-weight="600" fill="#1a6b3a" text-anchor="end">+$9,650</text>
+
+    <!-- Transaction 2 -->
+    <line x1="920" y1="372" x2="1106" y2="372" stroke="#f0f0f6" stroke-width="1"/>
+    <circle cx="934" cy="392" r="11" fill="rgba(76,73,201,0.1)"/>
+    <text x="934" y="396" font-size="9" fill="#4c49c9" text-anchor="middle">🏠</text>
+    <text x="950" y="390" font-size="10" font-weight="500" fill="#2d2f33">Rent Payment</text>
+    <text x="950" y="402" font-size="9" fill="#acadb1">Housing</text>
+    <text x="1106" y="394" font-size="11" font-weight="600" fill="#5a5b60" text-anchor="end">-$3,800</text>
+
+    <!-- Transaction 3 -->
+    <line x1="920" y1="416" x2="1106" y2="416" stroke="#f0f0f6" stroke-width="1"/>
+    <circle cx="934" cy="436" r="11" fill="rgba(255,152,23,0.1)"/>
+    <text x="934" y="440" font-size="9" fill="#ff9817" text-anchor="middle">🛒</text>
+    <text x="950" y="434" font-size="10" font-weight="500" fill="#2d2f33">Whole Foods</text>
+    <text x="950" y="446" font-size="9" fill="#acadb1">Groceries</text>
+    <text x="1106" y="438" font-size="11" font-weight="600" fill="#5a5b60" text-anchor="end">-$186</text>
+
+    <!-- Transaction 4 -->
+    <line x1="920" y1="460" x2="1106" y2="460" stroke="#f0f0f6" stroke-width="1"/>
+    <circle cx="934" cy="480" r="11" fill="rgba(186,26,26,0.08)"/>
+    <text x="934" y="484" font-size="9" fill="#ba1a1a" text-anchor="middle">▶</text>
+    <text x="950" y="478" font-size="10" font-weight="500" fill="#2d2f33">Netflix</text>
+    <text x="950" y="490" font-size="9" fill="#acadb1">Subscription</text>
+    <text x="1106" y="482" font-size="11" font-weight="600" fill="#5a5b60" text-anchor="end">-$22</text>
+
+    <!-- AI Adviser preview strip -->
+    <g filter="url(#cardShadow)">
+      <rect x="280" y="522" width="614" height="80" rx="16" fill="#fff"/>
+    </g>
+    <rect x="280" y="522" width="614" height="80" rx="16" fill="rgba(76,73,201,0.03)"/>
+    <circle cx="314" cy="562" r="18" fill="rgba(76,73,201,0.12)"/>
+    <text x="314" y="567" font-size="14" text-anchor="middle">✦</text>
+    <text x="346" y="553" font-size="12" font-weight="600" fill="#2d2f33">AI Adviser</text>
+    <text x="346" y="570" font-size="10.5" fill="#5a5b60">Based on your data, you could save an extra $1,240/mo by cutting variable spending by 12%.</text>
+    <text x="346" y="588" font-size="10" fill="#4c49c9" font-weight="500">Ask a follow-up →</text>
+
+    <!-- Savings Goals strip -->
+    <g filter="url(#cardShadow)">
+      <rect x="904" y="522" width="218" height="80" rx="16" fill="#fff"/>
+    </g>
+    <text x="928" y="546" font-size="12" font-weight="600" fill="#2d2f33">Savings Goals</text>
+    <text x="928" y="564" font-size="10" fill="#5a5b60">Emergency Fund</text>
+    <rect x="928" y="569" width="166" height="5" rx="2.5" fill="#f0f0f6"/>
+    <rect x="928" y="569" width="113" height="5" rx="2.5" fill="#1a6b3a"/>
+    <text x="1094" y="573" font-size="9" fill="#1a6b3a" text-anchor="end">68%</text>
+    <text x="928" y="589" font-size="10" fill="#5a5b60">Vacation Fund</text>
+    <rect x="928" y="594" width="166" height="5" rx="2.5" fill="#f0f0f6"/>
+    <rect x="928" y="594" width="60" height="5" rx="2.5" fill="#4c49c9"/>
+    <text x="1094" y="598" font-size="9" fill="#4c49c9" text-anchor="end">36%</text>
+
+  </g>
+
+  <!-- Bottom label — app name only, no localhost -->
+  <text x="600" y="732" font-size="13" fill="#acadb1" text-anchor="middle" letter-spacing="0.3">AI Fix My Money · Local-first AI finance dashboard</text>
+</svg>
