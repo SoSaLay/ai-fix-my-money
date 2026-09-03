@@ -6,8 +6,9 @@ import { Lock, CheckCircle2, Upload } from 'lucide-react'
 import { TopNav } from '@/components/layout/top-nav'
 import { CircularDial } from '@/components/savings/circular-dial'
 import { useDashboardSummary, useInvestingGoal } from '@/hooks/use-data'
+import { SectionGate } from '@/components/learning/section-gate'
 
-export default function InvestingPage() {
+function InvestingPageTool() {
   const { data: summary, loading: summaryLoading } = useDashboardSummary()
   const { goal, loading: goalLoading, updateGoal, updating } = useInvestingGoal()
 
@@ -42,17 +43,17 @@ export default function InvestingPage() {
             <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center mx-auto mb-5">
               <Upload size={28} className="text-secondary" />
             </div>
-            <p className="text-headline-sm text-on-surface font-semibold mb-2">No data imported yet</p>
+            <p className="text-headline-sm text-on-surface font-semibold mb-2">Nothing recorded yet</p>
             <p className="text-body-md text-on-surface-variant mb-6 leading-relaxed">
-              Import your financial data to set your investing allocation and track your portfolio.
+              The Investing track is still being written. Everything else is ready now.
             </p>
             <Link
-              href="/setup"
+              href="/learning"
               className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-label-lg transition-all hover:opacity-80"
               style={{ background: '#4c49c9', color: '#fff' }}
             >
               <Upload size={16} />
-              Import Financial Data
+              Go to Learning
             </Link>
           </div>
         </div>
@@ -188,5 +189,14 @@ export default function InvestingPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+// The tool is gated behind its learning track — see SectionGate.
+export default function InvestingPage() {
+  return (
+    <SectionGate trackId="investing">
+      <InvestingPageTool />
+    </SectionGate>
   )
 }

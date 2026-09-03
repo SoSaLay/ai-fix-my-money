@@ -11,6 +11,8 @@ import { HorizontalLimitBar } from '@/components/spending/horizontal-limit-bar'
 import type { TableTransaction } from '@/components/spending/transaction-table'
 import { useDashboardSummary, useTransactions, useSpendingLimit } from '@/hooks/use-data'
 import { useFinancialData } from '@/contexts/financial-data-context'
+import { SectionGate } from '@/components/learning/section-gate'
+import { ProfileEntry } from '@/components/entry/profile-entry'
 
 function getBudgetColor(pct: number): string {
   if (pct <= 60) return '#1a6b3a'
@@ -18,7 +20,7 @@ function getBudgetColor(pct: number): string {
   return '#ba1a1a'
 }
 
-export default function SpendingPage() {
+function SpendingPageTool() {
   const { hasData } = useFinancialData()
   const { data: summary, loading: summaryLoading } = useDashboardSummary()
   const { transactions, loading: txLoading } = useTransactions({ limit: 50 })
@@ -65,24 +67,14 @@ export default function SpendingPage() {
     return (
       <div className="flex flex-col min-h-full">
         <TopNav title="Spending Analytics" />
-        <div className="flex-1 px-8 pb-10 flex items-center justify-center">
-          <div className="text-center max-w-sm">
-            <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center mx-auto mb-5">
-              <Upload size={28} className="text-secondary" />
-            </div>
-            <p className="text-headline-sm text-on-surface font-semibold mb-2">No data imported yet</p>
-            <p className="text-body-md text-on-surface-variant mb-6 leading-relaxed">
-              Import your financial data to see spending analytics and set a monthly budget.
-            </p>
-            <Link
-              href="/setup"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-label-lg transition-all hover:opacity-80"
-              style={{ background: '#4c49c9', color: '#fff' }}
-            >
-              <Upload size={16} />
-              Import Financial Data
-            </Link>
-          </div>
+        <div className="flex-1 px-8 pb-10 flex flex-col gap-5 max-w-2xl">
+          <p className="text-body-lg text-on-surface-variant leading-relaxed">
+            Record what comes in and what goes out. The analytics below build
+            themselves from what you enter here.
+          </p>
+          <ProfileEntry section="income" />
+          <ProfileEntry section="fixed" />
+          <ProfileEntry section="variable" />
         </div>
       </div>
     )
@@ -141,6 +133,13 @@ export default function SpendingPage() {
       <TopNav title="Spending Analytics" />
 
       <div className="flex-1 px-8 pb-10 flex flex-col gap-6">
+        {/* Entry panels — everything below is derived from these */}
+        <div className="grid gap-4 md:grid-cols-3">
+          <ProfileEntry section="income" />
+          <ProfileEntry section="fixed" />
+          <ProfileEntry section="variable" />
+        </div>
+
         {/* Summary bar — Income / Spending / Monthly Net Income */}
         <SummaryBar
           income={monthlyIncome}
@@ -301,5 +300,14 @@ export default function SpendingPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+// The tool is gated behind its learning track — see SectionGate.
+export default function SpendingPage() {
+  return (
+    <SectionGate trackId="spending">
+      <SpendingPageTool />
+    </SectionGate>
   )
 }

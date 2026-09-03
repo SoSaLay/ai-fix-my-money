@@ -1,12 +1,11 @@
 // ============================================================================
 // Financial Insights Engine
-// Rule-based insight generator. Analyses ParsedFinancialData + statement
+// Rule-based insight generator. Analyses FinancialProfile + statement
 // history and returns natural-language bullets organized by category.
 // No LLM calls — deterministic, instant, works offline.
 // ============================================================================
 
-import type { ParsedFinancialData } from '@/lib/perplexity/parser'
-import type { StatementMonth } from '@/lib/statement-parser/index'
+import type { FinancialProfile, MonthlyBreakdown } from '@/lib/finance/model'
 
 // ─── Output types ─────────────────────────────────────────────────────────────
 
@@ -58,7 +57,7 @@ const id = (cat: InsightCategory) => `${cat}_${++_seq}`
 
 // ─── Rule groups ──────────────────────────────────────────────────────────────
 
-function incomeInsights(data: ParsedFinancialData): Insight[] {
+function incomeInsights(data: FinancialProfile): Insight[] {
   const out: Insight[] = []
   const { total_monthly } = data.income
 
@@ -87,7 +86,7 @@ function incomeInsights(data: ParsedFinancialData): Insight[] {
   return out
 }
 
-function savingsInsights(data: ParsedFinancialData): Insight[] {
+function savingsInsights(data: FinancialProfile): Insight[] {
   const out: Insight[] = []
   const { total_monthly } = data.income
   const { total_expenses, monthly_savings, savings_rate } = data.summary
@@ -163,7 +162,7 @@ function savingsInsights(data: ParsedFinancialData): Insight[] {
   return out
 }
 
-function spendingInsights(data: ParsedFinancialData): Insight[] {
+function spendingInsights(data: FinancialProfile): Insight[] {
   const out: Insight[] = []
   const { total_monthly } = data.income
 
@@ -239,7 +238,7 @@ function spendingInsights(data: ParsedFinancialData): Insight[] {
   return out
 }
 
-function subscriptionInsights(data: ParsedFinancialData): Insight[] {
+function subscriptionInsights(data: FinancialProfile): Insight[] {
   const out: Insight[] = []
   const subTotal = data.subscriptions.reduce((s, e) => s + e.amount, 0)
 
@@ -269,7 +268,7 @@ function subscriptionInsights(data: ParsedFinancialData): Insight[] {
   return out
 }
 
-function debtInsights(data: ParsedFinancialData): Insight[] {
+function debtInsights(data: FinancialProfile): Insight[] {
   const out: Insight[] = []
 
   const debtAccounts = data.accounts.filter(a =>
@@ -313,7 +312,7 @@ function debtInsights(data: ParsedFinancialData): Insight[] {
   return out
 }
 
-function trendInsights(months: StatementMonth[]): Insight[] {
+function trendInsights(months: MonthlyBreakdown[]): Insight[] {
   if (months.length < 2) return []
 
   const out: Insight[] = []
@@ -388,7 +387,7 @@ function trendInsights(months: StatementMonth[]): Insight[] {
   return out
 }
 
-function netWorthInsights(data: ParsedFinancialData): Insight[] {
+function netWorthInsights(data: FinancialProfile): Insight[] {
   const out: Insight[] = []
 
   const assetTotal = data.accounts
@@ -424,7 +423,7 @@ function netWorthInsights(data: ParsedFinancialData): Insight[] {
 
 // ─── Health score ─────────────────────────────────────────────────────────────
 
-function computeHealthScore(data: ParsedFinancialData, months: StatementMonth[]): number {
+function computeHealthScore(data: FinancialProfile, months: MonthlyBreakdown[]): number {
   let score = 50 // baseline
 
   const { savings_rate } = data.summary
@@ -484,7 +483,7 @@ function healthLabel(score: number): InsightSummary['healthLabel'] {
 
 // ─── Headline generator ───────────────────────────────────────────────────────
 
-function buildHeadline(data: ParsedFinancialData, score: number, months: StatementMonth[]): string {
+function buildHeadline(data: FinancialProfile, score: number, months: MonthlyBreakdown[]): string {
   const label = healthLabel(score)
   const { total_monthly } = data.income
   const { savings_rate, monthly_savings } = data.summary
@@ -522,8 +521,8 @@ function buildHeadline(data: ParsedFinancialData, score: number, months: Stateme
  * Pass an empty array for `months` if no statement history is available.
  */
 export function generateInsights(
-  data: ParsedFinancialData,
-  months: StatementMonth[] = [],
+  data: FinancialProfile,
+  months: MonthlyBreakdown[] = [],
 ): InsightSummary {
   _seq = 0 // reset ID counter per call
 
@@ -562,8 +561,8 @@ export function generateInsights(
  * Quick summary for dashboard widgets — just score + top 3 insights.
  */
 export function generateQuickInsights(
-  data: ParsedFinancialData,
-  months: StatementMonth[] = [],
+  data: FinancialProfile,
+  months: MonthlyBreakdown[] = [],
 ): { score: number; label: InsightSummary['healthLabel']; top: Insight[] } {
   const full = generateInsights(data, months)
   return {

@@ -79,7 +79,7 @@ export default function DashboardPage() {
     )
   }
 
-  // No data imported yet
+  // Nothing recorded yet
   if (!hasData || !summary) {
     return (
       <div className="flex flex-col min-h-full">
@@ -89,17 +89,17 @@ export default function DashboardPage() {
             <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center mx-auto mb-5">
               <Upload size={28} className="text-secondary" />
             </div>
-            <p className="text-headline-sm text-on-surface font-semibold mb-2">No data imported yet</p>
+            <p className="text-headline-sm text-on-surface font-semibold mb-2">Nothing recorded yet</p>
             <p className="text-body-md text-on-surface-variant mb-6 leading-relaxed">
-              Use Perplexity AI to fetch your financial data, then import it here to see your dashboard.
+              Your dashboard fills in as you work through the tracks and record your own numbers.
             </p>
             <Link
-              href="/setup"
+              href="/learning"
               className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-label-lg transition-all hover:opacity-80"
               style={{ background: '#4c49c9', color: '#fff' }}
             >
               <Upload size={16} />
-              Import Financial Data
+              Start learning
             </Link>
           </div>
         </div>

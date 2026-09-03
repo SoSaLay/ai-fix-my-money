@@ -8,21 +8,14 @@ import {
   useCallback,
   type ReactNode,
 } from 'react'
-import { useSnapshotPoller } from '@/hooks/use-snapshot-poller'
 import {
-  parsePerplexityData,
-  type ParsedFinancialData,
-  type ParseResult,
-} from '@/lib/perplexity/parser'
-import {
-  parseStatement,
-  detectRecurring,
   deriveMonthlyStats,
-  type ParsedStatement,
-  type StatementMonth,
-  type StatementTransaction,
-  type StatementImportResult,
-} from '@/lib/statement-parser/index'
+  emptyProfile,
+  recomputeSummary,
+  type FinancialProfile,
+  type LedgerTransaction,
+  type MonthlyBreakdown,
+} from '@/lib/finance/model'
 import type {
   Account,
   Transaction,
@@ -41,8 +34,8 @@ const STORAGE_KEY_SPENDING_LIMIT = 'llg_spending_limit'
 const STORAGE_KEY_SAVINGS_GOALS = 'llg_savings_goals'
 const STORAGE_KEY_INVESTING_GOAL = 'llg_investing_goal'
 const STORAGE_KEY_GENERAL_SAVINGS = 'llg_general_savings'
-const STORAGE_KEY_STATEMENTS = 'llg_statements'
 const STORAGE_KEY_MANUAL_ACCOUNTS = 'llg_manual_accounts'
+const STORAGE_KEY_LEDGER = 'llg_ledger'
 
 // Storage key helper — no user scoping in local-only mode
 const sk = (base: string) => base
@@ -57,6 +50,8 @@ export interface ManualAccount {
   /** e.g. 'checking', 'roth_ira', 'credit_card' */
   type: string
   balance: number
+  /** Credit limit — revolving accounts only. Utilisation needs it. */
+  limit?: number
   createdAt: string
 }
 
@@ -83,10 +78,10 @@ function writeStorage<T>(key: string, value: T): void {
 
 // ============================================================================
 // Transaction generation
-// Synthetic transactions derived from Perplexity expense data
+// Synthetic transactions derived from the recorded expense entries
 // ============================================================================
 
-function generateTransactions(data: ParsedFinancialData): Transaction[] {
+function generateTransactions(data: FinancialProfile): Transaction[] {
   const txns: Transaction[] = []
   const now = new Date()
   const year = now.getFullYear()
@@ -190,7 +185,7 @@ function classifyAccount(rawType: string, balance: number): 'asset' | 'debt' {
   return balance < 0 ? 'debt' : 'asset'
 }
 
-function mapAccounts(data: ParsedFinancialData): { assets: Account[]; debts: Account[] } {
+function mapAccounts(data: FinancialProfile): { assets: Account[]; debts: Account[] } {
   const assets: Account[] = []
   const debts: Account[] = []
   const now = new Date().toISOString()
@@ -228,81 +223,11 @@ function mapAccounts(data: ParsedFinancialData): { assets: Account[]; debts: Acc
 }
 
 // ============================================================================
-// Account derivation from statement groups
-// One account per user-named group (not one per file).
-// ============================================================================
-
-function deriveAccountsFromStatementGroups(stmts: ParsedStatement[]): { assets: Account[]; debts: Account[] } {
-  const assets: Account[] = []
-  const debts: Account[] = []
-
-  // Group statements by their accountName tag (falls back to filename for untagged uploads)
-  const groups: Record<string, ParsedStatement[]> = {}
-  for (const stmt of stmts) {
-    const key = stmt.accountName ?? stmt.filename
-    if (!groups[key]) groups[key] = []
-    groups[key].push(stmt)
-  }
-
-  for (const [groupName, groupStmts] of Object.entries(groups)) {
-    const allTxns = groupStmts
-      .flatMap(s => s.transactions)
-      .filter(t => t.category !== 'Transfers')
-
-    const totalExpenses = allTxns.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0)
-    const totalCredits  = allTxns.filter(t => t.amount < 0).reduce((s, t) => s + Math.abs(t.amount), 0)
-
-    // If credits are less than 40% of expenses → mostly spending → credit card
-    const isCreditCard = totalCredits / (totalExpenses || 1) < 0.4
-
-    // Average monthly net across all months represented in the statements
-    const byMonth: Record<string, { expenses: number; credits: number }> = {}
-    for (const tx of allTxns) {
-      const month = tx.date.slice(0, 7) // 'YYYY-MM'
-      if (!byMonth[month]) byMonth[month] = { expenses: 0, credits: 0 }
-      if (tx.amount > 0) byMonth[month].expenses += tx.amount
-      else byMonth[month].credits += Math.abs(tx.amount)
-    }
-    const months = Object.values(byMonth)
-    const monthCount = months.length || 1
-    const avgMonthlyNet = isCreditCard
-      ? months.reduce((s, m) => s + (m.expenses - m.credits), 0) / monthCount
-      : months.reduce((s, m) => s + (m.credits - m.expenses), 0) / monthCount
-    const netBalance = Math.round(avgMonthlyNet * 100) / 100
-
-    const bank = groupStmts[0].bank
-    const safeKey = groupName.replace(/[^a-z0-9]/gi, '_')
-
-    const account: Account = {
-      id: `stmt_grp_${safeKey}`,
-      user_id: 'local',
-      plaid_item_id: 'statement',
-      plaid_account_id: `stmt_grp_${safeKey}`,
-      name: groupName,
-      official_name: groupName,
-      type: isCreditCard ? 'credit' : 'depository',
-      subtype: isCreditCard ? 'credit card' : 'checking',
-      current_balance: netBalance,
-      currency_code: 'USD',
-      is_active: true,
-      institution_name: bank,
-      created_at: groupStmts[0].importedAt,
-      updated_at: groupStmts[groupStmts.length - 1].importedAt,
-    }
-
-    if (isCreditCard) debts.push(account)
-    else assets.push(account)
-  }
-
-  return { assets, debts }
-}
-
-// ============================================================================
 // DashboardSummary derivation
 // ============================================================================
 
 function deriveDashboardSummary(
-  data: ParsedFinancialData,
+  data: FinancialProfile,
   spendingLimit: StoredSpendingLimit | null,
   savingsGoals: SavingsGoal[],
   investingGoal: InvestingGoal | null,
@@ -393,15 +318,12 @@ interface StoredSpendingLimit {
 
 interface FinancialDataContextValue {
   // Raw imported data
-  financialData: ParsedFinancialData | null
+  financialData: FinancialProfile | null
   hasData: boolean
 
-  // MCP real-time sync state
-  isRefreshing: boolean
-  lastMcpUpdate: string | null
 
-  // Import / clear
-  importData: (raw: unknown) => ParseResult
+  // Reset
+  saveProfile: (update: (current: FinancialProfile) => FinancialProfile) => void
   clearData: () => void
 
   // Reset all allocation settings to zero
@@ -433,20 +355,19 @@ interface FinancialDataContextValue {
   generalSavingsPct: number
   setGeneralSavings: (pct: number) => void
 
-  // Statement uploads (CSV / OFX historical data)
-  statements: ParsedStatement[]
-  statementMonths: StatementMonth[]
-  importStatement: (text: string, filename: string, accountName?: string) => StatementImportResult
-  removeStatement: (filename: string) => void
-  removeStatementGroup: (accountName: string) => void
+  // Ledger of individually recorded transactions
+  ledger: LedgerTransaction[]
+  monthlyBreakdown: MonthlyBreakdown[]
+  addLedgerTransaction: (tx: Omit<LedgerTransaction, 'id'>) => LedgerTransaction
+  removeLedgerTransaction: (id: string) => void
 
   // Manually entered accounts
   manualAccounts: ManualAccount[]
   addManualAccount: (account: Omit<ManualAccount, 'id' | 'createdAt'>) => ManualAccount
-  updateManualAccount: (id: string, updates: Partial<Pick<ManualAccount, 'name' | 'type' | 'balance'>>) => void
+  updateManualAccount: (id: string, updates: Partial<Pick<ManualAccount, 'name' | 'type' | 'balance' | 'limit'>>) => void
   removeManualAccount: (id: string) => void
 
-  // Edit / remove accounts that came from the financialData (Perplexity / JSON) import
+  // Edit / remove accounts recorded on the profile
   updateParsedAccount: (accId: string, updates: { name?: string; balance?: number }) => void
   removeParsedAccount: (accId: string) => void
 
@@ -462,16 +383,16 @@ interface FinancialDataContextValue {
 
 const FinancialDataContext = createContext<FinancialDataContextValue | null>(null)
 
-// ─── Statement transaction → Transaction mapper ───────────────────────────────
+// ─── Ledger entry → dashboard Transaction ────────────────────────────────────
 
-function stmtTxToTransaction(tx: StatementTransaction): Transaction {
+function ledgerTxToTransaction(tx: LedgerTransaction): Transaction {
   return {
     id: tx.id,
     user_id: 'local',
-    account_id: tx.account,
+    account_id: tx.account || 'local',
     plaid_transaction_id: tx.id,
-    merchant_name: tx.description,
     name: tx.description,
+    merchant_name: tx.description,
     amount: tx.amount,
     transaction_date: tx.date,
     plaid_category: tx.category,
@@ -482,113 +403,34 @@ function stmtTxToTransaction(tx: StatementTransaction): Transaction {
   }
 }
 
-// ─── DashboardSummary derived from statement months ───────────────────────────
-
-function deriveSummaryFromStatementMonths(
-  months: StatementMonth[],
-  spendingLimit: { amount: number; period: 'monthly' | 'yearly' } | null,
-  savingsGoals: SavingsGoal[],
-  investingGoal: InvestingGoal | null,
-  generalSavingsPct: number,
-): DashboardSummary | null {
-  if (months.length === 0) return null
-
-  const latest = months[months.length - 1]
-  const monthlyIncome = latest.income
-  const monthlySpending = latest.expenses
-  const netCashFlow = latest.savings
-
-  const now = new Date()
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-
-  const goalsSummary = savingsGoals.map(g => ({
-    id: g.id,
-    name: g.name,
-    target_amount: g.target_amount,
-    current_amount: g.current_amount,
-    allocation_pct: g.allocation_pct,
-    progress: g.target_amount > 0 ? Math.round((g.current_amount / g.target_amount) * 100) : 0,
-  }))
-
-  const savingsTotalAllocated = savingsGoals.reduce((s, g) => s + g.allocation_pct, 0) + generalSavingsPct
-
-  let spendingLimitSummary: DashboardSummary['spending']['spending_limit'] = null
-  if (spendingLimit) {
-    const spent = monthlySpending
-    const remaining = spendingLimit.amount - spent
-    spendingLimitSummary = {
-      limit: spendingLimit.amount,
-      spent,
-      remaining,
-      percentage: spendingLimit.amount > 0 ? Math.round((spent / spendingLimit.amount) * 100) : 0,
-      period: spendingLimit.period,
-    }
-  }
-
-  return {
-    spending: {
-      monthly_spending: monthlySpending,
-      monthly_income: monthlyIncome,
-      net_cash_flow: netCashFlow,
-      spending_limit: spendingLimitSummary,
-    },
-    wealth: { total_assets: 0, total_debts: 0, net_worth: 0 },
-    goals: {
-      savings: goalsSummary,
-      savings_total_allocated: savingsTotalAllocated,
-      investing: investingGoal
-        ? { allocation_pct: investingGoal.allocation_pct, risk_profile: investingGoal.risk_profile }
-        : null,
-    },
-    period: {
-      start_date: startOfMonth.toISOString().split('T')[0],
-      end_date: endOfMonth.toISOString().split('T')[0],
-    },
-  }
-}
-
 export function FinancialDataProvider({ children }: { children: ReactNode }) {
-  const [financialData, setFinancialData] = useState<ParsedFinancialData | null>(null)
+  const [financialData, setFinancialData] = useState<FinancialProfile | null>(null)
   const [spendingLimit, setSpendingLimitState] = useState<StoredSpendingLimit | null>(null)
   const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([])
   const [investingGoal, setInvestingGoalState] = useState<InvestingGoal | null>(null)
   const [generalSavingsPct, setGeneralSavingsPctState] = useState<number>(0)
-  const [statements, setStatements] = useState<ParsedStatement[]>([])
+  const [ledger, setLedger] = useState<LedgerTransaction[]>([])
   const [manualAccounts, setManualAccounts] = useState<ManualAccount[]>([])
-  const [isRefreshing, setIsRefreshing] = useState(false)
-  const [lastMcpUpdate, setLastMcpUpdate] = useState<string | null>(null)
 
   // Load all state from localStorage once on mount
   useEffect(() => {
-    setFinancialData(readStorage<ParsedFinancialData>(STORAGE_KEY_FINANCIAL))
+    setFinancialData(readStorage<FinancialProfile>(STORAGE_KEY_FINANCIAL))
     setSpendingLimitState(readStorage<StoredSpendingLimit>(STORAGE_KEY_SPENDING_LIMIT))
     setSavingsGoals(readStorage<SavingsGoal[]>(STORAGE_KEY_SAVINGS_GOALS) ?? [])
     setInvestingGoalState(readStorage<InvestingGoal>(STORAGE_KEY_INVESTING_GOAL))
     setGeneralSavingsPctState(readStorage<number>(STORAGE_KEY_GENERAL_SAVINGS) ?? 0)
-    setStatements(readStorage<ParsedStatement[]>(STORAGE_KEY_STATEMENTS) ?? [])
+    setLedger(readStorage<LedgerTransaction[]>(STORAGE_KEY_LEDGER) ?? [])
     setManualAccounts(readStorage<ManualAccount[]>(STORAGE_KEY_MANUAL_ACCOUNTS) ?? [])
   }, [])
 
-  // ── MCP snapshot poller ───────────────────────────────────────────────────
-  useSnapshotPoller({
-    enabled: true,
-    onRefreshing: setIsRefreshing,
-    onNewSnapshot: (data, updatedAt) => {
-      setFinancialData(data)
-      writeStorage(sk(STORAGE_KEY_FINANCIAL), data)
-      setLastMcpUpdate(updatedAt)
-    },
-  })
-
-  // ── Import ────────────────────────────────────────────────────────────────
-  const importData = useCallback((raw: unknown): ParseResult => {
-    const result = parsePerplexityData(raw)
-    if (result.success && result.data) {
-      setFinancialData(result.data)
-      writeStorage(sk(STORAGE_KEY_FINANCIAL), result.data)
-    }
-    return result
+  // ── Profile ───────────────────────────────────────────────────────────────
+  // The profile is built up by hand as the user works through a learning track.
+  const saveProfile = useCallback((update: (current: FinancialProfile) => FinancialProfile) => {
+    setFinancialData(prev => {
+      const next = recomputeSummary(update(prev ?? emptyProfile()))
+      writeStorage(sk(STORAGE_KEY_FINANCIAL), next)
+      return next
+    })
   }, [])
 
   const clearData = useCallback(() => {
@@ -597,14 +439,14 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
     setSavingsGoals([])
     setInvestingGoalState(null)
     setGeneralSavingsPctState(0)
-    setStatements([])
+    setLedger([])
     setManualAccounts([])
     localStorage.removeItem(sk(STORAGE_KEY_FINANCIAL))
     localStorage.removeItem(sk(STORAGE_KEY_SPENDING_LIMIT))
     localStorage.removeItem(sk(STORAGE_KEY_SAVINGS_GOALS))
     localStorage.removeItem(sk(STORAGE_KEY_INVESTING_GOAL))
     localStorage.removeItem(sk(STORAGE_KEY_GENERAL_SAVINGS))
-    localStorage.removeItem(sk(STORAGE_KEY_STATEMENTS))
+    localStorage.removeItem(sk(STORAGE_KEY_LEDGER))
     localStorage.removeItem(sk(STORAGE_KEY_MANUAL_ACCOUNTS))
   }, [])
 
@@ -716,45 +558,24 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(sk(STORAGE_KEY_INVESTING_GOAL))
   }, [])
 
-  // ── Statement uploads ─────────────────────────────────────────────────────
-  const importStatement = useCallback((text: string, filename: string, accountName?: string): StatementImportResult => {
-    const result = parseStatement(text, filename)
-    if (result.success && result.statement) {
-      if (accountName) result.statement.accountName = accountName
-      setStatements(prev => {
-        // Replace if same filename, otherwise append
-        const filtered = prev.filter(s => s.filename !== filename)
-        const next = [...filtered, result.statement!]
-
-        // Re-run recurring detection across all transactions from every file
-        // so that multi-month patterns are caught even when files are uploaded one-at-a-time.
-        const allTxns = next.flatMap(s => s.transactions)
-        const retagged = detectRecurring(allTxns)
-        const retaggedById = new Map(retagged.map(t => [t.id, t]))
-        const finalStmts: ParsedStatement[] = next.map(s => ({
-          ...s,
-          transactions: s.transactions.map(t => retaggedById.get(t.id) ?? t),
-        }))
-
-        writeStorage(sk(STORAGE_KEY_STATEMENTS), finalStmts)
-        return finalStmts
-      })
+  // ── Ledger CRUD ───────────────────────────────────────────────────────────
+  const addLedgerTransaction = useCallback((tx: Omit<LedgerTransaction, 'id'>): LedgerTransaction => {
+    const entry: LedgerTransaction = {
+      ...tx,
+      id: `tx_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
     }
-    return result
-  }, [])
-
-  const removeStatement = useCallback((filename: string) => {
-    setStatements(prev => {
-      const next = prev.filter(s => s.filename !== filename)
-      writeStorage(sk(STORAGE_KEY_STATEMENTS), next)
+    setLedger(prev => {
+      const next = [...prev, entry]
+      writeStorage(sk(STORAGE_KEY_LEDGER), next)
       return next
     })
+    return entry
   }, [])
 
-  const removeStatementGroup = useCallback((accountName: string) => {
-    setStatements(prev => {
-      const next = prev.filter(s => (s.accountName ?? s.filename) !== accountName)
-      writeStorage(sk(STORAGE_KEY_STATEMENTS), next)
+  const removeLedgerTransaction = useCallback((id: string) => {
+    setLedger(prev => {
+      const next = prev.filter(t => t.id !== id)
+      writeStorage(sk(STORAGE_KEY_LEDGER), next)
       return next
     })
   }, [])
@@ -774,7 +595,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
     return newAccount
   }, [])
 
-  const updateManualAccount = useCallback((id: string, updates: Partial<Pick<ManualAccount, 'name' | 'type' | 'balance'>>) => {
+  const updateManualAccount = useCallback((id: string, updates: Partial<Pick<ManualAccount, 'name' | 'type' | 'balance' | 'limit'>>) => {
     setManualAccounts(prev => {
       const next = prev.map(a => a.id === id ? { ...a, ...updates } : a)
       writeStorage(sk(STORAGE_KEY_MANUAL_ACCOUNTS), next)
@@ -854,21 +675,35 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
 
   // Merge manual accounts into asset/debt lists
   const DEBT_KEYWORDS = ['credit', 'loan', 'mortgage', 'auto', 'student', 'heloc', 'debt', 'credit_card', 'personal_loan', 'medical_debt']
-  const toAccount = (a: ManualAccount, isDebt: boolean): Account => ({
-    id: a.id,
-    user_id: '',
-    plaid_item_id: '',
-    plaid_account_id: '',
-    name: a.name,
-    type: a.type.replace(/_/g, ' '),
-    current_balance: isDebt ? -Math.abs(a.balance) : a.balance,
-    currency_code: 'USD',
-    mask: '',
-    institution_name: 'Manual Entry',
-    is_active: true,
-    created_at: a.createdAt,
-    updated_at: a.createdAt,
-  })
+  const INVESTMENT_KEYWORDS = ['brokerage', 'retirement', 'investment', '401k', 'ira']
+
+  // `type` has to stay one of the canonical values the pages filter on; the
+  // specific kind the user picked lives in `subtype`.
+  const toAccount = (a: ManualAccount, isDebt: boolean): Account => {
+    const kind = a.type.toLowerCase()
+    const canonical = isDebt
+      ? 'credit'
+      : INVESTMENT_KEYWORDS.some(k => kind.includes(k))
+        ? 'investment'
+        : 'depository'
+
+    return {
+      id: a.id,
+      user_id: '',
+      plaid_item_id: '',
+      plaid_account_id: '',
+      name: a.name,
+      type: canonical,
+      subtype: a.type.replace(/_/g, ' '),
+      current_balance: isDebt ? -Math.abs(a.balance) : a.balance,
+      currency_code: 'USD',
+      mask: '',
+      institution_name: 'Manual Entry',
+      is_active: true,
+      created_at: a.createdAt,
+      updated_at: a.createdAt,
+    }
+  }
 
   const manualAssets: Account[] = manualAccounts
     .filter(a => !DEBT_KEYWORDS.some(k => a.type.toLowerCase().replace(/_/g, ' ').includes(k.replace(/_/g, ' '))))
@@ -877,76 +712,43 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
     .filter(a => DEBT_KEYWORDS.some(k => a.type.toLowerCase().replace(/_/g, ' ').includes(k.replace(/_/g, ' '))))
     .map(a => toAccount(a, true))
 
-  // Always derive accounts from statements so uploaded CSVs are reflected
-  // regardless of whether financialData is also present.
-  const { assets: stmtAssets, debts: stmtDebts } = statements.length > 0
-    ? deriveAccountsFromStatementGroups(statements)
-    : { assets: [] as Account[], debts: [] as Account[] }
-
-  const assetAccounts: Account[] = [...parsedAssets, ...manualAssets, ...stmtAssets]
-  const debtAccounts: Account[] = [...parsedDebts, ...manualDebts, ...stmtDebts]
+  const assetAccounts: Account[] = [...parsedAssets, ...manualAssets]
+  const debtAccounts: Account[] = [...parsedDebts, ...manualDebts]
 
   // Wealth totals from ALL account sources combined
   const totalAssets = assetAccounts.reduce((s, a) => s + Math.abs(a.current_balance), 0)
   const totalDebts  = debtAccounts.reduce((s, d) => s + Math.abs(d.current_balance), 0)
 
-  // Derive monthly stats from all statement transactions combined (must come before dashboardSummary)
-  const statementMonths: StatementMonth[] = deriveMonthlyStats(
-    statements.flatMap(s => s.transactions),
-  )
+  // Monthly rollup of everything recorded in the ledger
+  const monthlyBreakdown: MonthlyBreakdown[] = deriveMonthlyStats(ledger)
 
   const transactions: Transaction[] = financialData
     ? generateTransactions(financialData)
-    : (() => {
-        // Deduplicate IDs before mapping — handles cached statements parsed with
-        // the old sequential ID scheme (stmt_34, stmt_34, …) across multiple files.
-        const seenIds = new Map<string, number>()
-        return statements
-          .flatMap(s => s.transactions)
-          .map(tx => {
-            const count = seenIds.get(tx.id) ?? 0
-            seenIds.set(tx.id, count + 1)
-            return stmtTxToTransaction(count > 0 ? { ...tx, id: `${tx.id}_${count}` } : tx)
-          })
-          .sort((a, b) => b.transaction_date.localeCompare(a.transaction_date))
-      })()
+    : ledger
+        .map(ledgerTxToTransaction)
+        .sort((a, b) => b.transaction_date.localeCompare(a.transaction_date))
 
-  // When real bank statements are present, prefer statement months for income/spending.
-  // Fall back to financialData (Perplexity import) when no statements exist.
-  // In either case, wealth is computed from all account sources (not just financialData).
-  const dashboardSummary = (() => {
-    // Always use combined account totals from all sources for wealth.
-    const wealth = { total_assets: totalAssets, total_debts: totalDebts, net_worth: totalAssets - totalDebts }
-
-    // financialData (Perplexity / JSON import) is the primary source for income
-    // and spending figures. CSV statements rarely contain payroll deposits, so
-    // letting them override would zero out the income field.
-    if (financialData) {
-      const base = deriveDashboardSummary(
-        financialData, spendingLimit, savingsGoals, investingGoal, generalSavingsPct,
-      )
-      return { ...base, wealth }
-    }
-
-    // Fall back to statement months only when there is no financialData at all.
-    if (statementMonths.length > 0) {
-      const base = deriveSummaryFromStatementMonths(
-        statementMonths, spendingLimit, savingsGoals, investingGoal, generalSavingsPct,
-      )
-      if (base) return { ...base, wealth }
-    }
-
-    return null
-  })()
+  // The profile is the source of truth for income and spending; wealth is
+  // computed from every account the user has recorded.
+  const dashboardSummary = financialData
+    ? {
+        ...deriveDashboardSummary(
+          financialData, spendingLimit, savingsGoals, investingGoal, generalSavingsPct,
+        ),
+        wealth: {
+          total_assets: totalAssets,
+          total_debts: totalDebts,
+          net_worth: totalAssets - totalDebts,
+        },
+      }
+    : null
 
   return (
     <FinancialDataContext.Provider
       value={{
         financialData,
-        hasData: !!financialData || statements.length > 0,
-        isRefreshing,
-        lastMcpUpdate,
-        importData,
+        hasData: !!financialData || ledger.length > 0,
+        saveProfile,
         clearData,
         resetAllocations,
         dashboardSummary,
@@ -965,11 +767,10 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
         removeInvestingGoal,
         generalSavingsPct,
         setGeneralSavings,
-        statements,
-        statementMonths,
-        importStatement,
-        removeStatement,
-        removeStatementGroup,
+        ledger,
+        monthlyBreakdown,
+        addLedgerTransaction,
+        removeLedgerTransaction,
         manualAccounts,
         addManualAccount,
         updateManualAccount,

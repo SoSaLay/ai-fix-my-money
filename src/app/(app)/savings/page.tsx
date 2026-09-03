@@ -10,11 +10,12 @@ import { RecentTransfers } from '@/components/savings/recent-transfers'
 import type { Transfer } from '@/components/savings/recent-transfers'
 import { useDashboardSummary, useSavingsGoals } from '@/hooks/use-data'
 import { useFinancialData } from '@/contexts/financial-data-context'
+import { SectionGate } from '@/components/learning/section-gate'
 
 const GOALS_COLOR   = '#11d4bf'
 const GENERAL_COLOR = '#1a6b3a'
 
-export default function SavingsPage() {
+function SavingsPageTool() {
   const { data: summary, loading: summaryLoading } = useDashboardSummary()
   const { goals, loading: goalsLoading, updateGoal, deleteGoal, createGoal, updating } = useSavingsGoals()
   const { generalSavingsPct: savedGeneralPct, setGeneralSavings } = useFinancialData()
@@ -74,17 +75,17 @@ export default function SavingsPage() {
             <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center mx-auto mb-5">
               <Upload size={28} className="text-secondary" />
             </div>
-            <p className="text-headline-sm text-on-surface font-semibold mb-2">No data imported yet</p>
+            <p className="text-headline-sm text-on-surface font-semibold mb-2">Nothing recorded yet</p>
             <p className="text-body-md text-on-surface-variant mb-6 leading-relaxed">
-              Import your financial data to start setting savings goals and tracking your progress.
+              Work through the Savings track — you’ll set your goals and allocation as you go.
             </p>
             <Link
-              href="/setup"
+              href="/learning/savings"
               className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-label-lg transition-all hover:opacity-80"
               style={{ background: '#4c49c9', color: '#fff' }}
             >
               <Upload size={16} />
-              Import Financial Data
+              Go to the Savings track
             </Link>
           </div>
         </div>
@@ -232,5 +233,14 @@ export default function SavingsPage() {
         )}
       </div>
     </div>
+  )
+}
+
+// The tool is gated behind its learning track — see SectionGate.
+export default function SavingsPage() {
+  return (
+    <SectionGate trackId="savings">
+      <SavingsPageTool />
+    </SectionGate>
   )
 }

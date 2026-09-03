@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { TopNav } from '@/components/layout/top-nav'
 import { useAccounts, useDebts, type Account } from '@/hooks/use-data'
 import { useFinancialData } from '@/contexts/financial-data-context'
+import { SectionGate } from '@/components/learning/section-gate'
+import { AddAccountForm } from '@/components/entry/add-account-form'
 
 // ─── Inline edit form ──────────────────────────────────────────────────────────
 
@@ -265,21 +267,20 @@ function DebtCard({
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function AccountsPage() {
+function AccountsPageTool() {
   const { accounts, loading: accountsLoading, error: accountsError, refresh: refreshAccounts } = useAccounts()
   const { debts, loading: debtsLoading, error: debtsError, refresh: refreshDebts } = useDebts()
   const {
     removeManualAccount,
     updateManualAccount,
-    removeStatementGroup,
     updateParsedAccount,
     removeParsedAccount,
   } = useFinancialData()
 
   const [editingId, setEditingId] = useState<string | null>(null)
 
-  // Whether the account's balance is read-only (derived from uploaded transactions)
-  const isReadOnly = useCallback((id: string) => id.startsWith('stmt_grp_'), [])
+  // Every account is entered by hand, so every balance is editable
+  const isReadOnly = useCallback((_id: string) => false, [])
 
   function getEditHandler(account: Account) {
     return () => setEditingId(prev => prev === account.id ? null : account.id)
@@ -292,14 +293,12 @@ export default function AccountsPage() {
       } else if (account.id.startsWith('acc_')) {
         updateParsedAccount(account.id, { name, balance })
       }
-      // stmt_grp accounts: balance is read-only, no-op
       setEditingId(null)
     }
   }
 
   function getRemoveHandler(account: Account) {
     if (account.id.startsWith('manual_')) return () => { removeManualAccount(account.id); if (editingId === account.id) setEditingId(null) }
-    if (account.id.startsWith('stmt_grp_')) return () => { removeStatementGroup(account.name); if (editingId === account.id) setEditingId(null) }
     if (account.id.startsWith('acc_')) return () => { removeParsedAccount(account.id); if (editingId === account.id) setEditingId(null) }
     return () => {}
   }
@@ -354,14 +353,7 @@ export default function AccountsPage() {
           <p className="text-body-md text-on-surface-variant">
             {depositoryAccounts.length} account{depositoryAccounts.length !== 1 ? 's' : ''} · click <Pencil size={12} className="inline mb-0.5" /> to edit
           </p>
-          <Link
-            href="/setup"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-label-md font-semibold transition-all hover:opacity-80"
-            style={{ background: '#4c49c9', color: '#fff' }}
-          >
-            <Upload size={15} />
-            Update Data
-          </Link>
+          <AddAccountForm />
         </div>
 
         {/* Asset account cards */}
@@ -383,18 +375,10 @@ export default function AccountsPage() {
         ) : (
           <div className="bg-surface-container-lowest rounded-2xl shadow-card p-12 text-center">
             <CreditCard size={48} className="mx-auto text-on-surface-variant mb-4" />
-            <p className="text-headline-sm text-on-surface mb-2">No accounts imported yet</p>
+            <p className="text-headline-sm text-on-surface mb-2">No accounts yet</p>
             <p className="text-body-md text-on-surface-variant mb-6">
-              Import your financial data to start tracking your accounts
+              Add each account by hand — that is how you find the ones you forgot about.
             </p>
-            <Link
-              href="/setup"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-label-md font-semibold transition-all hover:opacity-80"
-              style={{ background: '#4c49c9', color: '#fff' }}
-            >
-              <Upload size={15} />
-              Import Data
-            </Link>
           </div>
         )}
 
@@ -443,5 +427,14 @@ export default function AccountsPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+// The tool is gated behind its learning track — see SectionGate.
+export default function AccountsPage() {
+  return (
+    <SectionGate trackId="accounts">
+      <AccountsPageTool />
+    </SectionGate>
   )
 }

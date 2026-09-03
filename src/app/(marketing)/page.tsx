@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import {
-  ArrowRight, CheckCircle2, Sparkles,
+  ArrowRight, Sparkles,
   Link2, Upload, BrainCircuit, TrendingUp, PiggyBank, Zap, MessageSquare, Github,
 } from 'lucide-react'
 
@@ -195,13 +195,12 @@ export default function MarketingPage() {
       <nav className="flex items-center justify-between px-8 py-5 max-w-5xl mx-auto w-full">
         <div>
           <p className="text-headline-sm text-on-surface font-bold">AI Fix My Money</p>
-          <p className="text-label-sm text-on-surface-variant tracking-widest uppercase">AI Finance</p>
         </div>
         <div className="flex items-center gap-3">
           <Link href="/dashboard">
             <Button variant="secondary" className="px-5 py-2.5 text-label-lg">Open App</Button>
           </Link>
-          <Link href="/onboarding">
+          <Link href="/learning">
             <Button variant="primary" className="px-5 py-2.5 text-label-lg">Get Started</Button>
           </Link>
         </div>
@@ -210,7 +209,7 @@ export default function MarketingPage() {
       {/* ── Hero ── */}
       <section className="flex flex-col items-center text-center gap-8 px-6 pt-20 pb-20 max-w-3xl mx-auto w-full">
         <h1 className="text-display-lg text-on-surface">
-          Your money,{' '}
+          You and your money,{' '}
           <span style={{ background: 'linear-gradient(135deg, #4c49c9, #ff9817)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
             finally intelligent.
           </span>
@@ -222,7 +221,7 @@ export default function MarketingPage() {
         </p>
 
         <div className="flex items-center gap-4">
-          <Link href="/onboarding">
+          <Link href="/learning">
             <Button variant="primary" className="px-8 py-3.5 text-body-md flex items-center gap-2">
               Get Started <ArrowRight size={16} />
             </Button>
@@ -232,14 +231,6 @@ export default function MarketingPage() {
           </Link>
         </div>
 
-        <div className="flex items-center gap-5 mt-1">
-          {['No Spreadsheets', 'AI-Powered', 'Privacy-First'].map((label) => (
-            <div key={label} className="flex items-center gap-1.5">
-              <CheckCircle2 size={13} style={{ color: '#1a6b3a' }} />
-              <span className="text-label-sm text-on-surface-variant">{label}</span>
-            </div>
-          ))}
-        </div>
       </section>
 
       {/* ── App Preview ── */}
@@ -340,7 +331,7 @@ export default function MarketingPage() {
         <p className="text-body-lg text-on-surface-variant">
           Import your data and let AI guide every financial decision.
         </p>
-        <Link href="/onboarding">
+        <Link href="/learning">
           <Button variant="primary" className="px-10 py-4 text-body-md flex items-center gap-2">
             Get Started, It&apos;s Free <ArrowRight size={16} />
           </Button>
@@ -356,7 +347,7 @@ export default function MarketingPage() {
         </div>
         <div className="flex items-center gap-4">
           <Link href="/dashboard" className="text-label-sm text-on-surface-variant hover:text-on-surface transition-colors">Open App</Link>
-          <Link href="/onboarding" className="text-label-sm text-secondary font-medium hover:opacity-80 transition-opacity">Get Started</Link>
+          <Link href="/learning" className="text-label-sm text-secondary font-medium hover:opacity-80 transition-opacity">Get Started</Link>
         </div>
       </footer>
 
