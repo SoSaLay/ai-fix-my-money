@@ -275,6 +275,10 @@ export function LearningProvider({ children }: { children: ReactNode }) {
       if (!track || track.lessons.length === 0) return { kind: 'done' }
       const p = trackProgress(trackId)
 
+      // Passing the final ends the track, however the learner got there — a
+      // test-out skips the lessons rather than leaving them owed.
+      if (p.final?.passed) return { kind: 'done' }
+
       const i = track.lessons.findIndex(l => !p.lessons[l.id]?.answered)
       if (i !== -1) return { kind: 'lesson', id: track.lessons[i].id, index: i }
       if (track.action && !p.actionDone) return { kind: 'action' }

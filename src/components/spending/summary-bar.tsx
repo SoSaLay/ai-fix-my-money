@@ -9,6 +9,8 @@ function formatDollars(n: number): string {
 }
 
 export function SummaryBar({ income, spending, netIncome }: SummaryBarProps) {
+  const negative = netIncome < 0
+
   return (
     <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6 flex items-stretch gap-0">
       {/* Monthly Income */}
@@ -37,13 +39,21 @@ export function SummaryBar({ income, spending, netIncome }: SummaryBarProps) {
       {/* Divider */}
       <div className="w-px bg-surface-container-low self-stretch mx-2" />
 
-      {/* Monthly Net Income — highlighted */}
+      {/* Monthly Net Income — highlighted, and negative when it is negative */}
       <div className="flex-1 flex flex-col gap-1 px-6 last:pr-0">
         <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">
           Monthly Net Income
         </p>
-        <p className="text-display-sm font-bold text-secondary">
-          {formatDollars(netIncome)}
+        <p
+          className="text-display-sm font-bold"
+          style={negative ? { color: '#ba1a1a' } : undefined}
+        >
+          <span className={negative ? undefined : 'text-secondary'}>
+            {negative ? '−' : ''}{formatDollars(netIncome)}
+          </span>
+          {negative && (
+            <span className="text-label-sm font-normal ml-1.5">deficit</span>
+          )}
         </p>
       </div>
     </div>

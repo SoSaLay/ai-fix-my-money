@@ -1,9 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { Lock, ArrowRight, CheckCircle2 } from 'lucide-react'
+import { Lock, ArrowRight, CheckCircle2, Check } from 'lucide-react'
 import { useLearning } from '@/contexts/learning-context'
-import { getTrack, type TrackId } from '@/lib/learning/tracks'
+import { getTrack, shortTitle, type TrackId } from '@/lib/learning/tracks'
 import { DisclaimerBar } from './disclaimer-bar'
 
 /**
@@ -20,7 +20,10 @@ export function SectionGate({
   trackId: TrackId
   children: React.ReactNode
 }) {
-  const { ready, isToolUnlocked, isTrackUnlocked, guided, endGuided, recordAction, trackCompletion } = useLearning()
+  const {
+    ready, isToolUnlocked, guided, endGuided, recordAction,
+    trackCompletion,
+  } = useLearning()
   const track = getTrack(trackId)
 
   if (!ready || !track) return null
@@ -74,59 +77,108 @@ export function SectionGate({
     )
   }
 
-  // Locked. Show what the track gives them and point at the one way forward.
-  const trackReachable = isTrackUnlocked(trackId)
+  // Locked. Say the rule in one line, show the path, then offer the shortcut.
   const { done, total } = trackCompletion(trackId)
   const started = done > 0
+  const comingSoon = track.status === 'coming-soon'
 
   return (
-    <div className="flex-1 flex items-center justify-center px-8 py-20">
-      <div className="max-w-md w-full flex flex-col gap-6 text-center items-center">
-        <div className="w-14 h-14 rounded-2xl bg-surface-container flex items-center justify-center">
-          <Lock size={22} className="text-on-surface-variant" />
-        </div>
-
-        <div className="flex flex-col gap-2.5">
+    <div className="flex-1 flex items-center justify-center px-8 py-16">
+      <div className="max-w-md w-full flex flex-col gap-7 items-center">
+        <div className="flex flex-col gap-3 items-center text-center">
+          <div className="w-12 h-12 rounded-2xl bg-surface-container flex items-center justify-center">
+            <Lock size={20} className="text-on-surface-variant" />
+          </div>
           <h1 className="text-headline-md text-on-surface font-bold">
-            {track.title} opens when you pass the course
+            Learn it to unlock it
           </h1>
           <p className="text-body-lg text-on-surface-variant leading-relaxed">
-            {track.outcome}
-          </p>
-          <p className="text-body-md text-on-surface-variant leading-relaxed">
-            You&apos;ll enter your real {track.title.toLowerCase()} data as you go, so by the
-            time this section opens it already has your numbers in it.
+            In this app, every feature opens once you finish its short course.
+            Here&apos;s the one for {track.title}.
           </p>
         </div>
 
-        {track.status === 'coming-soon' ? (
-          <p className="text-body-md text-on-surface-variant bg-surface-container rounded-2xl px-5 py-4">
-            This track is still being written. The other three are ready now.
+        {comingSoon ? (
+          <p className="text-body-md text-on-surface-variant bg-surface-container rounded-2xl px-5 py-4 text-center">
+            This course is still being written. The other three are ready now.
           </p>
-        ) : trackReachable ? (
-          <Link
-            href={`/learning/${trackId}`}
-            className="flex items-center gap-2 bg-secondary text-white rounded-2xl px-6 py-3.5 text-label-lg font-medium hover:opacity-90 transition-opacity"
-          >
-            {started ? `Continue — ${done} of ${total} done` : `Start the ${track.title} track`}
-            <ArrowRight size={16} />
-          </Link>
         ) : (
-          <div className="flex flex-col gap-3 items-center">
-            <p className="text-body-md text-on-surface-variant">
-              Finish the tracks before this one first — each builds on the last.
-            </p>
+          <>
+            <LearningPath trackId={trackId} />
+
             <Link
-              href="/learning"
+              href={`/learning/${trackId}`}
               className="flex items-center gap-2 bg-secondary text-white rounded-2xl px-6 py-3.5 text-label-lg font-medium hover:opacity-90 transition-opacity"
             >
-              Go to Learning <ArrowRight size={16} />
+              {started ? `Continue — ${done} of ${total} done` : 'Start the course'}
+              <ArrowRight size={16} />
             </Link>
-          </div>
+
+            {track.finalQuiz.length > 0 && (
+              <Link
+                href={`/learning/${trackId}?step=final`}
+                className="-mt-3 text-label-lg font-medium text-on-surface-variant underline underline-offset-4 hover:text-on-surface transition-colors"
+              >
+                Skip the learning — take me to the final test
+              </Link>
+            )}
+          </>
         )}
 
-        <DisclaimerBar className="justify-center pt-2" />
+        <DisclaimerBar className="justify-center" />
       </div>
     </div>
+  )
+}
+
+/** The steps of the course, in order, with what's already behind them ticked. */
+function LearningPath({ trackId }: { trackId: TrackId }) {
+  const { trackProgress } = useLearning()
+  const track = getTrack(trackId)
+  if (!track) return null
+
+  const p = trackProgress(trackId)
+  const steps = [
+    ...track.lessons.map(l => ({
+      key: l.id,
+      label: shortTitle(l.title),
+      done: !!p.lessons[l.id]?.answered,
+    })),
+    ...(track.action ? [{
+      key: 'action',
+      label: 'Your turn — enter your own numbers',
+      done: p.actionDone,
+    }] : []),
+    ...(track.finalQuiz.length > 0 ? [{
+      key: 'final',
+      label: 'Final test',
+      done: p.final?.passed === true,
+    }] : []),
+  ]
+
+  return (
+    <ol className="w-full bg-surface-container-lowest rounded-3xl px-6 py-5 flex flex-col gap-3">
+      {steps.map((step, i) => (
+        <li key={step.key} className="flex items-center gap-3">
+          <span
+            className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-label-sm font-semibold tabular-nums"
+            style={
+              step.done
+                ? { background: '#1a6b3a', color: '#fff' }
+                : { background: 'rgba(0,0,0,0.06)', color: 'inherit' }
+            }
+          >
+            {step.done ? <Check size={13} /> : i + 1}
+          </span>
+          <span
+            className={`text-body-md leading-snug ${
+              step.done ? 'text-on-surface-variant line-through decoration-1' : 'text-on-surface'
+            }`}
+          >
+            {step.label}
+          </span>
+        </li>
+      ))}
+    </ol>
   )
 }

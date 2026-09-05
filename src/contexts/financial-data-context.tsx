@@ -11,6 +11,7 @@ import {
 import {
   deriveMonthlyStats,
   emptyProfile,
+  normalizeProfile,
   recomputeSummary,
   type FinancialProfile,
   type LedgerTransaction,
@@ -109,26 +110,6 @@ function generateTransactions(data: FinancialProfile): Transaction[] {
       transaction_date: makeDate(i % 5),
       plaid_category: exp.category ?? 'Housing',
       personal_finance_category: exp.category ?? 'Housing',
-      pending: false,
-      is_recurring: true,
-      created_at: new Date().toISOString(),
-    })
-  })
-
-  // Subscriptions — dated 1st–7th, marked recurring
-  data.subscriptions.forEach((sub, i) => {
-    const id = makeId('sub')
-    txns.push({
-      id,
-      user_id: 'local',
-      account_id: 'local',
-      plaid_transaction_id: id,
-      name: sub.name,
-      merchant_name: sub.name,
-      amount: sub.amount,
-      transaction_date: makeDate(i % 7),
-      plaid_category: 'Subscriptions',
-      personal_finance_category: 'Subscriptions',
       pending: false,
       is_recurring: true,
       created_at: new Date().toISOString(),
@@ -371,10 +352,6 @@ interface FinancialDataContextValue {
   updateParsedAccount: (accId: string, updates: { name?: string; balance?: number }) => void
   removeParsedAccount: (accId: string) => void
 
-  // Subscription CRUD (operates directly on financialData.subscriptions)
-  addParsedSubscription: (sub: { name: string; amount: number; frequency?: string }) => void
-  updateParsedSubscription: (index: number, updates: { name?: string; amount?: number; frequency?: string }) => void
-  removeParsedSubscription: (index: number) => void
 }
 
 // ============================================================================
@@ -414,7 +391,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
 
   // Load all state from localStorage once on mount
   useEffect(() => {
-    setFinancialData(readStorage<FinancialProfile>(STORAGE_KEY_FINANCIAL))
+    setFinancialData(normalizeProfile(readStorage<unknown>(STORAGE_KEY_FINANCIAL)))
     setSpendingLimitState(readStorage<StoredSpendingLimit>(STORAGE_KEY_SPENDING_LIMIT))
     setSavingsGoals(readStorage<SavingsGoal[]>(STORAGE_KEY_SAVINGS_GOALS) ?? [])
     setInvestingGoalState(readStorage<InvestingGoal>(STORAGE_KEY_INVESTING_GOAL))
@@ -638,36 +615,6 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
-  // ── Subscription CRUD (operates directly on financialData.subscriptions) ──
-  const addParsedSubscription = useCallback((sub: { name: string; amount: number; frequency?: string }) => {
-    setFinancialData(prev => {
-      if (!prev) return prev
-      const next = { ...prev, subscriptions: [...prev.subscriptions, sub] }
-      writeStorage(sk(STORAGE_KEY_FINANCIAL), next)
-      return next
-    })
-  }, [])
-
-  const updateParsedSubscription = useCallback((index: number, updates: { name?: string; amount?: number; frequency?: string }) => {
-    setFinancialData(prev => {
-      if (!prev || index < 0 || index >= prev.subscriptions.length) return prev
-      const subscriptions = prev.subscriptions.map((s, i) => i === index ? { ...s, ...updates } : s)
-      const next = { ...prev, subscriptions }
-      writeStorage(sk(STORAGE_KEY_FINANCIAL), next)
-      return next
-    })
-  }, [])
-
-  const removeParsedSubscription = useCallback((index: number) => {
-    setFinancialData(prev => {
-      if (!prev || index < 0 || index >= prev.subscriptions.length) return prev
-      const subscriptions = prev.subscriptions.filter((_, i) => i !== index)
-      const next = { ...prev, subscriptions }
-      writeStorage(sk(STORAGE_KEY_FINANCIAL), next)
-      return next
-    })
-  }, [])
-
   // ── Derived values ────────────────────────────────────────────────────────
   const { assets: parsedAssets, debts: parsedDebts } = financialData
     ? mapAccounts(financialData)
@@ -777,9 +724,6 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
         removeManualAccount,
         updateParsedAccount,
         removeParsedAccount,
-        addParsedSubscription,
-        updateParsedSubscription,
-        removeParsedSubscription,
       }}
     >
       {children}

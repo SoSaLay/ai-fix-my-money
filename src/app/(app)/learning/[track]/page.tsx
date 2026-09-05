@@ -7,7 +7,7 @@ import {
   ArrowLeft, ArrowRight, Check, PenLine, Sparkles, Trophy, RotateCcw, Unlock,
 } from 'lucide-react'
 import { useLearning, type Stage } from '@/contexts/learning-context'
-import { getTrack, passMark, type Track, type Lesson } from '@/lib/learning/tracks'
+import { getTrack, passMark, shortTitle, type Track, type Lesson } from '@/lib/learning/tracks'
 import { DISCLAIMER_INVESTING } from '@/lib/learning/disclaimer'
 import { DisclaimerBar } from '@/components/learning/disclaimer-bar'
 import { AcknowledgmentGate } from '@/components/learning/acknowledgment-gate'
@@ -30,21 +30,28 @@ export default function TrackPage({ params }: { params: Promise<{ track: string 
   // rewinding their actual progress.
   const [view, setView] = useState<Stage | null>(null)
 
+  // `?step=final` is the test-out route off a locked section: it drops the
+  // learner straight on the final quiz, lessons and ordering set aside.
   useEffect(() => {
     if (!ready || !track) return
-    setView(stageFor(track.id))
+    const testOut = new URLSearchParams(window.location.search).get('step') === 'final'
+    setView(testOut && track.finalQuiz.length > 0 ? { kind: 'final' } : stageFor(track.id))
   }, [ready, track, stageFor])
 
   if (!ready || !track) {
     return <Missing message="That track doesn’t exist." />
   }
-  if (!isTrackUnlocked(track.id)) {
-    return <Missing message="Finish the tracks before this one first — each builds on the last." />
-  }
   if (track.lessons.length === 0) {
     return <ComingSoon track={track} />
   }
   if (!view) return null
+
+  // Track order still holds for the lessons — but never for the final, or for
+  // a track already passed by way of it.
+  const testedOut = trackProgress(track.id).final?.passed === true
+  if (!isTrackUnlocked(track.id) && view.kind !== 'final' && !testedOut) {
+    return <Missing message="Finish the tracks before this one first — each builds on the last." />
+  }
 
   const completion = trackCompletion(track.id)
   const finished = isTrackComplete(track.id)
@@ -78,7 +85,10 @@ export default function TrackPage({ params }: { params: Promise<{ track: string 
   const furthest = liveIndex === -1 ? railItems.length - 1 : liveIndex
   const viewIndex = railItems.findIndex(r => sameStage(r.stage, view))
 
-  const previous = viewIndex > 0 ? railItems[viewIndex - 1] : null
+  // Testing out of an order-locked track shows the final and nothing else —
+  // stepping back would land on lessons that aren't open to them yet.
+  const canBrowseSteps = isTrackUnlocked(track.id) || testedOut
+  const previous = canBrowseSteps && viewIndex > 0 ? railItems[viewIndex - 1] : null
 
   const advance = () => setView(stageFor(track.id))
 
@@ -93,7 +103,7 @@ export default function TrackPage({ params }: { params: Promise<{ track: string 
               className="flex items-center gap-2 text-label-lg text-on-surface-variant hover:text-on-surface transition-colors w-fit text-left"
             >
               <ArrowLeft size={15} className="shrink-0" />
-              <span className="truncate">Back to {previous.label}</span>
+              <span className="truncate">Back to {shortTitle(previous.label)}</span>
             </button>
           ) : (
             <Link
@@ -127,8 +137,8 @@ export default function TrackPage({ params }: { params: Promise<{ track: string 
             {railItems.map((item, i) => (
               <button
                 key={item.key}
-                onClick={() => i <= furthest ? setView(item.stage) : undefined}
-                disabled={i > furthest}
+                onClick={() => canBrowseSteps && i <= furthest ? setView(item.stage) : undefined}
+                disabled={!canBrowseSteps || i > furthest}
                 className="h-1.5 flex-1 rounded-full transition-all disabled:cursor-not-allowed"
                 style={{
                   background: item.done
@@ -177,7 +187,9 @@ export default function TrackPage({ params }: { params: Promise<{ track: string 
           />
         )}
 
-        {view.kind === 'done' && <Congratulations track={track} result={progress.final} />}
+        {view.kind === 'done' && (
+          <Congratulations track={track} result={progress.final} didAction={progress.actionDone} />
+        )}
 
         <DisclaimerBar />
       </div>
@@ -392,7 +404,7 @@ function FinalStage({
         </h2>
         <p className="text-body-md text-on-surface-variant leading-relaxed">
           {track.finalQuiz.length} questions. {needed} correct to pass and unlock the
-          section. Answers are not shown until you submit, and you can retake it.
+          feature. Answers are not shown until you submit, and you can retake it.
         </p>
       </div>
 
@@ -417,10 +429,12 @@ function FinalStage({
 // ─── Congratulations ─────────────────────────────────────────────────────────
 
 function Congratulations({
-  track, result,
+  track, result, didAction,
 }: {
   track: Track
   result: { best: number; total: number; attempts: number } | null
+  /** False when the learner tested out and skipped the lessons. */
+  didAction: boolean
 }) {
   return (
     <div className="bg-tertiary-fixed/30 rounded-3xl px-8 py-12 flex flex-col gap-5 items-center text-center max-w-2xl mx-auto">
@@ -445,8 +459,9 @@ function Congratulations({
       </p>
 
       <p className="text-body-md text-on-surface-variant leading-relaxed max-w-md">
-        {track.title} is unlocked for good, and it already holds the data you entered.
-        Everything you covered will come back in review over the next week.
+        {didAction
+          ? `${track.title} is unlocked for good, and it already holds the data you entered. Everything you covered will come back in review over the next week.`
+          : `${track.title} is unlocked for good. The lessons are still here whenever you want them, and anything you missed comes back in review over the next week.`}
       </p>
 
       <div className="flex items-center gap-3 flex-wrap justify-center mt-1">

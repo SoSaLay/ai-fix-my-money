@@ -28,7 +28,6 @@ export type InsightCategory =
   | 'savings'
   | 'income'
   | 'debt'
-  | 'subscriptions'
   | 'trends'
   | 'net_worth'
   | 'general'
@@ -238,35 +237,6 @@ function spendingInsights(data: FinancialProfile): Insight[] {
   return out
 }
 
-function subscriptionInsights(data: FinancialProfile): Insight[] {
-  const out: Insight[] = []
-  const subTotal = data.subscriptions.reduce((s, e) => s + e.amount, 0)
-
-  if (data.subscriptions.length === 0) return out
-
-  const annualCost = subTotal * 12
-  out.push({
-    id: id('subscriptions'),
-    category: 'subscriptions',
-    severity: subTotal > 200 ? 'warning' : 'neutral',
-    title: `${data.subscriptions.length} active subscription${data.subscriptions.length > 1 ? 's' : ''}`,
-    body: `Subscriptions cost ${fmt(subTotal)}/mo (${fmt(annualCost)}/yr). ${subTotal > 200 ? 'Review which ones you actually use — unused subscriptions are easy savings.' : 'A reasonable subscription spend.'}`,
-    action: subTotal > 200 ? 'View subscriptions' : undefined,
-    actionHref: subTotal > 200 ? '/spending' : undefined,
-  })
-
-  if (data.subscriptions.length >= 5) {
-    out.push({
-      id: id('subscriptions'),
-      category: 'subscriptions',
-      severity: 'neutral',
-      title: 'Subscription audit recommended',
-      body: `With ${data.subscriptions.length} subscriptions, a quarterly audit helps catch forgotten charges. Even cancelling one saves ${fmt(subTotal / data.subscriptions.length * 12)}/yr on average.`,
-    })
-  }
-
-  return out
-}
 
 function debtInsights(data: FinancialProfile): Insight[] {
   const out: Insight[] = []
@@ -530,7 +500,6 @@ export function generateInsights(
     ...incomeInsights(data),
     ...savingsInsights(data),
     ...spendingInsights(data),
-    ...subscriptionInsights(data),
     ...debtInsights(data),
     ...trendInsights(months),
     ...netWorthInsights(data),

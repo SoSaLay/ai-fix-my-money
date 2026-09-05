@@ -1168,6 +1168,15 @@ export function trackForRoute(pathname: string): Track | undefined {
   return TRACKS.find(t => pathname.startsWith(t.unlocks))
 }
 
+/**
+ * The subject of a title, without the explanatory tail after a colon or comma.
+ * "Credit: what is being measured" → "Credit". Used where a title is a label
+ * rather than a heading, such as the back button.
+ */
+export function shortTitle(title: string): string {
+  return title.split(/[:,]/)[0].trim()
+}
+
 /** Lessons + the action step + the final quiz. */
 export function totalSteps(track: Track): number {
   if (track.lessons.length === 0) return 0

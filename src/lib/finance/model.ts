@@ -20,12 +20,6 @@ export interface VariableExpense {
   amount: number
 }
 
-export interface Subscription {
-  name: string
-  amount: number
-  frequency?: string
-}
-
 export interface AccountEntry {
   name: string
   type: string
@@ -43,7 +37,6 @@ export interface FinancialProfile {
   }
   expenses_fixed: FixedExpense[]
   expenses_variable: VariableExpense[]
-  subscriptions: Subscription[]
   accounts: AccountEntry[]
   summary: {
     total_income: number
@@ -124,7 +117,6 @@ export function emptyProfile(): FinancialProfile {
     income: { total_monthly: 0, sources: [] },
     expenses_fixed: [],
     expenses_variable: [],
-    subscriptions: [],
     accounts: [],
     summary: {
       total_income: 0,
@@ -136,6 +128,65 @@ export function emptyProfile(): FinancialProfile {
   }
 }
 
+/**
+ * Bring a stored profile up to the current shape.
+ *
+ * Anything read back from localStorage was written by an older build of this
+ * app, so every field is treated as missing until proven otherwise. Recurring
+ * charges used to live in their own `subscriptions` bucket that counted toward
+ * expenses without appearing anywhere on screen — those are folded into fixed
+ * costs, where they are visible and editable.
+ */
+export function normalizeProfile(raw: unknown): FinancialProfile | null {
+  if (!raw || typeof raw !== 'object') return null
+  const p = raw as Record<string, unknown>
+
+  const num = (v: unknown): number => (typeof v === 'number' && isFinite(v) ? v : 0)
+  const str = (v: unknown): string => (typeof v === 'string' ? v : '')
+  const arr = (v: unknown): unknown[] => (Array.isArray(v) ? v : [])
+
+  const rawIncome = (p.income ?? {}) as Record<string, unknown>
+  const sources: IncomeSource[] = arr(rawIncome.sources)
+    .map(r => r as Record<string, unknown>)
+    .map(r => ({ name: str(r.name), amount: num(r.amount) }))
+
+  const fixed: FixedExpense[] = arr(p.expenses_fixed)
+    .map(r => r as Record<string, unknown>)
+    .map(r => ({
+      name: str(r.name),
+      amount: num(r.amount),
+      ...(typeof r.category === 'string' ? { category: r.category } : {}),
+    }))
+
+  // Legacy: recurring charges kept apart from fixed costs.
+  const legacySubscriptions: FixedExpense[] = arr(p.subscriptions)
+    .map(r => r as Record<string, unknown>)
+    .map(r => ({ name: str(r.name) || 'Subscription', amount: num(r.amount) }))
+
+  const variable: VariableExpense[] = arr(p.expenses_variable)
+    .map(r => r as Record<string, unknown>)
+    .map(r => ({ category: str(r.category), amount: num(r.amount) }))
+
+  const accounts: AccountEntry[] = arr(p.accounts)
+    .map(r => r as Record<string, unknown>)
+    .map(r => ({
+      name: str(r.name),
+      type: str(r.type),
+      balance: num(r.balance),
+      ...(r.limit !== undefined ? { limit: num(r.limit) } : {}),
+      ...(typeof r.institution === 'string' ? { institution: r.institution } : {}),
+    }))
+
+  return recomputeSummary({
+    income: { total_monthly: num(rawIncome.total_monthly), sources },
+    expenses_fixed: [...fixed, ...legacySubscriptions],
+    expenses_variable: variable,
+    accounts,
+    summary: { total_income: 0, total_expenses: 0, monthly_savings: 0, savings_rate: 0 },
+    imported_at: str(p.imported_at) || new Date().toISOString(),
+  })
+}
+
 /** Recompute the summary block from the profile's own entries. */
 export function recomputeSummary(profile: FinancialProfile): FinancialProfile {
   const total_income = profile.income.sources.reduce((s, i) => s + i.amount, 0)
@@ -143,8 +194,7 @@ export function recomputeSummary(profile: FinancialProfile): FinancialProfile {
 
   const total_expenses =
     profile.expenses_fixed.reduce((s, e) => s + e.amount, 0) +
-    profile.expenses_variable.reduce((s, e) => s + e.amount, 0) +
-    profile.subscriptions.reduce((s, e) => s + e.amount, 0)
+    profile.expenses_variable.reduce((s, e) => s + e.amount, 0)
 
   const monthly_savings = total_income - total_expenses
 

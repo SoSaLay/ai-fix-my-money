@@ -39,7 +39,7 @@ export default function LearningPage() {
           </h1>
           <p className="text-body-lg text-on-surface-variant max-w-2xl leading-relaxed">
             Four tracks, in order. Each one is short lessons broken up by real work —
-            you enter your own numbers as you go, and the section unlocks when you finish.
+            you enter your own numbers as you go, and the feature unlocks when you finish.
             Nothing you enter is practice data.
           </p>
         </header>

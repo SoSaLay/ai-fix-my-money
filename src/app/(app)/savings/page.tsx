@@ -6,8 +6,6 @@ import { Lock, Unlock, Upload } from 'lucide-react'
 import { TopNav } from '@/components/layout/top-nav'
 import { CircularDial } from '@/components/savings/circular-dial'
 import { GoalsList } from '@/components/savings/goals-list'
-import { RecentTransfers } from '@/components/savings/recent-transfers'
-import type { Transfer } from '@/components/savings/recent-transfers'
 import { useDashboardSummary, useSavingsGoals } from '@/hooks/use-data'
 import { useFinancialData } from '@/contexts/financial-data-context'
 import { SectionGate } from '@/components/learning/section-gate'
@@ -30,8 +28,9 @@ function SavingsPageTool() {
 
   // Cross-category caps (derived safely before summary guard)
   const monthlyIncome = summary?.spending.monthly_income ?? 0
-  const lockedSpendingPct = summary?.spending.spending_limit
-    ? Math.round((summary.spending.spending_limit.limit / monthlyIncome) * 100)
+  const spendingLimitAmount = summary?.spending.spending_limit?.limit ?? 0
+  const lockedSpendingPct = monthlyIncome > 0
+    ? Math.round((spendingLimitAmount / monthlyIncome) * 100)
     : 0
   const lockedInvestingPct = Math.round(summary?.goals.investing?.allocation_pct || 0)
   const maxTotalSavingsPct = Math.max(0, 100 - lockedSpendingPct - lockedInvestingPct)
@@ -113,8 +112,6 @@ function SavingsPageTool() {
     setGeneralSavingsPct(newFreePct)
     setHasUnsavedChanges(true)
   }
-
-  const recentTransfers: Transfer[] = []
 
   return (
     <div className="flex flex-col min-h-full">
@@ -207,6 +204,13 @@ function SavingsPageTool() {
                 </div>
               )}
             </div>
+
+            <CommittedAllocations
+              monthlyIncome={monthlyIncome}
+              spendingPct={lockedSpendingPct}
+              spendingAmount={spendingLimitAmount}
+              investingPct={lockedInvestingPct}
+            />
           </div>
 
           {/* Right: goals list */}
@@ -220,18 +224,51 @@ function SavingsPageTool() {
           />
         </div>
 
-        {/* Recent transfers */}
-        {recentTransfers.length > 0 ? (
-          <RecentTransfers transfers={recentTransfers} />
-        ) : (
-          <div className="bg-surface-container-lowest rounded-2xl shadow-card p-8 text-center">
-            <p className="text-body-md text-on-surface-variant">No recent transfers</p>
-            <p className="text-label-sm text-on-surface-variant mt-2">
-              Your savings transfers will appear here
-            </p>
-          </div>
-        )}
       </div>
+    </div>
+  )
+}
+
+/**
+ * Income already committed elsewhere — the reason the dial has a ceiling.
+ * Figures only; the numbers say it.
+ */
+function CommittedAllocations({
+  monthlyIncome, spendingPct, spendingAmount, investingPct,
+}: {
+  monthlyIncome: number
+  spendingPct: number
+  spendingAmount: number
+  investingPct: number
+}) {
+  if (spendingPct === 0 && investingPct === 0) return null
+
+  const money = (n: number) => `$${Math.round(n).toLocaleString()}`
+  const investingAmount = Math.round((investingPct / 100) * monthlyIncome)
+
+  return (
+    <div className="w-full border-t border-outline-variant/30 pt-4">
+      <table className="w-full text-label-sm">
+        <tbody>
+          {spendingPct > 0 && (
+            <tr>
+              <td className="py-1.5 text-on-surface-variant">Spending limit</td>
+              <td className="py-1.5 text-right font-semibold text-on-surface whitespace-nowrap">
+                {spendingPct}% · {money(spendingAmount)}
+              </td>
+            </tr>
+          )}
+
+          {investingPct > 0 && (
+            <tr>
+              <td className="py-1.5 text-on-surface-variant">Investing</td>
+              <td className="py-1.5 text-right font-semibold text-on-surface whitespace-nowrap">
+                {investingPct}% · {money(investingAmount)}
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   )
 }

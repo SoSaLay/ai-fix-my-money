@@ -2,28 +2,18 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { Lock, Unlock, TrendingUp, Upload } from 'lucide-react'
+import { Lock, Unlock } from 'lucide-react'
 import { TopNav } from '@/components/layout/top-nav'
 import { SummaryBar } from '@/components/spending/summary-bar'
-import { RecurringCard } from '@/components/spending/recurring-card'
-import { TransactionTable } from '@/components/spending/transaction-table'
 import { HorizontalLimitBar } from '@/components/spending/horizontal-limit-bar'
-import type { TableTransaction } from '@/components/spending/transaction-table'
-import { useDashboardSummary, useTransactions, useSpendingLimit } from '@/hooks/use-data'
+import { useDashboardSummary, useSpendingLimit } from '@/hooks/use-data'
 import { useFinancialData } from '@/contexts/financial-data-context'
 import { SectionGate } from '@/components/learning/section-gate'
 import { ProfileEntry } from '@/components/entry/profile-entry'
 
-function getBudgetColor(pct: number): string {
-  if (pct <= 60) return '#1a6b3a'
-  if (pct <= 85) return '#ff9817'
-  return '#ba1a1a'
-}
-
 function SpendingPageTool() {
   const { hasData } = useFinancialData()
   const { data: summary, loading: summaryLoading } = useDashboardSummary()
-  const { transactions, loading: txLoading } = useTransactions({ limit: 50 })
   const { data: spendingLimitData, updateLimit, updating } = useSpendingLimit()
 
   // Spending limit as % of MONTHLY INCOME (the true capacity ceiling)
@@ -49,7 +39,7 @@ function SpendingPageTool() {
   }, [spendingLimitData, summary])
 
   // Show loading state
-  if (summaryLoading || txLoading) {
+  if (summaryLoading) {
     return (
       <div className="flex flex-col min-h-full">
         <TopNav title="Spending Analytics" />
@@ -95,8 +85,6 @@ function SpendingPageTool() {
   const budgetPct = spendingLimitAmount > 0
     ? Math.round((monthlySpending / spendingLimitAmount) * 100)
     : 0
-  const budgetRemaining = spendingLimitAmount - monthlySpending
-  const barColor = getBudgetColor(budgetPct)
 
   const handleLockIn = async () => {
     const success = await updateLimit(spendingLimitAmount, 'monthly')
@@ -117,16 +105,6 @@ function SpendingPageTool() {
   }
 
 
-  // All transactions for table
-  const formattedTransactions: TableTransaction[] = transactions.map(tx => ({
-    id: tx.id,
-    merchant_name: tx.merchant_name || tx.name,
-    name: tx.name,
-    plaid_category: tx.plaid_category || 'Uncategorized',
-    amount: tx.amount,
-    transaction_date: tx.transaction_date,
-    pending: tx.pending,
-  }))
 
   return (
     <div className="flex flex-col min-h-full">
@@ -170,18 +148,31 @@ function SpendingPageTool() {
           </div>
 
           <div className="mt-6 flex flex-col gap-6">
-            {/* Cross-category allocation info */}
-            {(lockedSavingsPct > 0 || lockedInvestingPct > 0) && (
-              <div className="flex items-center justify-between bg-surface-container rounded-xl px-4 py-3 text-label-sm">
-                <span className="text-on-surface-variant">
-                  {lockedSavingsPct > 0 && `${lockedSavingsPct}% savings`}
-                  {lockedSavingsPct > 0 && lockedInvestingPct > 0 && ' · '}
-                  {lockedInvestingPct > 0 && `${lockedInvestingPct}% investing`}
-                  {' '}already allocated
-                </span>
-                <span className="font-semibold text-on-surface">
-                  {maxSpendingPct}% available for spending
-                </span>
+            {/* Why the slider stops short of 100% */}
+            {maxSpendingPct < 100 && (
+              <div className="bg-surface-container rounded-xl px-4 py-3">
+                <p className="text-label-md text-on-surface-variant leading-relaxed">
+                  <span className="font-semibold text-on-surface">
+                    {100 - maxSpendingPct}% of your income is already committed
+                  </span>
+                  {' — '}
+                  {lockedSavingsPct > 0 && `${lockedSavingsPct}% to savings goals`}
+                  {lockedSavingsPct > 0 && lockedInvestingPct > 0 && ' and '}
+                  {lockedInvestingPct > 0 && `${lockedInvestingPct}% to investing`}
+                  , so this cap stops at {maxSpendingPct}%. Change those on the{' '}
+                  <Link href="/savings" className="text-secondary underline underline-offset-2">
+                    Savings
+                  </Link>
+                  {lockedInvestingPct > 0 && (
+                    <>
+                      {' and '}
+                      <Link href="/investing" className="text-secondary underline underline-offset-2">
+                        Investing
+                      </Link>
+                    </>
+                  )}
+                  {' '}page{lockedInvestingPct > 0 ? 's' : ''} to free up more.
+                </p>
               </div>
             )}
 
@@ -193,26 +184,8 @@ function SpendingPageTool() {
               disabled={isLocked}
             />
 
-            {/* Projected net income based on selected cap */}
-            <div className="flex items-center justify-between bg-surface-container rounded-2xl px-5 py-4">
-              <div>
-                <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">
-                  Projected Monthly Net Income
-                </p>
-                <p className="text-label-sm text-on-surface-variant mt-0.5">
-                  If you stay within this spending cap
-                </p>
-              </div>
-              <p
-                className="text-headline-md font-bold"
-                style={{ color: monthlyIncome - spendingLimitAmount >= 0 ? '#1a6b3a' : '#ba1a1a' }}
-              >
-                ${Math.abs(monthlyIncome - spendingLimitAmount).toLocaleString()}
-                {monthlyIncome - spendingLimitAmount < 0 && (
-                  <span className="text-label-sm font-normal ml-1">deficit</span>
-                )}
-              </p>
-            </div>
+            {/* What the cap leaves over, and what that money is for */}
+            <ProjectedNet leftover={monthlyIncome - spendingLimitAmount} />
 
             {/* Lock button — hidden when already locked */}
             {!isLocked && (
@@ -230,75 +203,72 @@ function SpendingPageTool() {
             )}
           </div>
         </div>
-
-        {/* Recurring subscriptions */}
-        <RecurringCard />
-
-        {/* Transactions — unified card with budget bar in header */}
-        <div className="bg-surface-container-lowest rounded-2xl shadow-card overflow-hidden">
-          {/* Card header: spending total + budget progress */}
-          <div className="px-6 pt-6 pb-5 border-b border-outline-variant/30">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <p className="text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">
-                  Monthly Spending
-                </p>
-                <div className="flex items-end gap-3">
-                  <p className="text-display-sm font-bold text-on-surface">
-                    ${Math.round(monthlySpending).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </p>
-                  {/* vs-last-month chip placeholder */}
-                  <span
-                    className="flex items-center gap-1 rounded-full px-2.5 py-1 text-label-sm font-semibold mb-1"
-                    style={{
-                      backgroundColor: 'rgba(186,26,26,0.10)',
-                      color: '#ba1a1a',
-                    }}
-                  >
-                    <TrendingUp size={12} />
-                    This month
-                  </span>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-label-sm text-on-surface-variant mb-1">
-                  {budgetPct}% of budget used
-                </p>
-                <p
-                  className="text-label-md font-semibold"
-                  style={{ color: barColor }}
-                >
-                  {budgetRemaining > 0
-                    ? `$${Math.round(budgetRemaining).toLocaleString()} remaining`
-                    : `$${Math.round(-budgetRemaining).toLocaleString()} over limit`}
-                </p>
-              </div>
-            </div>
-
-            {/* Budget progress bar */}
-            <div className="h-2 bg-surface-container-low rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${Math.min(budgetPct, 100)}%`, backgroundColor: barColor }}
-              />
-            </div>
-          </div>
-
-          {/* Transaction table */}
-          <div className="p-6 pt-4">
-            {formattedTransactions.length > 0 ? (
-              <TransactionTable transactions={formattedTransactions} />
-            ) : (
-              <div className="py-10 text-center">
-                <p className="text-body-md text-on-surface-variant">No transactions found</p>
-                <p className="text-label-sm text-on-surface-variant mt-2">
-                  Connect an account to start tracking your spending
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
       </div>
+    </div>
+  )
+}
+
+/**
+ * What the chosen cap leaves over each month, said in money and in plain
+ * words: a figure on the left, what it means on the right.
+ */
+function ProjectedNet({ leftover }: { leftover: number }) {
+  const short = leftover < 0
+  const color = short ? '#ba1a1a' : '#1a6b3a'
+  const money = (n: number) =>
+    `$${Math.abs(Math.round(n)).toLocaleString('en-US')}`
+
+  const rows = short
+    ? [
+        {
+          value: money(leftover),
+          unit: 'short each month',
+          text: 'This cap spends more than comes in. Lower it until the number turns positive, or the gap comes out of savings or onto a card.',
+        },
+        {
+          value: money(leftover * 12),
+          unit: 'over a year',
+          text: 'What that monthly gap adds up to if nothing changes.',
+        },
+      ]
+    : [
+        {
+          value: money(leftover),
+          unit: 'left each month',
+          text: 'Money that isn’t spoken for — what you could put toward savings, investments, travel, or paying down debt faster.',
+        },
+        {
+          value: money(leftover * 12),
+          unit: 'over a year',
+          text: 'The same amount, twelve months on, if you hold this cap.',
+        },
+      ]
+
+  return (
+    <div className="bg-surface-container rounded-2xl overflow-hidden">
+      <p className="text-label-sm text-on-surface-variant uppercase tracking-wider px-5 pt-4">
+        If you stay within this cap
+      </p>
+
+      <table className="w-full mt-2">
+        <tbody>
+          {rows.map(row => (
+            <tr key={row.unit} className="border-t border-outline-variant/25 first:border-0">
+              <td className="align-top px-5 py-3.5 w-[38%] min-w-[132px]">
+                <p className="text-headline-md font-bold leading-tight" style={{ color }}>
+                  {row.value}
+                </p>
+                <p className="text-label-sm text-on-surface-variant mt-0.5">{row.unit}</p>
+              </td>
+              <td className="align-top px-5 py-3.5">
+                <p className="text-body-sm text-on-surface-variant leading-relaxed">
+                  {row.text}
+                </p>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }

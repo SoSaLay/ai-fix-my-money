@@ -1,7 +1,14 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { Plus, X, Trash2 } from 'lucide-react'
+import {
+  Plus, X, Trash2, PenLine, Pencil,
+  Home, Zap, Smartphone, Wifi, Shield, Car, Landmark, Tv, Baby, Dumbbell,
+  ShoppingCart, UtensilsCrossed, Fuel, Bus, ShoppingBag, Clapperboard,
+  HeartPulse, Plane, PawPrint, Scissors,
+  Briefcase, Laptop, Gift, Coins, Store, HeartHandshake, PiggyBank, TrendingUp, Banknote,
+  type LucideIcon,
+} from 'lucide-react'
 import { useFinancialData } from '@/contexts/financial-data-context'
 import type { FinancialProfile } from '@/lib/finance/model'
 
@@ -16,7 +23,7 @@ const COPY: Record<Section, { title: string; blurb: string; nameLabel: string; n
   },
   fixed: {
     title: 'Fixed costs',
-    blurb: 'Obligations that arrive on a schedule at roughly the same amount.',
+    blurb: 'Think recurring — the bills that come back every month for about the same amount, whether you use them or not.',
     nameLabel: 'What is it',
     namePlaceholder: 'Rent',
   },
@@ -28,18 +35,69 @@ const COPY: Record<Section, { title: string; blurb: string; nameLabel: string; n
   },
 }
 
+/** Common entries, offered as one tap before anyone types anything. */
+const TEMPLATES: Partial<Record<Section, { name: string; Icon: LucideIcon }[]>> = {
+  income: [
+    { name: 'Paycheck',       Icon: Briefcase      },
+    { name: 'Second job',     Icon: Store          },
+    { name: 'Freelance',      Icon: Laptop         },
+    { name: 'Self-employed',  Icon: Coins          },
+    { name: 'Tips',           Icon: Banknote       },
+    { name: 'Bonus',          Icon: Gift           },
+    { name: 'Benefits',       Icon: Landmark       },
+    { name: 'Pension',        Icon: PiggyBank      },
+    { name: 'Rental income',  Icon: Home           },
+    { name: 'Investments',    Icon: TrendingUp     },
+    { name: 'Support',        Icon: HeartHandshake },
+  ],
+  fixed: [
+    { name: 'Rent',          Icon: Home       },
+    { name: 'Utilities',     Icon: Zap        },
+    { name: 'Phone',         Icon: Smartphone },
+    { name: 'Internet',      Icon: Wifi       },
+    { name: 'Insurance',     Icon: Shield     },
+    { name: 'Car payment',   Icon: Car        },
+    { name: 'Loan payment',  Icon: Landmark   },
+    { name: 'Subscriptions', Icon: Tv         },
+    { name: 'Childcare',     Icon: Baby       },
+    { name: 'Gym',           Icon: Dumbbell   },
+  ],
+  variable: [
+    { name: 'Groceries',     Icon: ShoppingCart    },
+    { name: 'Eating out',    Icon: UtensilsCrossed },
+    { name: 'Gas',           Icon: Fuel            },
+    { name: 'Transit',       Icon: Bus             },
+    { name: 'Shopping',      Icon: ShoppingBag     },
+    { name: 'Entertainment', Icon: Clapperboard    },
+    { name: 'Health',        Icon: HeartPulse      },
+    { name: 'Travel',        Icon: Plane           },
+    { name: 'Pets',          Icon: PawPrint        },
+    { name: 'Personal care', Icon: Scissors        },
+  ],
+}
+
+/** Closed, picking a common entry, or filling in the amount. */
+type AddStep = 'hidden' | 'picking' | 'amount'
+
 /** Rows of name + monthly amount, written straight onto the profile. */
 export function ProfileEntry({ section }: { section: Section }) {
   const { financialData, saveProfile } = useFinancialData()
-  const [adding, setAdding] = useState(false)
+  const [step, setStep] = useState<AddStep>('hidden')
   const [name, setName] = useState('')
   const [amount, setAmount] = useState('')
+  /** True when the name came from a template, so it isn't asked for again. */
+  const [prefilled, setPrefilled] = useState(false)
+  /** A template name is a starting point — this opens it for editing. */
+  const [editingName, setEditingName] = useState(false)
 
   const copy = COPY[section]
+  const templates = TEMPLATES[section]
   const rows = readRows(financialData, section)
   const total = rows.reduce((s, r) => s + r.amount, 0)
 
-  const reset = useCallback(() => { setName(''); setAmount(''); setAdding(false) }, [])
+  const reset = useCallback(() => {
+    setName(''); setAmount(''); setPrefilled(false); setEditingName(false); setStep('hidden')
+  }, [])
 
   const add = useCallback(() => {
     const value = parseFloat(amount)
@@ -51,6 +109,31 @@ export function ProfileEntry({ section }: { section: Section }) {
   const remove = useCallback((index: number) => {
     saveProfile(profile => removeRow(profile, section, index))
   }, [section, saveProfile])
+
+  // Sections without templates go straight to the form.
+  const openAdd = () => {
+    setStep(templates ? 'picking' : 'amount')
+    setPrefilled(false)
+    setEditingName(false)
+  }
+
+  const pickTemplate = (templateName: string) => {
+    setName(templateName)
+    setPrefilled(true)
+    setEditingName(false)
+    setStep('amount')
+  }
+
+  const pickCustom = () => {
+    setName('')
+    setPrefilled(false)
+    setEditingName(false)
+    setStep('amount')
+  }
+
+  const backToPicking = () => {
+    setStep('picking'); setName(''); setPrefilled(false); setEditingName(false)
+  }
 
   return (
     <div className="bg-surface-container-lowest rounded-2xl p-5 flex flex-col gap-4">
@@ -72,7 +155,10 @@ export function ProfileEntry({ section }: { section: Section }) {
               key={`${row.name}-${i}`}
               className="flex items-center justify-between gap-3 py-2.5 border-b border-outline-variant/30 last:border-0 group"
             >
-              <span className="text-body-md text-on-surface truncate">{row.name}</span>
+              <span className="flex items-center gap-2.5 min-w-0">
+                <RowIcon section={section} name={row.name} />
+                <span className="text-body-md text-on-surface truncate">{row.name}</span>
+              </span>
               <div className="flex items-center gap-3 shrink-0">
                 <span className="text-body-md text-on-surface tabular-nums">
                   ${row.amount.toLocaleString('en-US', { maximumFractionDigits: 2 })}
@@ -90,27 +176,86 @@ export function ProfileEntry({ section }: { section: Section }) {
         </div>
       )}
 
-      {adding ? (
+      {step === 'picking' && templates && (
+        <div className="flex flex-col gap-2.5">
+          <div className="flex items-center justify-between">
+            <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">
+              Quick select
+            </p>
+            <button
+              onClick={reset}
+              className="text-on-surface-variant/60 hover:text-on-surface transition-colors"
+              aria-label="Cancel"
+            >
+              <X size={15} />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            {templates.map(({ name: templateName, Icon }) => (
+              <button
+                key={templateName}
+                onClick={() => pickTemplate(templateName)}
+                className="flex items-center gap-2 bg-surface-container rounded-xl px-3 py-2.5 text-label-md font-medium text-on-surface text-left hover:opacity-80 active:scale-[0.97] transition-all"
+              >
+                <Icon size={14} className="text-on-surface-variant shrink-0" />
+                <span className="truncate">{templateName}</span>
+              </button>
+            ))}
+
+            <button
+              onClick={pickCustom}
+              className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-label-md font-medium text-secondary text-left hover:opacity-80 active:scale-[0.97] transition-all bg-secondary/10"
+            >
+              <PenLine size={14} className="shrink-0" />
+              <span className="truncate">Something else</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {step === 'amount' && (
         <div className="flex flex-col gap-3">
-          <div className="grid grid-cols-[1fr_130px] gap-2">
+          {/* A template name shows as a label until you click the pencil. */}
+          {prefilled && !editingName && (
+            <div className="flex items-center gap-2.5">
+              <RowIcon section={section} name={name} />
+              <p className="text-body-md text-on-surface font-medium truncate">{name}</p>
+              <button
+                onClick={() => setEditingName(true)}
+                className="text-on-surface-variant/60 hover:text-secondary transition-colors shrink-0"
+                aria-label={`Rename ${name}`}
+                title="Rename"
+              >
+                <Pencil size={13} />
+              </button>
+            </div>
+          )}
+
+          <div className={prefilled && !editingName ? '' : 'grid grid-cols-[1fr_130px] gap-2'}>
+            {(!prefilled || editingName) && (
+              <input
+                autoFocus
+                value={name}
+                onChange={e => setName(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') setEditingName(false) }}
+                placeholder={copy.namePlaceholder}
+                className="bg-surface-container rounded-xl px-3.5 py-2.5 text-body-md text-on-surface outline-none focus:ring-2 focus:ring-secondary/40 min-w-0"
+                aria-label={copy.nameLabel}
+              />
+            )}
             <input
-              autoFocus
-              value={name}
-              onChange={e => setName(e.target.value)}
-              placeholder={copy.namePlaceholder}
-              className="bg-surface-container rounded-xl px-3.5 py-2.5 text-body-md text-on-surface outline-none focus:ring-2 focus:ring-secondary/40"
-              aria-label={copy.nameLabel}
-            />
-            <input
+              autoFocus={prefilled && !editingName}
               value={amount}
               onChange={e => setAmount(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') add() }}
               inputMode="decimal"
               placeholder="0.00"
-              className="bg-surface-container rounded-xl px-3.5 py-2.5 text-body-md text-on-surface outline-none focus:ring-2 focus:ring-secondary/40"
+              className="bg-surface-container rounded-xl px-3.5 py-2.5 text-body-md text-on-surface outline-none focus:ring-2 focus:ring-secondary/40 w-full min-w-0"
               aria-label="Monthly amount"
             />
           </div>
+
           <div className="flex items-center gap-2">
             <button
               onClick={add}
@@ -119,6 +264,14 @@ export function ProfileEntry({ section }: { section: Section }) {
             >
               Add
             </button>
+            {templates && (
+              <button
+                onClick={backToPicking}
+                className="text-label-lg text-on-surface-variant hover:text-on-surface px-2 py-2.5 transition-colors"
+              >
+                Back
+              </button>
+            )}
             <button
               onClick={reset}
               className="text-on-surface-variant hover:text-on-surface p-2.5"
@@ -128,9 +281,11 @@ export function ProfileEntry({ section }: { section: Section }) {
             </button>
           </div>
         </div>
-      ) : (
+      )}
+
+      {step === 'hidden' && (
         <button
-          onClick={() => setAdding(true)}
+          onClick={openAdd}
           className="flex items-center gap-2 text-label-lg font-medium text-secondary hover:opacity-80 transition-opacity w-fit"
         >
           <Plus size={15} /> Add {section === 'income' ? 'a source' : section === 'fixed' ? 'a fixed cost' : 'a category'}
@@ -138,6 +293,13 @@ export function ProfileEntry({ section }: { section: Section }) {
       )}
     </div>
   )
+}
+
+/** The template icon for a row, when its name matches one. */
+function RowIcon({ section, name }: { section: Section; name: string }) {
+  const match = TEMPLATES[section]?.find(t => t.name.toLowerCase() === name.trim().toLowerCase())
+  const Icon = match?.Icon ?? PenLine
+  return <Icon size={14} className="text-on-surface-variant/70 shrink-0" />
 }
 
 // ─── Profile read/write ──────────────────────────────────────────────────────
