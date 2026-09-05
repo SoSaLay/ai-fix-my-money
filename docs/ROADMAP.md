@@ -64,8 +64,29 @@ share of search noise worth skipping before pressing play.
 
 The Accounts queue holds 25 candidates awaiting review.
 
-Still to build: serving (§1.6), grading (§1.7), and the learner-facing changes
-(§1.9).
+Phase 3 — serving and grading — is in:
+
+- `src/lib/learning/quiz/attempt.ts` — the attempt is a signed token, not a
+  session. The sampled ids travel inside it and an HMAC makes them unforgeable,
+  so grading knows which reference answer belongs to which response with no
+  store and no host requirements. Round trip and tamper rejection are tested.
+- `src/lib/learning/quiz/sample.ts` — eight live videos plus two multiple
+  choice, shuffled fresh per attempt, projected to public fields. A track whose
+  live pool cannot fill a paper returns 503 rather than a short quiz.
+- `src/lib/learning/quiz/rate-limit.ts` — per-IP, in-memory. Honest about being
+  per-instance; move it to a shared store if the app scales horizontally.
+- `src/lib/learning/grading/grader.ts` — Claude Sonnet 5 with structured
+  outputs, so the response cannot be malformed JSON. Validates that score and
+  verdict agree and drops any "missed" point the reviewer did not write, then
+  retries once before failing.
+- `src/app/api/quiz/[track]/route.ts` and `src/app/api/quiz/grade/route.ts`.
+  An empty answer is scored without a model call.
+
+Still to build: the learner-facing changes (§1.9).
+
+**Before this can run:** `ANTHROPIC_API_KEY` in `.env.local` and in production.
+`QUIZ_ATTEMPT_SECRET` is generated locally already; production needs its own.
+See `.env.example`.
 
 ## 1.1 The model: a human-curated pool
 
@@ -339,7 +360,10 @@ design — only the learner's written answer is sent.
   and stale framing is visible rather than silent. `--max-age` and
   `--stale-after` override it per run if the flags turn out to be noise.
 - **Pool size per track.** 25–30 is the recommendation above; confirm.
-- **Grading model.** Recommend Claude. Confirm which, and where the key lives.
+- **Grading model.** Settled: Claude Sonnet 5 (`claude-sonnet-5`), with
+  structured outputs and adaptive thinking at medium effort. The key lives in
+  `ANTHROPIC_API_KEY` — unlike the TikHub key, this one is a production
+  environment variable, because grading happens at runtime.
 - **Deploy target.** Needs to be a Node target, not a static export. The only
   secret it carries is the grading key — `TIKHUB_API_KEY` stays local — and there
   is no scheduled job to host, since the health check runs by hand.
