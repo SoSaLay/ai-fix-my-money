@@ -17,6 +17,29 @@ can follow it *and judge it* — not just recall it. A question is as likely to 
 That framing is also what keeps the platform on the right side of its own
 disclosures: we are teaching people to assess content, not endorsing it.
 
+## 1.0 Built so far
+
+Phase 1 — the authoring half — is in the repo:
+
+- `src/lib/learning/video-pool/types.ts` — `VideoCandidate` (what ingestion
+  finds), `VideoReview` (what the reviewer writes), `PooledVideo` (both, plus
+  status), `QueuedVideo` (a candidate mid-review), and `PublicVideoQuestion`
+  (what a browser may see). Types only, so it is safe on both sides.
+- `src/lib/learning/video-pool/pool.ts` — `server-only`. Loads the approved
+  pools, projects public fields, reports pool health, and reads and writes the
+  review queue. Writes throw outside development.
+- `src/lib/learning/video-pool/<trackId>.json` and `<trackId>.candidates.json` —
+  all eight files exist and are empty, awaiting ingestion.
+- `src/app/admin/` — the dev-gated review area: a track index with pool health,
+  and a per-track screen. `src/app/api/admin/review/route.ts` is its only write
+  path and refuses outside development.
+- `src/components/learning/video-embed.tsx` — TikTok's official embed, sandboxed,
+  with a report-unavailable affordance. Shared by the review screen and, later,
+  the quiz.
+
+Still to build: ingestion (§1.4 steps 1–3), the health check (§1.5), serving
+(§1.6), grading (§1.7), and the learner-facing changes (§1.9).
+
 ## 1.1 The model: a human-curated pool
 
 Videos are pulled in batches, **watched by a reviewer**, and turned into a
