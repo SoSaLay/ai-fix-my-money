@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" font-family="Inter, system-ui, sans-serif">
+  <rect width="640" height="480" fill="#ffffff"/>
+  <text x="40" y="52" fill="#2d2f33" font-size="21" font-weight="700">Sinking funds: the bills you can see coming</text>
+  <text x="40" y="78" fill="#5a5b60" font-size="14">Divide a known future cost by the months until it lands. Set that aside monthly.</text>
+
+  <g font-size="13">
+    <rect x="40" y="106" width="253" height="106" rx="16" fill="#f0f0f6"/>
+    <text x="60" y="134" fill="#2d2f33" font-size="14.5" font-weight="600">Car insurance</text>
+    <text x="60" y="158" fill="#5a5b60">$852 due in 6 months</text>
+    <rect x="60" y="170" width="213" height="10" rx="5" fill="#e7e8ee"/>
+    <rect x="60" y="170" width="71" height="10" rx="5" fill="#4c49c9"/>
+    <text x="60" y="200" fill="#4c49c9" font-weight="600">$142 / month</text>
+
+    <rect x="307" y="106" width="253" height="106" rx="16" fill="#f0f0f6"/>
+    <text x="327" y="134" fill="#2d2f33" font-size="14.5" font-weight="600">Holiday travel</text>
+    <text x="327" y="158" fill="#5a5b60">$900 due in 9 months</text>
+    <rect x="327" y="170" width="213" height="10" rx="5" fill="#e7e8ee"/>
+    <rect x="327" y="170" width="47" height="10" rx="5" fill="#4c49c9"/>
+    <text x="327" y="200" fill="#4c49c9" font-weight="600">$100 / month</text>
+
+    <rect x="40" y="226" width="253" height="106" rx="16" fill="#f0f0f6"/>
+    <text x="60" y="254" fill="#2d2f33" font-size="14.5" font-weight="600">Car maintenance</text>
+    <text x="60" y="278" fill="#5a5b60">$600 across the year</text>
+    <rect x="60" y="290" width="213" height="10" rx="5" fill="#e7e8ee"/>
+    <rect x="60" y="290" width="124" height="10" rx="5" fill="#4c49c9"/>
+    <text x="60" y="320" fill="#4c49c9" font-weight="600">$50 / month</text>
+
+    <rect x="307" y="226" width="253" height="106" rx="16" fill="#f0f0f6"/>
+    <text x="327" y="254" fill="#2d2f33" font-size="14.5" font-weight="600">Annual renewals</text>
+    <text x="327" y="278" fill="#5a5b60">$336 across the year</text>
+    <rect x="327" y="290" width="213" height="10" rx="5" fill="#e7e8ee"/>
+    <rect x="327" y="290" width="96" height="10" rx="5" fill="#4c49c9"/>
+    <text x="327" y="320" fill="#4c49c9" font-weight="600">$28 / month</text>
+  </g>
+
+  <rect x="40" y="348" width="520" height="48" rx="12" fill="#4c49c9"/>
+  <text x="60" y="378" fill="#ffffff" font-size="14.5" font-weight="600">Set aside monthly, in total</text>
+  <text x="540" y="378" fill="#ffffff" font-size="16" font-weight="700" text-anchor="end">$320</text>
+
+  <text x="40" y="428" fill="#5a5b60" font-size="13">None of these are emergencies. They are known amounts on known dates, and</text>
+  <text x="40" y="450" fill="#5a5b60" font-size="13">the only surprise is treating them as surprises.</text>
+</svg>

@@ -241,7 +241,11 @@ function LessonStage({
         <ReadTimer seconds={lesson.readSeconds} onElapsed={onElapsed} />
       ) : (
         <div className="flex flex-col gap-4">
-          <QuestionStack questions={lesson.questions} onChange={setState} />
+          <QuestionStack
+            questions={lesson.questions}
+            images={lesson.images}
+            onChange={setState}
+          />
           <div className="flex items-center justify-end gap-4 flex-wrap">
             {!state.allAnswered && (
               <p className="text-label-sm text-on-surface-variant">

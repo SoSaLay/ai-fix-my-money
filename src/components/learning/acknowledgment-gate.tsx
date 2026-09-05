@@ -1,8 +1,10 @@
 'use client'
 
+import Link from 'next/link'
 import { ShieldCheck, Check } from 'lucide-react'
 import { useLearning } from '@/contexts/learning-context'
 import { ACKNOWLEDGMENT_POINTS } from '@/lib/learning/disclaimer'
+import { LEGAL_ROOT } from '@/lib/legal/documents'
 
 /**
  * Shown once, before anyone starts a track. It is an explicit acknowledgment
@@ -39,12 +41,21 @@ export function AcknowledgmentGate({ children }: { children: React.ReactNode }) 
           ))}
         </ul>
 
-        <button
-          onClick={acknowledge}
-          className="self-start bg-secondary text-white rounded-2xl px-6 py-3.5 text-label-lg font-medium hover:opacity-90 transition-opacity"
-        >
-          I understand — start learning
-        </button>
+        <div className="flex items-center gap-5 flex-wrap">
+          <button
+            onClick={acknowledge}
+            className="bg-secondary text-white rounded-2xl px-6 py-3.5 text-label-lg font-medium hover:opacity-90 transition-opacity"
+          >
+            I understand — start learning
+          </button>
+          {/* Readable before agreeing, not only after. */}
+          <Link
+            href={LEGAL_ROOT}
+            className="text-label-lg font-medium text-on-surface-variant underline underline-offset-4 hover:text-on-surface transition-colors"
+          >
+            Read the full disclosures first
+          </Link>
+        </div>
       </div>
     </div>
   )

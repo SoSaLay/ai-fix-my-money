@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" font-family="Inter, system-ui, sans-serif">
+  <rect width="640" height="480" fill="#ffffff"/>
+  <text x="40" y="52" fill="#2d2f33" font-size="21" font-weight="700">The part of the month already decided</text>
+  <text x="40" y="78" fill="#5a5b60" font-size="14">Fixed costs are committed before the month starts. What is left is the part you steer.</text>
+
+  <rect x="40" y="110" width="520" height="56" rx="14" fill="#e7e8ee"/>
+  <rect x="40" y="110" width="343" height="56" rx="14" fill="#4c49c9"/>
+  <text x="60" y="144" fill="#ffffff" font-size="14" font-weight="600">Fixed — $1,880</text>
+  <text x="540" y="144" fill="#5a5b60" font-size="14" font-weight="600" text-anchor="end">Left — $854</text>
+
+  <text x="40" y="206" fill="#5a5b60" font-size="11.5" font-weight="600" letter-spacing="1.3">WHAT IS IN THE FIXED BLOCK</text>
+
+  <g font-size="13.5">
+    <rect x="40" y="220" width="253" height="44" rx="12" fill="#f0f0f6"/>
+    <text x="60" y="248" fill="#2d2f33">Rent</text>
+    <text x="273" y="248" fill="#2d2f33" text-anchor="end" font-weight="600">$1,150</text>
+
+    <rect x="307" y="220" width="253" height="44" rx="12" fill="#f0f0f6"/>
+    <text x="327" y="248" fill="#2d2f33">Car payment</text>
+    <text x="540" y="248" fill="#2d2f33" text-anchor="end" font-weight="600">$310</text>
+
+    <rect x="40" y="276" width="253" height="44" rx="12" fill="#f0f0f6"/>
+    <text x="60" y="304" fill="#2d2f33">Phone</text>
+    <text x="273" y="304" fill="#2d2f33" text-anchor="end" font-weight="600">$65</text>
+
+    <rect x="307" y="276" width="253" height="44" rx="12" fill="#f0f0f6"/>
+    <text x="327" y="304" fill="#2d2f33">Insurance</text>
+    <text x="540" y="304" fill="#2d2f33" text-anchor="end" font-weight="600">$142</text>
+
+    <rect x="40" y="332" width="253" height="44" rx="12" fill="#f0f0f6"/>
+    <text x="60" y="360" fill="#2d2f33">Utilities</text>
+    <text x="273" y="360" fill="#2d2f33" text-anchor="end" font-weight="600">$118</text>
+
+    <rect x="307" y="332" width="253" height="44" rx="12" fill="#f0f0f6"/>
+    <text x="327" y="360" fill="#2d2f33">Loan minimum</text>
+    <text x="540" y="360" fill="#2d2f33" text-anchor="end" font-weight="600">$95</text>
+  </g>
+
+  <text x="40" y="418" fill="#5a5b60" font-size="13">Fixed does not mean permanent. It means it will not change this month —</text>
+  <text x="40" y="440" fill="#5a5b60" font-size="13">changing it takes a decision and usually a notice period.</text>
+</svg>

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" font-family="Inter, system-ui, sans-serif">
+  <rect width="640" height="480" fill="#ffffff"/>
+  <text x="40" y="52" fill="#2d2f33" font-size="21" font-weight="700">Decide before the month starts</text>
+  <text x="40" y="78" fill="#5a5b60" font-size="14">Allocation gives every dollar of take-home a destination on day one.</text>
+
+  <text x="40" y="118" fill="#5a5b60" font-size="12.5">Take-home — $2,734</text>
+  <rect x="40" y="130" width="520" height="52" rx="13" fill="#f0f0f6"/>
+  <rect x="40" y="130" width="358" height="52" rx="13" fill="#4c49c9"/>
+  <rect x="398" y="130" width="61" height="52" fill="#8b89e3"/>
+  <rect x="459" y="130" width="101" height="52" rx="13" fill="#ff9817"/>
+  <rect x="440" y="130" width="38" height="52" fill="#8b89e3"/>
+
+  <g font-size="13.5">
+    <rect x="40" y="204" width="520" height="42" rx="11" fill="#f0f0f6"/>
+    <rect x="56" y="218" width="14" height="14" rx="4" fill="#4c49c9"/>
+    <text x="82" y="230" fill="#2d2f33">Fixed costs</text>
+    <text x="440" y="230" fill="#5a5b60" text-anchor="end">69%</text>
+    <text x="544" y="230" fill="#2d2f33" text-anchor="end" font-weight="600">$1,880</text>
+
+    <rect x="40" y="254" width="520" height="42" rx="11" fill="#f0f0f6"/>
+    <rect x="56" y="268" width="14" height="14" rx="4" fill="#8b89e3"/>
+    <text x="82" y="280" fill="#2d2f33">Savings and sinking funds</text>
+    <text x="440" y="280" fill="#5a5b60" text-anchor="end">12%</text>
+    <text x="544" y="280" fill="#2d2f33" text-anchor="end" font-weight="600">$320</text>
+
+    <rect x="40" y="304" width="520" height="42" rx="11" fill="#f0f0f6"/>
+    <rect x="56" y="318" width="14" height="14" rx="4" fill="#ff9817"/>
+    <text x="82" y="330" fill="#2d2f33">Everything variable</text>
+    <text x="440" y="330" fill="#5a5b60" text-anchor="end">19%</text>
+    <text x="544" y="330" fill="#2d2f33" text-anchor="end" font-weight="600">$534</text>
+  </g>
+
+  <line x1="40" y1="368" x2="600" y2="368" stroke="#acadb1" stroke-width="1" opacity="0.5"/>
+  <text x="40" y="400" fill="#5a5b60" font-size="13">Deciding up front makes savings a fixed cost rather than a leftover, and</text>
+  <text x="40" y="422" fill="#5a5b60" font-size="13">leftovers are the thing that reliably fails to appear.</text>
+  <text x="40" y="452" fill="#5a5b60" font-size="12">Percentages are illustrative. There is no split this platform recommends.</text>
+</svg>

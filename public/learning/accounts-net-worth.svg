@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" font-family="Inter, system-ui, sans-serif">
+  <rect width="640" height="480" fill="#ffffff"/>
+  <text x="40" y="52" fill="#2d2f33" font-size="21" font-weight="700">Net worth is one subtraction</text>
+  <text x="40" y="78" fill="#5a5b60" font-size="14">Everything you own, less everything you owe. It can be negative, and often is.</text>
+
+  <rect x="60" y="132" width="120" height="220" rx="14" fill="#1a6b3a" opacity="0.18"/>
+  <rect x="60" y="132" width="120" height="220" rx="14" fill="none" stroke="#1a6b3a" stroke-width="2"/>
+  <text x="120" y="118" fill="#1a6b3a" font-size="11.5" font-weight="600" letter-spacing="1.2" text-anchor="middle">ASSETS</text>
+  <text x="120" y="252" fill="#2d2f33" font-size="19" font-weight="700" text-anchor="middle">$11,470</text>
+
+  <text x="212" y="252" fill="#5a5b60" font-size="30" font-weight="300" text-anchor="middle">−</text>
+
+  <rect x="244" y="176" width="120" height="176" rx="14" fill="#ff9817" opacity="0.25"/>
+  <rect x="244" y="176" width="120" height="176" rx="14" fill="none" stroke="#ff9817" stroke-width="2"/>
+  <text x="304" y="162" fill="#b56600" font-size="11.5" font-weight="600" letter-spacing="1.2" text-anchor="middle">DEBTS</text>
+  <text x="304" y="272" fill="#2d2f33" font-size="19" font-weight="700" text-anchor="middle">$28,090</text>
+
+  <text x="396" y="252" fill="#5a5b60" font-size="30" font-weight="300" text-anchor="middle">=</text>
+
+  <rect x="428" y="216" width="152" height="136" rx="14" fill="#4c49c9"/>
+  <text x="504" y="202" fill="#4c49c9" font-size="11.5" font-weight="600" letter-spacing="1.2" text-anchor="middle">NET WORTH</text>
+  <text x="504" y="284" fill="#ffffff" font-size="21" font-weight="700" text-anchor="middle">− $16,620</text>
+
+  <line x1="40" y1="384" x2="600" y2="384" stroke="#acadb1" stroke-width="1" opacity="0.5"/>
+  <text x="40" y="414" fill="#5a5b60" font-size="13">A negative number is a starting position, not a verdict. It is the</text>
+  <text x="40" y="436" fill="#5a5b60" font-size="13">direction it moves over time that carries the information.</text>
+</svg>

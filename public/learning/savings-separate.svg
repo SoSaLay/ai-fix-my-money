@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" font-family="Inter, system-ui, sans-serif">
+  <rect width="640" height="480" fill="#ffffff"/>
+  <text x="40" y="52" fill="#2d2f33" font-size="21" font-weight="700">Savings has to sit somewhere else</text>
+  <text x="40" y="78" fill="#5a5b60" font-size="14">Money in the spending account is spendable. That is the whole problem.</text>
+
+  <rect x="52" y="120" width="240" height="256" rx="20" fill="#f0f0f6"/>
+  <text x="172" y="154" fill="#2d2f33" font-size="15" font-weight="600" text-anchor="middle">One account</text>
+  <rect x="88" y="176" width="168" height="140" rx="14" fill="#cfcdff"/>
+  <rect x="88" y="176" width="168" height="52" rx="14" fill="#4c49c9"/>
+  <text x="172" y="208" fill="#ffffff" font-size="12.5" font-weight="600" text-anchor="middle">“savings” $600</text>
+  <text x="172" y="262" fill="#2d2f33" font-size="12.5" text-anchor="middle">spending $1,200</text>
+  <text x="172" y="288" fill="#5a5b60" font-size="12" text-anchor="middle">one balance, one tap</text>
+  <text x="172" y="344" fill="#ba1a1a" font-size="12.5" font-weight="600" text-anchor="middle">The $600 is indistinguishable</text>
+  <text x="172" y="363" fill="#ba1a1a" font-size="12.5" font-weight="600" text-anchor="middle">from the rest at the till.</text>
+
+  <rect x="348" y="120" width="240" height="256" rx="20" fill="#f0f0f6"/>
+  <text x="468" y="154" fill="#2d2f33" font-size="15" font-weight="600" text-anchor="middle">Two accounts</text>
+  <rect x="384" y="176" width="168" height="60" rx="14" fill="#4c49c9"/>
+  <text x="468" y="212" fill="#ffffff" font-size="12.5" font-weight="600" text-anchor="middle">savings $600</text>
+  <rect x="384" y="248" width="168" height="68" rx="14" fill="#cfcdff"/>
+  <text x="468" y="288" fill="#2d2f33" font-size="12.5" text-anchor="middle">spending $1,200</text>
+  <text x="468" y="344" fill="#1a6b3a" font-size="12.5" font-weight="600" text-anchor="middle">Spending it now takes a</text>
+  <text x="468" y="363" fill="#1a6b3a" font-size="12.5" font-weight="600" text-anchor="middle">transfer — a deliberate act.</text>
+
+  <text x="320" y="418" fill="#5a5b60" font-size="13" text-anchor="middle">Separation does not add willpower. It adds a step, and a step is enough.</text>
+  <text x="320" y="442" fill="#5a5b60" font-size="13" text-anchor="middle">Same total either way — $1,800.</text>
+</svg>

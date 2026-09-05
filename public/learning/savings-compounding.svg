@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" font-family="Inter, system-ui, sans-serif">
+  <rect width="640" height="480" fill="#ffffff"/>
+  <text x="40" y="52" fill="#2d2f33" font-size="21" font-weight="700">Interest on interest</text>
+  <text x="40" y="78" fill="#5a5b60" font-size="14">Illustration only — $5,000 at 5% a year, nothing added, nothing taken out.</text>
+
+  <g stroke="#e7e8ee" stroke-width="1">
+    <line x1="80" y1="300" x2="580" y2="300"/>
+    <line x1="80" y1="240" x2="580" y2="240"/>
+    <line x1="80" y1="180" x2="580" y2="180"/>
+  </g>
+  <line x1="80" y1="108" x2="80" y2="356" stroke="#acadb1" stroke-width="1.5"/>
+  <line x1="80" y1="356" x2="580" y2="356" stroke="#acadb1" stroke-width="1.5"/>
+
+  <!-- Deposit plus flat interest: a straight line -->
+  <line x1="80" y1="356" x2="560" y2="225" stroke="#acadb1" stroke-width="2.5" stroke-dasharray="6 5"/>
+  <!-- Compounding: 5,000 x 1.05^t, plotted every five years -->
+  <polyline points="80,356 200,320 320,274 440,215 560,140"
+            fill="none" stroke="#4c49c9" stroke-width="3.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+
+  <circle cx="560" cy="140" r="5" fill="#4c49c9"/>
+  <circle cx="560" cy="225" r="5" fill="#acadb1"/>
+
+  <text x="560" y="126" fill="#4c49c9" font-size="13" font-weight="700" text-anchor="end" stroke="#ffffff" stroke-width="4" paint-order="stroke">Compounding — $13,266</text>
+  <text x="560" y="258" fill="#5a5b60" font-size="13" font-weight="600" text-anchor="end" stroke="#ffffff" stroke-width="4" paint-order="stroke">Flat interest — $10,000</text>
+
+  <g font-size="12.5" fill="#5a5b60" text-anchor="middle">
+    <text x="80" y="378">year 0</text>
+    <text x="200" y="378">5</text>
+    <text x="320" y="378">10</text>
+    <text x="440" y="378">15</text>
+    <text x="560" y="378">20</text>
+  </g>
+
+  <text x="40" y="420" fill="#5a5b60" font-size="13">The gap is not the rate. It is that each year’s interest joins the balance and</text>
+  <text x="40" y="442" fill="#5a5b60" font-size="13">earns in its own right. Time, not cleverness, is what opens it.</text>
+</svg>

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" font-family="Inter, system-ui, sans-serif">
+  <rect width="640" height="480" fill="#ffffff"/>
+  <text x="40" y="52" fill="#2d2f33" font-size="21" font-weight="700">Gross is not the number you budget with</text>
+  <text x="40" y="78" fill="#5a5b60" font-size="14">Take-home is what actually arrives, and it is the only figure the rest of the month runs on.</text>
+
+  <rect x="40" y="112" width="520" height="44" rx="12" fill="#cfcdff"/>
+  <text x="60" y="140" fill="#2d2f33" font-size="14" font-weight="600">Gross pay</text>
+  <text x="540" y="140" fill="#2d2f33" font-size="14" font-weight="700" text-anchor="end">$4,000</text>
+
+  <g font-size="13">
+    <rect x="96" y="172" width="404" height="38" rx="10" fill="#f0f0f6"/>
+    <text x="116" y="196" fill="#5a5b60">Federal and state tax</text>
+    <text x="480" y="196" fill="#ba1a1a" text-anchor="end" font-weight="600">− $612</text>
+
+    <rect x="96" y="220" width="404" height="38" rx="10" fill="#f0f0f6"/>
+    <text x="116" y="244" fill="#5a5b60">Social Security and Medicare</text>
+    <text x="480" y="244" fill="#ba1a1a" text-anchor="end" font-weight="600">− $306</text>
+
+    <rect x="96" y="268" width="404" height="38" rx="10" fill="#f0f0f6"/>
+    <text x="116" y="292" fill="#5a5b60">Health insurance premium</text>
+    <text x="480" y="292" fill="#ba1a1a" text-anchor="end" font-weight="600">− $148</text>
+
+    <rect x="96" y="316" width="404" height="38" rx="10" fill="#f0f0f6"/>
+    <text x="116" y="340" fill="#5a5b60">Retirement contribution</text>
+    <text x="480" y="340" fill="#ba1a1a" text-anchor="end" font-weight="600">− $200</text>
+  </g>
+
+  <rect x="40" y="376" width="520" height="52" rx="12" fill="#4c49c9"/>
+  <text x="60" y="408" fill="#ffffff" font-size="15" font-weight="600">Take-home pay</text>
+  <text x="540" y="408" fill="#ffffff" font-size="17" font-weight="700" text-anchor="end">$2,734</text>
+
+  <text x="40" y="456" fill="#5a5b60" font-size="12.5">Roughly a third of the headline number never reaches the account.</text>
+</svg>

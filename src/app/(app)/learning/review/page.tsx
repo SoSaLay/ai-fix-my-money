@@ -2,9 +2,10 @@
 
 import { useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowLeft, Check, X, RotateCcw, ArrowRight } from 'lucide-react'
 import { useLearning, type ReviewItem } from '@/contexts/learning-context'
-import { getTrack, type QuizQuestion } from '@/lib/learning/tracks'
+import { getTrack, findLessonImage, type QuizQuestion } from '@/lib/learning/tracks'
 import { DisclaimerBar } from '@/components/learning/disclaimer-bar'
 
 /**
@@ -25,6 +26,13 @@ export default function ReviewPage() {
 
   const item = due[index]
   const question = useMemo(() => item ? findQuestion(item) : null, [item])
+
+  // A question that leaned on a diagram in the lesson keeps it here — checking
+  // the picture is the point of the review, not a shortcut past it.
+  const image = useMemo(
+    () => (question?.imageSrc ? findLessonImage(question.imageSrc) : undefined),
+    [question],
+  )
 
   const choose = useCallback((i: number) => {
     if (selected !== null || !item || !question) return
@@ -76,6 +84,21 @@ export default function ReviewPage() {
           <p className="text-title-lg text-on-surface font-medium leading-snug">
             {question.question}
           </p>
+
+          {image && (
+            <figure className="w-full max-w-[380px] rounded-xl overflow-hidden bg-surface-container">
+              <div className="relative w-full aspect-[4/3]">
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  fill
+                  sizes="380px"
+                  unoptimized={image.src.endsWith('.svg')}
+                  className="object-contain"
+                />
+              </div>
+            </figure>
+          )}
 
           <div className="flex flex-col gap-2">
             {question.options.map((opt, i) => {

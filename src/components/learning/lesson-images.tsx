@@ -26,6 +26,9 @@ export function LessonImages({ images }: { images?: LessonImage[] }) {
               alt={image.alt}
               fill
               sizes="(max-width: 1024px) 100vw, 340px"
+              // The diagrams ship as SVG; the optimizer rejects those by
+              // default. A raster swapped in later still gets optimized.
+              unoptimized={image.src.endsWith('.svg')}
               className="object-contain"
             />
           </div>

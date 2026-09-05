@@ -25,6 +25,11 @@ export interface QuizQuestion {
   options: string[]
   /** Index into `options`. */
   answer: number
+  /**
+   * A `LessonImage.src` from the same lesson. When set, the question shows that
+   * picture beside it, so checking the diagram never means scrolling back up.
+   */
+  imageSrc?: string
   /** Shown after answering, right or wrong. This is the feedback step. */
   why: string
 }
@@ -129,12 +134,20 @@ const ACCOUNTS: Track = {
           ],
         },
       ],
+      images: [
+        {
+          src: '/learning/accounts-two-sides.svg',
+          alt: 'Two columns side by side. On the left, asset accounts — checking, savings, brokerage, retirement — each with a positive balance. On the right, liability accounts — credit card, student loan, auto loan, mortgage — each with an amount owed.',
+          caption: 'Assets on one side, liabilities on the other. The same word — balance — points in opposite directions.',
+        },
+      ],
       questions: [
         {
           id: 'acc-1-q1',
           question: 'A credit card account shows a balance of $840. What does that number represent?',
           options: ['Money available to you', 'Money you owe', 'Money already paid', 'Your credit limit'],
           answer: 1,
+          imageSrc: '/learning/accounts-two-sides.svg',
           why: 'On a liability account the balance is the amount still owed. On an asset account the same word means the opposite — money you hold.',
         },
         {
@@ -184,6 +197,13 @@ const ACCOUNTS: Track = {
           divider: true,
           heading: 'The practical consequence',
           body: 'Withdrawal rules, fees, and tax treatment attach to the account type, not to the amount.',
+        },
+      ],
+      images: [
+        {
+          src: '/learning/accounts-types.svg',
+          alt: 'Six account types laid out as cards: checking, savings, brokerage, retirement, credit card and instalment loan, each with a note on how it behaves and which side it sits on.',
+          caption: 'The type is what sets the rules — access, interest, and whether the balance is yours or owed.',
         },
       ],
       questions: [
@@ -236,12 +256,20 @@ const ACCOUNTS: Track = {
           ],
         },
       ],
+      images: [
+        {
+          src: '/learning/accounts-balances.svg',
+          alt: 'One account shown three ways: a current balance of $1,200, pending charges of $150 subtracted from it, an available balance of $1,050, and a separate statement balance of $840 from the last closing date.',
+          caption: 'Current, less what is pending, gives available. The statement balance is a separate, older number.',
+        },
+      ],
       questions: [
         {
           id: 'acc-3-q1',
           question: 'Which balance tells you what you can spend right now?',
           options: ['Current balance', 'Available balance', 'Statement balance', 'Opening balance'],
           answer: 1,
+          imageSrc: '/learning/accounts-balances.svg',
           why: 'Available balance already accounts for pending charges and holds. Current balance does not.',
         },
         {
@@ -254,6 +282,7 @@ const ACCOUNTS: Track = {
             'The statement balance excludes interest',
           ],
           answer: 1,
+          imageSrc: '/learning/accounts-balances.svg',
           why: 'The statement balance is frozen at the cycle close. Anything you spend afterwards shows in the current balance but not the statement.',
         },
         {
@@ -261,6 +290,7 @@ const ACCOUNTS: Track = {
           question: 'A pending charge has not settled. What has it already affected?',
           options: ['Nothing', 'Your available balance', 'Your credit score', 'Your statement balance'],
           answer: 1,
+          imageSrc: '/learning/accounts-balances.svg',
           why: 'Pending charges reduce what you can spend immediately, even though they have not posted to your transaction history.',
         },
       ],
@@ -293,12 +323,20 @@ const ACCOUNTS: Track = {
           ],
         },
       ],
+      images: [
+        {
+          src: '/learning/accounts-utilisation.svg',
+          alt: 'Two progress bars. Card A has a $5,000 limit with $1,500 used, filling 30 per cent. Card B has a $2,000 limit with the same $1,500 used, filling 75 per cent.',
+          caption: 'The same $1,500 is 30% on one card and 75% on another. Utilisation is the ratio, never the amount.',
+        },
+      ],
       questions: [
         {
           id: 'acc-4-q1',
           question: 'You owe $450 on a card with a $1,500 limit. What is your utilisation on that card?',
           options: ['4.5%', '30%', '45%', '15%'],
           answer: 1,
+          imageSrc: '/learning/accounts-utilisation.svg',
           why: '450 ÷ 1500 = 0.30, so 30%. Utilisation is always balance divided by limit, not balance divided by income or spending.',
         },
         {
@@ -353,12 +391,20 @@ const ACCOUNTS: Track = {
           ],
         },
       ],
+      images: [
+        {
+          src: '/learning/accounts-net-worth.svg',
+          alt: 'A block of assets worth $11,470, minus a block of debts worth $28,090, equals a net worth of negative $16,620.',
+          caption: 'Assets minus debts. One subtraction, and the answer is allowed to be negative.',
+        },
+      ],
       questions: [
         {
           id: 'acc-5-q1',
           question: 'You have $4,000 across your accounts and owe $9,500. What is your net worth?',
           options: ['$13,500', '−$5,500', '$5,500', '−$9,500'],
           answer: 1,
+          imageSrc: '/learning/accounts-net-worth.svg',
           why: '4,000 − 9,500 = −5,500. Negative net worth simply means recorded debts currently exceed recorded assets.',
         },
         {
@@ -538,12 +584,20 @@ const SPENDING: Track = {
           ],
         },
       ],
+      images: [
+        {
+          src: '/learning/spending-gross-net.svg',
+          alt: 'Gross pay of $4,000 with four deductions listed beneath it — tax, payroll tax, health insurance and a retirement contribution — leaving take-home pay of $2,734.',
+          caption: 'Gross pay, less tax and deductions, gives take-home. Take-home is the figure the month runs on.',
+        },
+      ],
       questions: [
         {
           id: 'spd-1-q1',
           question: 'Which figure describes money that has actually reached your account?',
           options: ['Gross income', 'Net income', 'Annual salary', 'Base pay'],
           answer: 1,
+          imageSrc: '/learning/spending-gross-net.svg',
           why: 'Net income is what remains after deductions. It is the only figure you can actually spend or move.',
         },
         {
@@ -584,6 +638,13 @@ const SPENDING: Track = {
             { term: 'Fixed is not permanent', text: 'Changing one takes a deliberate decision and usually notice — moving, refinancing, switching plans.' },
             { term: 'They are the floor', text: 'Income below your fixed total cannot be resolved by spending more carefully.' },
           ],
+        },
+      ],
+      images: [
+        {
+          src: '/learning/spending-fixed-costs.svg',
+          alt: 'A bar showing $1,880 of fixed costs against $854 left over, with the fixed block broken out into rent, car payment, phone, insurance, utilities and a loan minimum.',
+          caption: 'Fixed costs are committed before the month begins. What remains is the part you can steer.',
         },
       ],
       questions: [
@@ -637,6 +698,13 @@ const SPENDING: Track = {
             { term: 'The estimate gap', text: 'Recalled spending is commonly well below the real total, because small frequent charges are easiest to forget.' },
             { term: 'Frequency beats size', text: 'One $200 charge is easy to notice. Twenty $10 charges are the same money and much harder to see.' },
           ],
+        },
+      ],
+      images: [
+        {
+          src: '/learning/spending-variable.svg',
+          alt: 'Five horizontal bars for variable categories — groceries $412, eating out $326, transport $187, shopping $146 and fun $93 — totalling $1,164.',
+          caption: 'Categories turn one unexplained total into a short list of numbers worth looking at.',
         },
       ],
       questions: [
@@ -700,6 +768,13 @@ const SPENDING: Track = {
           ],
         },
       ],
+      images: [
+        {
+          src: '/learning/spending-subscriptions.svg',
+          alt: 'Five subscriptions listed with their monthly and annual cost side by side, totalling $76.96 a month and $923.52 a year.',
+          caption: 'Each subscription is priced to be ignorable monthly. The annual column is the one that is hard to ignore.',
+        },
+      ],
       questions: [
         {
           id: 'spd-4-q1',
@@ -758,12 +833,20 @@ const SPENDING: Track = {
           body: 'A spending limit is a threshold you set for yourself so overspending becomes visible while the month is still running.',
         },
       ],
+      images: [
+        {
+          src: '/learning/spending-cash-flow.svg',
+          alt: 'Take-home pay of $2,734 in, fixed costs of $1,880 and variable spending of $1,164 out, leaving cash flow of negative $310.',
+          caption: 'Money in, less money out. The sign of that number decides what everything else is made of.',
+        },
+      ],
       questions: [
         {
           id: 'spd-5-q1',
           question: 'Income $3,400. Fixed $1,900. Variable $1,150. Subscriptions $95. What is net cash flow?',
           options: ['+$255', '−$255', '+$350', '+$1,500'],
           answer: 0,
+          imageSrc: '/learning/spending-cash-flow.svg',
           why: '3,400 − (1,900 + 1,150 + 95) = 255. Every outflow category has to be included or the figure flatters you.',
         },
         {
@@ -841,6 +924,13 @@ const SAVINGS: Track = {
           body: 'Money separated when income arrives is not competing with the month’s spending. Money separated at month end is whatever survived.',
         },
       ],
+      images: [
+        {
+          src: '/learning/savings-separate.svg',
+          alt: 'The same $1,800 shown two ways: as one account where savings and spending share a balance, and as two accounts where moving the savings takes a transfer.',
+          caption: 'The same total either way. Separating it does not add willpower — it adds a step.',
+        },
+      ],
       questions: [
         {
           id: 'sav-1-q1',
@@ -895,12 +985,20 @@ const SAVINGS: Track = {
           ],
         },
       ],
+      images: [
+        {
+          src: '/learning/savings-emergency-fund.svg',
+          alt: 'Six month-blocks in a row with the first three filled, above essential monthly costs of $1,880 and a balance of $5,640.',
+          caption: 'The unit is months of your own essential costs, which is why a dollar figure on its own says nothing.',
+        },
+      ],
       questions: [
         {
           id: 'sav-2-q1',
           question: 'The common three-to-six-month guideline is based on what?',
           options: ['Gross income', 'Essential monthly expenses', 'Net worth', 'Total debt'],
           answer: 1,
+          imageSrc: '/learning/savings-emergency-fund.svg',
           why: 'The fund needs to cover what you must pay, not what you normally earn or spend. Essential costs are the relevant base.',
         },
         {
@@ -941,6 +1039,13 @@ const SAVINGS: Track = {
             { text: 'They only feel like emergencies because nothing was set aside.' },
             { term: 'Separate targets', text: 'Distinct funds stop one goal from quietly consuming another.' },
           ],
+        },
+      ],
+      images: [
+        {
+          src: '/learning/savings-sinking-funds.svg',
+          alt: 'Four sinking funds — car insurance, holiday travel, car maintenance and annual renewals — each with a target, a due date, a progress bar and a monthly amount, adding to $320 a month.',
+          caption: 'A known cost divided by the months until it lands. None of these are emergencies.',
         },
       ],
       questions: [
@@ -993,6 +1098,13 @@ const SAVINGS: Track = {
           body: 'Carried credit card balances compound too. The same mechanism that grows savings grows debt.',
         },
       ],
+      images: [
+        {
+          src: '/learning/savings-compounding.svg',
+          alt: 'A chart over twenty years comparing a straight dashed line reaching $10,000 with a curve reaching $13,266, from the same $5,000 at 5 per cent.',
+          caption: 'Illustration only. The gap opens because each year’s interest joins the balance and earns in its own right.',
+        },
+      ],
       questions: [
         {
           id: 'sav-4-q1',
@@ -1004,6 +1116,7 @@ const SAVINGS: Track = {
             'Interest is tax-free',
           ],
           answer: 1,
+          imageSrc: '/learning/savings-compounding.svg',
           why: 'The base itself grows. That is why the effect accelerates rather than staying linear.',
         },
         {
@@ -1054,6 +1167,13 @@ const SAVINGS: Track = {
           divider: true,
           heading: 'What "save what is left" actually produces',
           body: 'The amount is set by whatever the month happened to cost — which is to say, not decided at all.',
+        },
+      ],
+      images: [
+        {
+          src: '/learning/savings-allocation.svg',
+          alt: 'A single bar of $2,734 take-home split into fixed costs at 69 per cent, savings and sinking funds at 12 per cent, and variable spending at 19 per cent.',
+          caption: 'Every dollar given a destination on day one. The percentages are illustrative, not recommended.',
         },
       ],
       questions: [
@@ -1192,4 +1312,18 @@ export function readingMinutes(track: Track): number {
 /** How many correct answers the final quiz requires. */
 export function passMark(track: Track): number {
   return Math.ceil(track.finalQuiz.length * PASS_THRESHOLD)
+}
+
+/**
+ * Reference art by its src, across every track. Review pulls questions out of
+ * their lesson, so it needs a way back to the picture a question points at.
+ */
+export function findLessonImage(src: string): LessonImage | undefined {
+  for (const track of TRACKS) {
+    for (const lesson of track.lessons) {
+      const hit = lesson.images?.find(image => image.src === src)
+      if (hit) return hit
+    }
+  }
+  return undefined
 }

@@ -1,11 +1,17 @@
 'use client'
 
 import { useState, useCallback, useMemo, useEffect } from 'react'
+import Image from 'next/image'
 import { Check, X } from 'lucide-react'
-import type { QuizQuestion } from '@/lib/learning/tracks'
+import type { QuizQuestion, LessonImage } from '@/lib/learning/tracks'
 
 interface QuestionStackProps {
   questions: QuizQuestion[]
+  /**
+   * The lesson's reference art. A question naming one by `imageSrc` shows it
+   * inline, so checking the picture never means scrolling back up to find it.
+   */
+  images?: LessonImage[]
   /** Reveal the right answer and the reason as soon as each one is answered. */
   revealImmediately?: boolean
   /** Fires whenever the answer set changes, so the parent can gate its CTA. */
@@ -18,10 +24,17 @@ interface QuestionStackProps {
  */
 export function QuestionStack({
   questions,
+  images,
   revealImmediately = true,
   onChange,
 }: QuestionStackProps) {
   const [answers, setAnswers] = useState<Record<string, number>>({})
+
+  // Questions point at art by src, so alt text stays defined in one place.
+  const bySrc = useMemo(
+    () => new Map((images ?? []).map(image => [image.src, image])),
+    [images],
+  )
 
   const choose = useCallback((q: QuizQuestion, option: number) => {
     // First answer stands — no changing it once the reason is on screen.
@@ -71,6 +84,10 @@ export function QuestionStack({
               {q.question}
             </p>
 
+            {q.imageSrc && bySrc.has(q.imageSrc) && (
+              <QuestionImage image={bySrc.get(q.imageSrc)!} />
+            )}
+
             <div className="flex flex-col gap-2">
               {q.options.map((opt, i) => {
                 const isAnswer = i === q.answer
@@ -111,5 +128,27 @@ export function QuestionStack({
       })}
       </div>
     </div>
+  )
+}
+
+/**
+ * The lesson diagram, repeated beside the question that refers to it. Sized
+ * well below the lesson's own copy — this is a reminder of the picture, not a
+ * second presentation of it.
+ */
+function QuestionImage({ image }: { image: LessonImage }) {
+  return (
+    <figure className="w-full max-w-[380px] rounded-xl overflow-hidden bg-surface-container">
+      <div className="relative w-full aspect-[4/3]">
+        <Image
+          src={image.src}
+          alt={image.alt}
+          fill
+          sizes="380px"
+          unoptimized={image.src.endsWith('.svg')}
+          className="object-contain"
+        />
+      </div>
+    </figure>
   )
 }

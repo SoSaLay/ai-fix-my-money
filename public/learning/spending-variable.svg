@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" font-family="Inter, system-ui, sans-serif">
+  <rect width="640" height="480" fill="#ffffff"/>
+  <text x="40" y="52" fill="#2d2f33" font-size="21" font-weight="700">Where the variable money actually went</text>
+  <text x="40" y="78" fill="#5a5b60" font-size="14">Categories exist so the total stops being a single unexplained number.</text>
+
+  <g font-size="13.5">
+    <text x="40" y="128" fill="#2d2f33">Groceries</text>
+    <rect x="180" y="112" width="330" height="24" rx="8" fill="#e7e8ee"/>
+    <rect x="180" y="112" width="248" height="24" rx="8" fill="#4c49c9"/>
+    <text x="560" y="130" fill="#2d2f33" text-anchor="end" font-weight="600">$412</text>
+
+    <text x="40" y="176" fill="#2d2f33">Eating out</text>
+    <rect x="180" y="160" width="330" height="24" rx="8" fill="#e7e8ee"/>
+    <rect x="180" y="160" width="196" height="24" rx="8" fill="#6a68d6"/>
+    <text x="560" y="178" fill="#2d2f33" text-anchor="end" font-weight="600">$326</text>
+
+    <text x="40" y="224" fill="#2d2f33">Transport</text>
+    <rect x="180" y="208" width="330" height="24" rx="8" fill="#e7e8ee"/>
+    <rect x="180" y="208" width="112" height="24" rx="8" fill="#8b89e3"/>
+    <text x="560" y="226" fill="#2d2f33" text-anchor="end" font-weight="600">$187</text>
+
+    <text x="40" y="272" fill="#2d2f33">Shopping</text>
+    <rect x="180" y="256" width="330" height="24" rx="8" fill="#e7e8ee"/>
+    <rect x="180" y="256" width="88" height="24" rx="8" fill="#ffb457"/>
+    <text x="560" y="274" fill="#2d2f33" text-anchor="end" font-weight="600">$146</text>
+
+    <text x="40" y="320" fill="#2d2f33">Fun</text>
+    <rect x="180" y="304" width="330" height="24" rx="8" fill="#e7e8ee"/>
+    <rect x="180" y="304" width="56" height="24" rx="8" fill="#ff9817"/>
+    <text x="560" y="322" fill="#2d2f33" text-anchor="end" font-weight="600">$93</text>
+  </g>
+
+  <line x1="40" y1="356" x2="600" y2="356" stroke="#acadb1" stroke-width="1" opacity="0.5"/>
+  <text x="40" y="388" fill="#2d2f33" font-size="15" font-weight="600">Variable total — $1,164</text>
+  <text x="40" y="422" fill="#5a5b60" font-size="13">Two categories are two thirds of it. That is the useful part of</text>
+  <text x="40" y="444" fill="#5a5b60" font-size="13">categorising: it tells you which two numbers are worth looking at.</text>
+</svg>

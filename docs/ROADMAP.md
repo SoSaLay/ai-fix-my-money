@@ -5,56 +5,7 @@ can be picked up cold.
 
 ---
 
-## 1. Disclaimer page behind the info icon
-
-**Where:** `src/components/learning/disclaimer-bar.tsx` — the ⓘ icon beside
-"Educational content only — not financial, investment, tax, or legal advice."
-
-**What to build**
-
-- Turn the icon into a real, obvious icon button (it currently reads as
-  decoration) and make the whole bar clickable.
-- Route it to a dedicated disclosures page, e.g. `/learning/disclosures`.
-- The page content is **not decided yet** — to be specified later.
-
-**Notes**
-
-- Long-form copy already exists in `src/lib/learning/disclaimer.ts`
-  (`DISCLAIMER_MEDIUM`, `DISCLAIMER_INVESTING`, `ACKNOWLEDGMENT_POINTS`) and is
-  the natural starting point for the page.
-- The bar appears on every learning screen, so the page has to stand on its own
-  without conversational context.
-
----
-
-## 2. Reference images in lessons and questions
-
-**Status:** plumbing is in place; the art is not.
-
-**Already built**
-
-- `LessonImage` type on `Lesson` in `src/lib/learning/tracks.ts`
-  (`src`, `alt`, optional `caption`).
-- `src/components/learning/lesson-images.tsx` renders the right column and
-  returns nothing when a lesson has no images, so the material takes the full
-  width until art exists.
-- Lesson layout is already content-left / images-right, with the timer and then
-  the questions below both.
-
-**What is left**
-
-- Produce the images and drop them under `public/`.
-- Add an `images: [...]` array to each lesson that needs one.
-- Let questions reference a lesson image, so a learner can check the picture
-  rather than re-reading the text. This needs a field on `QuizQuestion`
-  (e.g. `imageSrc`) and rendering inside `question-stack.tsx`.
-- Highest value on the concrete, visual concepts: statement vs. current vs.
-  available balance, credit utilisation as a ratio, and the assets-minus-debts
-  net worth split.
-
----
-
-## 3. Interactive final quiz — video sources and free-form answers
+## 1. Interactive final quiz — video sources and free-form answers
 
 The current final quiz is 10 multiple-choice questions with a fixed answer key.
 The target is a richer assessment.
@@ -88,3 +39,50 @@ The target is a richer assessment.
 
 **Owner note:** the API for pulling platform content is being provided
 separately.
+
+**Already written for it.** The disclosures and legal documents added
+below already cover AI-assisted grading and embedded third-party video —
+`DISCLOSURES` has an "AI-assisted features" and a "Third-party content" section,
+`TERMS` has "Automated feedback", and `PRIVACY` has a "Third-party processing"
+section naming what is sent to a model. Those sections were written ahead of the
+feature; check them against what actually ships and correct anything that drifts.
+
+---
+
+## Done, with follow-ups
+
+### Disclosures page behind the info icon — built
+
+`/learning/disclosures`, with `/terms` and `/privacy` beneath it. The bar in
+`src/components/learning/disclaimer-bar.tsx` is now the whole control and opens
+the hub; the acknowledgment gate and the learning hub link there too.
+
+Content lives in `src/lib/legal/documents.ts` and renders through
+`src/components/legal/legal-document-view.tsx`.
+
+**Still to do**
+
+- Fill in `OPERATOR` at the top of `src/lib/legal/documents.ts` — legal entity
+  name, contact email, postal address, and governing state are all placeholders,
+  and they are interpolated throughout all three documents.
+- Have a lawyer review the documents before the platform is public. They were
+  drafted against the common requirements for an educational finance platform
+  and are a starting point, not advice.
+- Decide whether the documents should also be reachable from the marketing page
+  footer, not only from inside `/learning`.
+
+### Reference images in lessons and questions — built
+
+Every lesson in Accounts, Spending, and Savings has a diagram in the right-hand
+column, and ten questions point back at one through the new `imageSrc` field on
+`QuizQuestion`. Spaced review shows the same diagram beside a question that used
+it.
+
+**Still to do**
+
+- The 15 files in `public/learning/` are hand-drawn SVG diagrams built to hold
+  the layout and be legible on their own. Swap in final art whenever it exists —
+  the `images` arrays in `src/lib/learning/tracks.ts` are the only thing that
+  needs to change, and `LessonImages` and `QuestionImage` already fall back to
+  the optimizer for raster formats.
+- The Investing track has no lessons yet, so it has no imagery either.

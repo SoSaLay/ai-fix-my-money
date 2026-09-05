@@ -8,6 +8,7 @@ import {
 import { useLearning } from '@/contexts/learning-context'
 import { TRACKS, readingMinutes, type Track } from '@/lib/learning/tracks'
 import { DISCLAIMER_MEDIUM } from '@/lib/learning/disclaimer'
+import { LEGAL_ROOT } from '@/lib/legal/documents'
 import { AcknowledgmentGate } from '@/components/learning/acknowledgment-gate'
 
 const ICONS: Record<string, React.ReactNode> = {
@@ -81,10 +82,16 @@ export default function LearningPage() {
         </div>
 
         {/* Standing disclaimer */}
-        <div className="border-t border-outline-variant/40 pt-6">
+        <div className="border-t border-outline-variant/40 pt-6 flex flex-col gap-3 items-start">
           <p className="text-body-sm text-on-surface-variant leading-relaxed max-w-2xl">
             {DISCLAIMER_MEDIUM}
           </p>
+          <Link
+            href={LEGAL_ROOT}
+            className="text-label-lg font-medium text-on-surface-variant underline underline-offset-4 hover:text-on-surface transition-colors"
+          >
+            Disclosures, terms, and privacy
+          </Link>
         </div>
       </div>
     </AcknowledgmentGate>

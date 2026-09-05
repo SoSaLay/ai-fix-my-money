@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" font-family="Inter, system-ui, sans-serif">
+  <rect width="640" height="480" fill="#ffffff"/>
+  <text x="40" y="52" fill="#2d2f33" font-size="21" font-weight="700">Cash flow is what is left over</text>
+  <text x="40" y="78" fill="#5a5b60" font-size="14">Money in, less money out. Its sign decides what every other choice is made of.</text>
+
+  <rect x="40" y="116" width="520" height="46" rx="12" fill="#1a6b3a" opacity="0.2"/>
+  <text x="60" y="145" fill="#2d2f33" font-size="14" font-weight="600">Take-home in</text>
+  <text x="540" y="145" fill="#1a6b3a" font-size="15" font-weight="700" text-anchor="end">+ $2,734</text>
+
+  <rect x="40" y="176" width="520" height="46" rx="12" fill="#f0f0f6"/>
+  <text x="60" y="205" fill="#2d2f33" font-size="14">Fixed costs out</text>
+  <text x="540" y="205" fill="#ba1a1a" font-size="14" font-weight="600" text-anchor="end">− $1,880</text>
+
+  <rect x="40" y="232" width="520" height="46" rx="12" fill="#f0f0f6"/>
+  <text x="60" y="261" fill="#2d2f33" font-size="14">Variable spending out</text>
+  <text x="540" y="261" fill="#ba1a1a" font-size="14" font-weight="600" text-anchor="end">− $1,164</text>
+
+  <line x1="40" y1="300" x2="600" y2="300" stroke="#acadb1" stroke-width="1" opacity="0.5"/>
+
+  <rect x="40" y="318" width="520" height="60" rx="14" fill="#ba1a1a" opacity="0.12"/>
+  <text x="60" y="345" fill="#2d2f33" font-size="15" font-weight="600">Monthly cash flow</text>
+  <text x="60" y="367" fill="#5a5b60" font-size="12.5">Negative — the gap is being covered by something</text>
+  <text x="540" y="356" fill="#ba1a1a" font-size="21" font-weight="700" text-anchor="end">− $310</text>
+
+  <text x="40" y="412" fill="#5a5b60" font-size="13">Positive cash flow is the raw material for saving, investing, and paying debt</text>
+  <text x="40" y="434" fill="#5a5b60" font-size="13">down. Negative cash flow means savings or credit is quietly filling the gap.</text>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" font-family="Inter, system-ui, sans-serif">
+  <rect width="640" height="480" fill="#ffffff"/>
+  <text x="40" y="52" fill="#2d2f33" font-size="21" font-weight="700">Utilisation is a ratio, not an amount</text>
+  <text x="40" y="78" fill="#5a5b60" font-size="14">Balance divided by limit. The same $1,500 reads differently on a different card.</text>
+
+  <text x="40" y="128" fill="#5a5b60" font-size="12.5">Card A — limit $5,000</text>
+  <rect x="40" y="140" width="460" height="40" rx="10" fill="#e7e8ee"/>
+  <rect x="40" y="140" width="138" height="40" rx="10" fill="#4c49c9"/>
+  <text x="194" y="166" fill="#2d2f33" font-size="14" font-weight="600">$1,500 used</text>
+  <text x="600" y="167" fill="#4c49c9" font-size="18" font-weight="700" text-anchor="end">30%</text>
+
+  <text x="40" y="228" fill="#5a5b60" font-size="12.5">Card B — limit $2,000</text>
+  <rect x="40" y="240" width="460" height="40" rx="10" fill="#e7e8ee"/>
+  <rect x="40" y="240" width="345" height="40" rx="10" fill="#ff9817"/>
+  <text x="401" y="266" fill="#2d2f33" font-size="14" font-weight="600">$1,500 used</text>
+  <text x="600" y="267" fill="#b56600" font-size="18" font-weight="700" text-anchor="end">75%</text>
+
+  <rect x="40" y="316" width="520" height="128" rx="18" fill="#f0f0f6"/>
+  <text x="64" y="350" fill="#2d2f33" font-size="14" font-weight="600">Same debt. Different ratio.</text>
+  <text x="64" y="378" fill="#5a5b60" font-size="13">The ratio moves when either number moves — paying the balance down,</text>
+  <text x="64" y="399" fill="#5a5b60" font-size="13">or the limit changing, shifts it without anything else about you changing.</text>
+  <text x="64" y="426" fill="#5a5b60" font-size="13">It is measured per card and across every card at once.</text>
+</svg>
