@@ -40,7 +40,10 @@ export function extractRows(data: unknown): Record<string, unknown>[] {
   const containers = [root, asRecord(root.data)].filter(Boolean) as Record<string, unknown>[]
 
   for (const container of containers) {
-    for (const key of ['data', 'aweme_list', 'videos', 'item_list', 'list']) {
+    // `search_item_list` is what the video-search endpoint actually returns —
+    // confirmed against a live response. Its sibling `aweme_list` is present
+    // but empty. The rest are fallbacks for the endpoints we do not use yet.
+    for (const key of ['search_item_list', 'aweme_list', 'data', 'videos', 'item_list', 'list']) {
       const value = container[key]
       if (!Array.isArray(value)) continue
       const rows = value.map(asRecord).filter(Boolean) as Record<string, unknown>[]
@@ -121,8 +124,14 @@ export function engagementScore(candidate: VideoCandidate): number {
  */
 const CONCERN_PATTERNS: Array<{ label: string; pattern: RegExp }> = [
   {
+    // Case-sensitive on purpose. Ticker shape IS upper case, and matching it
+    // case-insensitively turns every "in stock" into a stock pick.
     label: 'Names a specific ticker or stock pick',
-    pattern: /\$[A-Z]{1,5}\b|\b(buy|sell|load up on|all in on)\s+(NVDA|TSLA|AAPL|SPY|QQQ|BTC|ETH)\b/i,
+    pattern: /\$[A-Z]{1,5}\b|\b[A-Z][A-Za-z]{1,4}\s+stocks?\b/,
+  },
+  {
+    label: 'Names a specific ticker or stock pick',
+    pattern: /\b(buy|sell|load up on|all in on)\s+(NVDA|TSLA|AAPL|SPY|QQQ|BTC|ETH)\b/i,
   },
   {
     label: 'Get-rich-quick framing',
@@ -138,15 +147,57 @@ const CONCERN_PATTERNS: Array<{ label: string; pattern: RegExp }> = [
   },
   {
     label: 'Crypto or trading promotion',
-    pattern: /\b(pump|moon|to the moon|1000x|altcoin|day trading signals|forex signals|copy my trades)\b/i,
+    pattern: /\b(pump|to the moon|1000x|altcoin|day trading signals|forex signals|copy my trades)\b/i,
   },
   {
-    label: 'Personalised advice framing',
-    pattern: /\b(you should (buy|invest|put)|what you need to do with your money|tell me your (income|salary))\b/i,
+    // The platform's whole legal position is that it does not tell anyone what
+    // to do with their money. A video that does is not automatically unusable —
+    // "is this creator telling you what to do, and should they?" is a good
+    // question — but the reviewer should go in knowing.
+    label: 'Tells the viewer what to do with their money',
+    pattern: /\b(you (need|have) to (move|switch|open|stop|start)|you should (buy|invest|put|open|move)|(it'?s|it may be) time to (move|switch|open)|move your money|stop (keeping|leaving) your money|do this (now|today)|what you need to do with your money)\b/i,
+  },
+  {
+    label: 'Recommends specific products',
+    pattern: /\b((the )?\d+ best|top \d+|best .{0,20}(accounts?|cards?|banks?|funds?)|i recommend|my favorite (bank|card|account))\b/i,
+  },
+  {
+    label: 'Asks the viewer for personal financial details',
+    pattern: /\b(tell me your (income|salary|credit score)|comment your (income|salary|score)|how much do you (make|have))\b/i,
   },
 ]
 
+/**
+ * Search returns a fair amount of content that merely mentions a keyword. A
+ * caption with no financial vocabulary at all is usually one of those, and
+ * saying so up front saves the reviewer from opening it.
+ */
+const TOPIC_SIGNAL =
+  /\b(account|bank|credit|debit|savings?|checking|interest|apr|apy|hysa|budget|money|debt|loan|invest|fund|ira|401k|roth|tax|score|fee|cash|income|salary|spend|balance|deposit)/i
+
+/** Capitalised words that precede "stock" in ordinary prose, not as tickers. */
+const NOT_A_TICKER = /^(The|This|That|My|Your|Our|A|An|In|On|Of|Is|It|If|Why|How|What|When|Best|Top|New|One|Two|Buy|Sell|Own|Hot|Big)$/
+
 export function screenCaption(caption: string): string[] {
-  if (!caption.trim()) return []
-  return CONCERN_PATTERNS.filter(({ pattern }) => pattern.test(caption)).map(({ label }) => label)
+  const trimmed = caption.trim()
+  if (!trimmed) return ['No caption — no signal either way about what this is']
+
+  const concerns = [
+    ...new Set(
+      CONCERN_PATTERNS
+        .filter(({ pattern }) => {
+          const match = trimmed.match(pattern)
+          if (!match) return false
+          // "The stock market" is prose; "UBL stock" is a pick.
+          const leading = match[0].match(/^([A-Z][A-Za-z]{1,4})\s+stocks?$/)
+          return !leading || !NOT_A_TICKER.test(leading[1])
+        })
+        .map(({ label }) => label),
+    ),
+  ]
+
+  if (!TOPIC_SIGNAL.test(trimmed)) {
+    concerns.push('Caption gives no sign the video is about the topic')
+  }
+  return concerns
 }

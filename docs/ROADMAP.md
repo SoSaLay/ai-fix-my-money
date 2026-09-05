@@ -54,6 +54,16 @@ Phase 2 — ingestion and the health check — is in too:
   `pool.ts` because `server-only` throws in plain Node and the scripts need
   both. `pool.ts` re-exports them, so app code still has one import.
 
+Confirmed against the live API on the first run: results come back under
+`data.search_item_list` (its sibling `aweme_list` is present but always empty),
+each row wrapping the video in `aweme_info`. `aweme_id` is a string,
+`create_time` is unix seconds, and the counts sit under `statistics`. The
+caption screen was tuned against twenty real captions — it flags eight of them
+with no false positives, four for having no topic signal at all, which is the
+share of search noise worth skipping before pressing play.
+
+The Accounts queue holds 25 candidates awaiting review.
+
 Still to build: serving (§1.6), grading (§1.7), and the learner-facing changes
 (§1.9).
 

@@ -1,1 +1,467 @@
-[]
+[
+  {
+    "id": "acc-v-001",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7582956283981073682",
+    "shareUrl": "https://www.tiktok.com/@katlego_kala/video/7582956283981073682",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7582956283981073682",
+    "creatorHandle": "@katlego_kala",
+    "postedAt": "2025-12-12T13:03:17.000Z",
+    "caption": "ClearScore made finances make sense. Free, simple and honestly….necessary.  #ClearScore #KatlegoKevin #PersonalFinance #Fyp #Ad @clearscore_za ",
+    "engagement": {
+      "likes": 132530,
+      "comments": 403,
+      "shares": 2745,
+      "plays": 62172423
+    },
+    "status": "draft",
+    "concerns": [
+      "Caption gives no sign the video is about the topic"
+    ]
+  },
+  {
+    "id": "acc-v-002",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7351912418815003935",
+    "shareUrl": "https://www.tiktok.com/@creditspeak/video/7351912418815003935",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7351912418815003935",
+    "creatorHandle": "@creditspeak",
+    "postedAt": "2024-03-29T22:15:35.000Z",
+    "caption": "This is how you want to climb up the credit card ladder💳 these are only a couple credit cards in the entire credit card market. Make sure to pay off credit cards responsibly and on time.🙏🏻 make sure to CreditSpeak, as I speak credit every day 💳💰 ##credit##creditcard##credittips##amex##credittips101##creditscore##creditpoints##americanexpress",
+    "engagement": {
+      "likes": 1418771,
+      "comments": 5315,
+      "shares": 97800,
+      "plays": 22616680
+    },
+    "status": "draft"
+  },
+  {
+    "id": "acc-v-003",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7452911357646654726",
+    "shareUrl": "https://www.tiktok.com/@angieonabudget/video/7452911357646654726",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7452911357646654726",
+    "creatorHandle": "@angieonabudget",
+    "postedAt": "2024-12-27T02:22:33.000Z",
+    "caption": "Did you know this about credit cards? 🤯 I learned this from my fav financetoker @alex on a budget 💰🤩 #financetok #PersonalFinance #financialliteracy #creditcards #interest #personalgrowth #debt",
+    "engagement": {
+      "likes": 717520,
+      "comments": 4659,
+      "shares": 85861,
+      "plays": 7769766
+    },
+    "status": "draft"
+  },
+  {
+    "id": "acc-v-004",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7455135248091860230",
+    "shareUrl": "https://www.tiktok.com/@angieonabudget/video/7455135248091860230",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7455135248091860230",
+    "creatorHandle": "@angieonabudget",
+    "postedAt": "2025-01-02T02:12:32.000Z",
+    "caption": "What happens when you immediately pay off your credit card and always have a balance of $0??? #financetok #creditcard #financialliteracy #PersonalFinance #utilizationrate #microlearning #learnwithtiktok ",
+    "engagement": {
+      "likes": 619832,
+      "comments": 2728,
+      "shares": 33857,
+      "plays": 6326412
+    },
+    "status": "draft"
+  },
+  {
+    "id": "acc-v-005",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7600507807250664734",
+    "shareUrl": "https://www.tiktok.com/@bonafidelegal/video/7600507807250664734",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7600507807250664734",
+    "creatorHandle": "@bonafidelegal",
+    "postedAt": "2026-01-28T20:12:27.000Z",
+    "caption": "Do you have to pay a debt collector? Debt collector, secrets revealed.  What you should know to go properly armed into battle!! #credittips #debthelp #creditscore #collections #creatorsearchinsights ",
+    "engagement": {
+      "likes": 262167,
+      "comments": 2976,
+      "shares": 49896,
+      "plays": 6131964
+    },
+    "status": "draft"
+  },
+  {
+    "id": "acc-v-006",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7615475189177978125",
+    "shareUrl": "https://www.tiktok.com/@markcallowayofficial/video/7615475189177978125",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7615475189177978125",
+    "creatorHandle": "@markcallowayofficial",
+    "postedAt": "2026-03-10T04:13:47.000Z",
+    "caption": "These 3 banks have the worst fees, worst rates, and worst customer service in America. Is yours on the list? #banks #hysa #savingsaccount #moneytok #PersonalFinance ",
+    "engagement": {
+      "likes": 186915,
+      "comments": 8155,
+      "shares": 40155,
+      "plays": 6691096
+    },
+    "status": "draft"
+  },
+  {
+    "id": "acc-v-007",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7508744179107859755",
+    "shareUrl": "https://www.tiktok.com/@phdkitty/video/7508744179107859755",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7508744179107859755",
+    "creatorHandle": "@phdkitty",
+    "postedAt": "2025-05-26T13:23:37.000Z",
+    "caption": "Kitty explain credit score",
+    "engagement": {
+      "likes": 401102,
+      "comments": 1176,
+      "shares": 54394,
+      "plays": 2392448
+    },
+    "status": "draft"
+  },
+  {
+    "id": "acc-v-008",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7595391502487014687",
+    "shareUrl": "https://www.tiktok.com/@julialynnnnnn/video/7595391502487014687",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7595391502487014687",
+    "creatorHandle": "@julialynnnnnn",
+    "postedAt": "2026-01-15T01:18:29.000Z",
+    "caption": "get smarter and richer with credit cards ",
+    "engagement": {
+      "likes": 368083,
+      "comments": 2213,
+      "shares": 41545,
+      "plays": 1551055
+    },
+    "status": "draft"
+  },
+  {
+    "id": "acc-v-009",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7410832145259826462",
+    "shareUrl": "https://www.tiktok.com/@bonafidelegal/video/7410832145259826462",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7410832145259826462",
+    "creatorHandle": "@bonafidelegal",
+    "postedAt": "2024-09-04T16:53:50.000Z",
+    "caption": "Don’t pay any collections till you hear this! For help and guidance please set up your free consultation with our link 🔗 in the bio.👍🏻👍🏻.                                          #collections #help #realestate #repo #creditrepairservices #financialfreedom #house  #debtfree #fyp #viral #fypシ゚viral",
+    "engagement": {
+      "likes": 130828,
+      "comments": 2464,
+      "shares": 42135,
+      "plays": 3286425
+    },
+    "status": "draft"
+  },
+  {
+    "id": "acc-v-010",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7639834323381701910",
+    "shareUrl": "https://www.tiktok.com/@kevintrudeau_student/video/7639834323381701910",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7639834323381701910",
+    "creatorHandle": "@kevintrudeau_student",
+    "postedAt": "2026-05-14T19:39:07.000Z",
+    "caption": "This is how to increase your credit score  #creditcards #richpeople #creditscore ",
+    "engagement": {
+      "likes": 176449,
+      "comments": 1099,
+      "shares": 28948,
+      "plays": 2850049
+    },
+    "status": "draft"
+  },
+  {
+    "id": "acc-v-011",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7604957667467037983",
+    "shareUrl": "https://www.tiktok.com/@bonafidelegal/video/7604957667467037983",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7604957667467037983",
+    "creatorHandle": "@bonafidelegal",
+    "postedAt": "2026-02-09T20:00:23.000Z",
+    "caption": "In case you didn’t know, your consumer rights were violated Your personal information was transferred electronically to a third-party debt collector without your consent leaving you exposed 🤔🤔 GLBA law, FCRA law  #credit #debthelp #creditrepair #credittips #studentloan ",
+    "engagement": {
+      "likes": 127844,
+      "comments": 326,
+      "shares": 4930,
+      "plays": 4321148
+    },
+    "status": "draft"
+  },
+  {
+    "id": "acc-v-012",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7606771686687509790",
+    "shareUrl": "https://www.tiktok.com/@payoutsss/video/7606771686687509790",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7606771686687509790",
+    "creatorHandle": "@payoutsss",
+    "postedAt": "2026-02-14T17:19:26.000Z",
+    "caption": "never go over your 30% 💯🧏🏽‍♂️ #raudgeez #tiktok #creditcard #credittips #foryoupage ",
+    "engagement": {
+      "likes": 319084,
+      "comments": 1115,
+      "shares": 8601,
+      "plays": 2187330
+    },
+    "status": "draft"
+  },
+  {
+    "id": "acc-v-013",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7641359248542272781",
+    "shareUrl": "https://www.tiktok.com/@jahbaritaylor/video/7641359248542272781",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7641359248542272781",
+    "creatorHandle": "@jahbaritaylor",
+    "postedAt": "2026-05-18T22:16:46.000Z",
+    "caption": "Ranking savings bank accounts #TikTokLearningCampaign #financialliteracy ",
+    "engagement": {
+      "likes": 143046,
+      "comments": 1003,
+      "shares": 12094,
+      "plays": 2658909
+    },
+    "status": "draft"
+  },
+  {
+    "id": "acc-v-014",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7668801578723233055",
+    "shareUrl": "https://www.tiktok.com/@bonafidelegal/video/7668801578723233055",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7668801578723233055",
+    "creatorHandle": "@bonafidelegal",
+    "postedAt": "2026-07-31T21:07:04.000Z",
+    "caption": "Remove negative items: Collections Charge off Student debt Medical debt Bankruptcies Evictions Car repossessions And more #credit #creditrepair #debtfree #financialliteracy ",
+    "engagement": {
+      "likes": 99249,
+      "comments": 300,
+      "shares": 22432,
+      "plays": 2578037
+    },
+    "status": "draft"
+  },
+  {
+    "id": "acc-v-015",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7260579983930805546",
+    "shareUrl": "https://www.tiktok.com/@planetmoney/video/7260579983930805546",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7260579983930805546",
+    "creatorHandle": "@planetmoney",
+    "postedAt": "2023-07-27T19:18:46.000Z",
+    "caption": "What goes into a credit score?  #creditscore #creditcard #economics #LearnOnTikTok ",
+    "engagement": {
+      "likes": 267776,
+      "comments": 1024,
+      "shares": 14690,
+      "plays": 1251957
+    },
+    "status": "draft",
+    "concerns": [
+      "Older than 3 years — check the framing still holds"
+    ]
+  },
+  {
+    "id": "acc-v-016",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7571152879554186526",
+    "shareUrl": "https://www.tiktok.com/@financingwithkaitlyn/video/7571152879554186526",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7571152879554186526",
+    "creatorHandle": "@financingwithkaitlyn",
+    "postedAt": "2025-11-10T17:40:21.000Z",
+    "caption": "i’ve been budgeting with wizefi recently and have saved so much and i wanna know if anyone else is going thru this too?!?! #wizefi #wizefipartner #Budgeting #moneytok #financialfreedom ",
+    "engagement": {
+      "likes": 54184,
+      "comments": 7433,
+      "shares": 1585,
+      "plays": 3826806
+    },
+    "status": "draft"
+  },
+  {
+    "id": "acc-v-017",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7665166773712391455",
+    "shareUrl": "https://www.tiktok.com/@thebudgetingprincess/video/7665166773712391455",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7665166773712391455",
+    "creatorHandle": "@thebudgetingprincess",
+    "postedAt": "2026-07-22T02:02:10.000Z",
+    "caption": "Save $10,000 in a year with this 26 paycheck savings challenge 💸💸💸 #Budgeting #savingmoney #savingschallenge #savingchallenge #moneytips ",
+    "engagement": {
+      "likes": 93816,
+      "comments": 304,
+      "shares": 7565,
+      "plays": 3134124
+    },
+    "status": "draft"
+  },
+  {
+    "id": "acc-v-018",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7651731045775166750",
+    "shareUrl": "https://www.tiktok.com/@fentifriedchicken/video/7651731045775166750",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7651731045775166750",
+    "creatorHandle": "@fentifriedchicken",
+    "postedAt": "2026-06-15T21:04:42.000Z",
+    "caption": "Credit scores make perfect sense! #Corporate ",
+    "engagement": {
+      "likes": 181569,
+      "comments": 2391,
+      "shares": 13556,
+      "plays": 1738051
+    },
+    "status": "draft"
+  },
+  {
+    "id": "acc-v-019",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7673260631247605005",
+    "shareUrl": "https://www.tiktok.com/@hs.queen96/video/7673260631247605005",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7673260631247605005",
+    "creatorHandle": "@hs.queen96",
+    "postedAt": "2026-08-12T21:30:37.000Z",
+    "caption": "What's the move ??!?!  lol This is not a joke.   . #fypシ゚viral #millon #chase #millionaire #chasebank ",
+    "engagement": {
+      "likes": 118711,
+      "comments": 2689,
+      "shares": 5511,
+      "plays": 2733449
+    },
+    "status": "draft",
+    "concerns": [
+      "Caption gives no sign the video is about the topic"
+    ]
+  },
+  {
+    "id": "acc-v-020",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7629788510114925854",
+    "shareUrl": "https://www.tiktok.com/@wallstreetkitty/video/7629788510114925854",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7629788510114925854",
+    "creatorHandle": "@wallstreetkitty",
+    "postedAt": "2026-04-17T17:56:35.000Z",
+    "caption": "kitty explain how to build credit at 18 years old ",
+    "engagement": {
+      "likes": 211317,
+      "comments": 534,
+      "shares": 16479,
+      "plays": 1069810
+    },
+    "status": "draft"
+  },
+  {
+    "id": "acc-v-021",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7620602111906024717",
+    "shareUrl": "https://www.tiktok.com/@cadyebs/video/7620602111906024717",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7620602111906024717",
+    "creatorHandle": "@cadyebs",
+    "postedAt": "2026-03-23T23:48:44.000Z",
+    "caption": "Credit cards are actually AMAZING if used properly. The points, protection, cash back, etc are 100% worth it. Let me know if you have questions, we can dive in more on another episode of finance talks 💛",
+    "engagement": {
+      "likes": 184014,
+      "comments": 990,
+      "shares": 4885,
+      "plays": 1635017
+    },
+    "status": "draft"
+  },
+  {
+    "id": "acc-v-022",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7653964335185808671",
+    "shareUrl": "https://www.tiktok.com/@captain.t.roll/video/7653964335185808671",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7653964335185808671",
+    "creatorHandle": "@captain.t.roll",
+    "postedAt": "2026-06-21T21:31:06.000Z",
+    "caption": "This used to be one of my favorite places to eat at, but I noticed a new service fee on my bill that wasn’t always there. Apparently the servers at this restaurant were told to add this service fee whenever I come in because I haven’t been tipping properly. I thought tipping was optional not mandatory. Are they allowed to do this? #receipt #tipping",
+    "engagement": {
+      "likes": 104632,
+      "comments": 7799,
+      "shares": 1672,
+      "plays": 2228224
+    },
+    "status": "draft"
+  },
+  {
+    "id": "acc-v-023",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7592708027237682462",
+    "shareUrl": "https://www.tiktok.com/@bonafidelegal/video/7592708027237682462",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7592708027237682462",
+    "creatorHandle": "@bonafidelegal",
+    "postedAt": "2026-01-07T19:45:31.000Z",
+    "caption": "This is how I remove: Student loans Collections  Charge off  Hospital bills  Evictions  Late payments  Bankruptcies  Drop a comment if you need this too!! #credit #fixmycredit #studentloans #creditscorematters #financialfreedom ",
+    "engagement": {
+      "likes": 69589,
+      "comments": 1657,
+      "shares": 14454,
+      "plays": 2042864
+    },
+    "status": "draft"
+  },
+  {
+    "id": "acc-v-024",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7580620017067248927",
+    "shareUrl": "https://www.tiktok.com/@lonecirco/video/7580620017067248927",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7580620017067248927",
+    "creatorHandle": "@lonecirco",
+    "postedAt": "2025-12-06T05:57:47.000Z",
+    "caption": "Welcome to my life truly #fyp #foryou #xyzbca ",
+    "engagement": {
+      "likes": 121699,
+      "comments": 548,
+      "shares": 2334,
+      "plays": 1916557
+    },
+    "status": "draft",
+    "concerns": [
+      "Caption gives no sign the video is about the topic"
+    ]
+  },
+  {
+    "id": "acc-v-025",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7659940161089817887",
+    "shareUrl": "https://www.tiktok.com/@trellthetrainer/video/7659940161089817887",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7659940161089817887",
+    "creatorHandle": "@trellthetrainer",
+    "postedAt": "2026-07-08T00:00:12.000Z",
+    "caption": "If you want to work with me directly to learn how to make more money. How to invest, build credit, and just be more successful as a man.. just DM Me “PASSIVE” right now! I’m taking the first 30ppl!!",
+    "engagement": {
+      "likes": 153154,
+      "comments": 709,
+      "shares": 9726,
+      "plays": 978672
+    },
+    "status": "draft",
+    "concerns": [
+      "Course or funnel"
+    ]
+  }
+]
