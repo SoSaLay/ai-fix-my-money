@@ -125,14 +125,53 @@ fills a review queue.
 5. **Approval flips `status` to `approved`.** Nothing reaches a learner at
    `draft`. This gate is not optional.
 
-Build the review queue as something usable — video, numbers, and typing fields on
-one screen. If the review pass means hand-editing raw JSON it will happen once
-and never again, and the pool will rot.
+**Where the review happens: a dev-only screen that writes to the repo.** Not a
+hosted admin panel. Decided deliberately, and going live is the reason for it
+rather than against it.
+
+The pool is authored, not edited at runtime — live learners only read it, and
+content is refreshed by hand when it decays rather than on a schedule. That makes
+this a build-time job, and keeping it at build time is what keeps the answer key
+out of reach: `referenceAnswer` and `rubric` sit in the repo behind `server-only`
+instead of in a hosted database behind a login form on the public internet. A
+panel would also mean building auth from nothing — the app has no accounts, no
+sessions, and no store — and production content would immediately start drifting
+from the repo.
+
+Git supplies the approval gate for free. Flipping an item to `approved` is a diff
+someone reads before it merges, and the commit already records who did it and
+when.
+
+The shape:
+
+- **`/admin/review`, a route inside this app**, so it reuses the embed component,
+  the `PooledVideo` type, and the existing styling instead of becoming a second
+  tool to maintain.
+- **Dev-only, gated twice.** The layout calls `notFound()` unless
+  `NODE_ENV === 'development'`, and the route handler that writes refuses outside
+  dev. A read-only production filesystem is a third layer that comes free.
+- **Two files per track.** `<trackId>.candidates.json` is what the ingest script
+  writes; `<trackId>.json` holds approved items only. Approving moves an item
+  across.
+- **One candidate per screen** — the video playing, engagement figures, creator,
+  posted date, caption, and the four fields to type into. Approve writes to the
+  working tree; then commit, push, deploy.
+
+Hand-editing raw JSON is not an acceptable substitute. It will happen once and
+never again, and the pool will rot.
+
+**What would change this:** a non-technical reviewer who cannot run
+`npm run dev`. The answer then is still not a CMS — it is a hosted form that
+commits to a branch through the GitHub API, so the repo stays the source of truth
+and no answer key lands in a production database. That costs an auth story, so
+build it only once such a reviewer actually exists.
 
 API facts, confirmed: base `https://api.tikhub.io`, header
 `Authorization: Bearer <key>`, 10 QPS, ~$0.001 per request. A full four-track
 candidate pull costs well under a dollar, so cost is not a design constraint.
-Key goes in `.env.local` as `TIKHUB_API_KEY`, server-side only.
+Key goes in `.env.local` as `TIKHUB_API_KEY`. Because ingestion and review only
+ever run locally, it is never a production environment variable — the deployed
+app never talks to TikHub.
 
 ## 1.5 Dead videos
 
@@ -141,7 +180,8 @@ TikToks get deleted, go private, and creators quit. **A video that no longer
 loads must be replaced.**
 
 - **Health check.** A script re-checks every `approved` item's embed and stamps
-  `lastCheckedAt`. Anything failing flips to `unavailable`.
+  `lastCheckedAt`. Anything failing flips to `unavailable`. Like ingestion, it is
+  run by hand against the repo and its result is a commit, not a live write.
 - **Never served.** Sampling skips `unavailable` items, so a learner never draws
   a dead embed.
 - **Replenishment signal.** When a track's live pool drops below 2× the video
@@ -248,7 +288,12 @@ design — only the learner's written answer is sent.
   engagement and the reviewer judges.
 - **Pool size per track.** 25–30 is the recommendation above; confirm.
 - **Grading model.** Recommend Claude. Confirm which, and where the key lives.
-- **Deploy target.** Decides the env-var and scheduled-health-check story.
+- **Deploy target.** Needs to be a Node target, not a static export. The only
+  secret it carries is the grading key — `TIKHUB_API_KEY` stays local — and there
+  is no scheduled job to host, since the health check runs by hand.
+
+Settled: **review tooling.** A dev-only `/admin/review` screen writing to the
+repo, per 1.4. No hosted admin panel, no database, no auth.
 
 ---
 
