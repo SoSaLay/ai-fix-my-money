@@ -14,16 +14,8 @@
 
 import 'server-only'
 
-import { promises as fs } from 'fs'
-import path from 'path'
-
 import type { TrackId } from '@/lib/learning/tracks'
-import type {
-  PooledVideo,
-  PublicVideoQuestion,
-  QueuedVideo,
-  VideoStatus,
-} from './types'
+import type { PooledVideo, PublicVideoQuestion, VideoStatus } from './types'
 
 import accountsPool from './accounts.json'
 import spendingPool from './spending.json'
@@ -32,23 +24,16 @@ import investingPool from './investing.json'
 
 // ─── Quiz shape ──────────────────────────────────────────────────────────────
 
-/** Video questions per attempt. The rest of the ten are multiple choice. */
-export const VIDEO_QUESTIONS_PER_QUIZ = 8
+// In `constants.ts` so the scripts can read them too. Re-exported here so app
+// code has one place to import from.
+export {
+  CHOICE_QUESTIONS_PER_QUIZ,
+  REPLENISH_BELOW,
+  TARGET_POOL_SIZE,
+  VIDEO_QUESTIONS_PER_QUIZ,
+} from './constants'
 
-/** Hand-written multiple choice per attempt, drawn from `finalQuiz`. */
-export const CHOICE_QUESTIONS_PER_QUIZ = 2
-
-/**
- * What a healthy track holds. Three times the sampled count, so answers
- * circulating does not make the paper memorisable.
- */
-export const TARGET_POOL_SIZE = 25
-
-/**
- * Below twice the sampled count, a track needs a new ingestion round. This is
- * the replenishment signal, not a hard floor — the quiz still runs.
- */
-export const REPLENISH_BELOW = VIDEO_QUESTIONS_PER_QUIZ * 2
+import { REPLENISH_BELOW, VIDEO_QUESTIONS_PER_QUIZ } from './constants'
 
 // ─── Loading ─────────────────────────────────────────────────────────────────
 
@@ -158,68 +143,12 @@ export function toPublicQuestion(video: PooledVideo): PublicVideoQuestion {
 
 // ─── The review queue on disk ────────────────────────────────────────────────
 
-const POOL_DIR = path.join(process.cwd(), 'src', 'lib', 'learning', 'video-pool')
-
-const approvedPath = (trackId: TrackId) => path.join(POOL_DIR, `${trackId}.json`)
-const queuePath = (trackId: TrackId) => path.join(POOL_DIR, `${trackId}.candidates.json`)
-
-/**
- * Writing the pool is a development-time job whose output is a commit. On a
- * deployed host the filesystem is read-only anyway, but failing here means the
- * mistake surfaces at the call site rather than as an fs error.
- */
-function assertWritable() {
-  if (process.env.NODE_ENV !== 'development') {
-    throw new Error('The video pool is only editable in development.')
-  }
-}
-
-async function readJson<T>(file: string, fallback: T): Promise<T> {
-  try {
-    return JSON.parse(await fs.readFile(file, 'utf8')) as T
-  } catch {
-    return fallback
-  }
-}
-
-// Two-space indent and a trailing newline, so a review pass produces a diff a
-// person can read.
-async function writeJson(file: string, value: unknown): Promise<void> {
-  await fs.writeFile(file, `${JSON.stringify(value, null, 2)}\n`, 'utf8')
-}
-
-/** Candidates awaiting a human. Rejected ones stay, so they are not re-pulled. */
-export async function readQueue(trackId: TrackId): Promise<QueuedVideo[]> {
-  return readJson<QueuedVideo[]>(queuePath(trackId), [])
-}
-
-export async function writeQueue(trackId: TrackId, queue: QueuedVideo[]): Promise<void> {
-  assertWritable()
-  await writeJson(queuePath(trackId), queue)
-}
-
-/**
- * Read the approved file off disk rather than through the static import. The
- * import is a build-time snapshot; a review pass needs what is on disk right
- * now, including its own last write.
- */
-export async function readApprovedFile(trackId: TrackId): Promise<PooledVideo[]> {
-  return readJson<PooledVideo[]>(approvedPath(trackId), [])
-}
-
-export async function writeApprovedFile(trackId: TrackId, pool: PooledVideo[]): Promise<void> {
-  assertWritable()
-  await writeJson(approvedPath(trackId), pool)
-}
-
-/** Ids already spoken for, so ingestion never re-offers a video or reuses an id. */
-export async function knownIds(
-  trackId: TrackId,
-): Promise<{ ids: Set<string>; videoIds: Set<string> }> {
-  const [approved, queue] = await Promise.all([readApprovedFile(trackId), readQueue(trackId)])
-  const rows = [...approved, ...queue]
-  return {
-    ids: new Set(rows.map(r => r.id)),
-    videoIds: new Set(rows.map(r => r.videoId)),
-  }
-}
+// Lives in `pool-files.ts` so the scripts can use it too — `server-only` throws
+// in plain Node. Re-exported here so app code has one place to import from.
+export {
+  knownIds,
+  readApprovedFile,
+  readQueue,
+  writeApprovedFile,
+  writeQueue,
+} from './pool-files'

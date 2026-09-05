@@ -256,6 +256,22 @@ export function ReviewQueue({ trackId, trackTitle, initialQueue }: ReviewQueuePr
           </div>
 
           <div className="flex flex-col gap-4">
+            {current.concerns && current.concerns.length > 0 && (
+              <div className="rounded-xl bg-tertiary/10 px-4 py-3">
+                <p className="text-label-md font-medium text-on-surface">
+                  Flagged from the caption
+                </p>
+                <ul className="mt-1 list-disc pl-5 text-body-md text-on-surface-variant">
+                  {current.concerns.map(concern => (
+                    <li key={concern}>{concern}</li>
+                  ))}
+                </ul>
+                <p className="mt-2 text-label-sm text-on-surface-variant">
+                  A hint, not a verdict — the script only saw the caption. You have the video.
+                </p>
+              </div>
+            )}
+
             {current.rejected && (
               <div className="flex items-center justify-between gap-3 rounded-xl bg-error/10 px-4 py-3">
                 <span className="text-body-md text-error">

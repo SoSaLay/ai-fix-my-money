@@ -70,6 +70,13 @@ export interface PooledVideo extends VideoCandidate, VideoReview {
  */
 export interface QueuedVideo extends VideoCandidate, Partial<VideoReview> {
   status: 'draft'
+  /**
+   * Patterns the ingest script noticed in the caption — specific stock picks,
+   * get-rich-quick, MLM recruiting, course funnels. A flag, never a filter: the
+   * script has only the caption to go on, and the reviewer has the video. It
+   * exists so the obvious rejects are obvious before you press play.
+   */
+  concerns?: string[]
   /** Set when the reviewer rejects the candidate, so it is never pulled again. */
   rejected?: boolean
   rejectedReason?: string

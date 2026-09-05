@@ -37,8 +37,25 @@ Phase 1 — the authoring half — is in the repo:
   with a report-unavailable affordance. Shared by the review screen and, later,
   the quiz.
 
-Still to build: ingestion (§1.4 steps 1–3), the health check (§1.5), serving
-(§1.6), grading (§1.7), and the learner-facing changes (§1.9).
+Phase 2 — ingestion and the health check — is in too:
+
+- `scripts/ingest-videos.ts` (`npm run ingest -- --track accounts`). Searches
+  TikHub, ranks by engagement, drops anything already known, screens captions,
+  and appends drafts to the candidate queue. `--help` lists the options; nothing
+  it writes is ever approved.
+- `scripts/check-videos.ts` (`npm run check-videos`). Re-checks every approved
+  embed against TikTok's public oEmbed endpoint and flips the dead ones to
+  `unavailable`. Confirmed against live TikTok: 200 for a video that exists, 400
+  for one that does not. No key and no cost — it does not touch TikHub.
+- `scripts/lib/` — the TikHub client (the only thing in the repo that calls it)
+  and the normaliser, which is defensive because TikHub types the response body
+  as an untyped passthrough of TikTok's own shape.
+- `src/lib/learning/video-pool/pool-files.ts` and `constants.ts` — split out of
+  `pool.ts` because `server-only` throws in plain Node and the scripts need
+  both. `pool.ts` re-exports them, so app code still has one import.
+
+Still to build: serving (§1.6), grading (§1.7), and the learner-facing changes
+(§1.9).
 
 ## 1.1 The model: a human-curated pool
 
@@ -305,10 +322,12 @@ design — only the learner's written answer is sent.
 
 ## 1.12 Open questions
 
-- **Recency.** "Not 2007 content" and "popular older videos are fine if
-  engagement is high" pull the candidate query in different directions. Decide
-  whether `publish_time` caps age at all, or whether it sorts purely on
-  engagement and the reviewer judges.
+- **Recency.** Resolved as a default, still open to change. The ingest script
+  applies no age cap (`publish_time = 0`), sorts on engagement, and flags
+  anything older than three years as a concern on the review screen. That serves
+  both halves of the original tension — a popular older video still surfaces,
+  and stale framing is visible rather than silent. `--max-age` and
+  `--stale-after` override it per run if the flags turn out to be noise.
 - **Pool size per track.** 25–30 is the recommendation above; confirm.
 - **Grading model.** Recommend Claude. Confirm which, and where the key lives.
 - **Deploy target.** Needs to be a Node target, not a static export. The only
