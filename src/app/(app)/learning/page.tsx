@@ -50,10 +50,10 @@ export default function LearningPage() {
             <Link
               href="/learning/review"
               title={`${due.length} ${due.length === 1 ? 'question' : 'questions'} due for review`}
-              className="btn-review shrink-0 flex items-center justify-center gap-2"
+              className="btn-review shrink-0 items-center justify-center gap-1.5"
             >
-              <RotateCcw size={14} aria-hidden />
-              Review so it sticks
+              <RotateCcw size={13} aria-hidden />
+              Go to review mode
               <span className="tabular-nums font-semibold">({due.length})</span>
             </Link>
           )}

@@ -73,7 +73,7 @@
   /* Review call-to-action. Deliberately not a brand colour — it is the one
      thing on the page competing with the track list for attention. */
   .btn-review {
-    display: inline-block;
+    display: inline-flex;
     outline: 0;
     cursor: pointer;
     border-radius: 8px;
@@ -84,8 +84,10 @@
     height: 31px;
     padding: 0 11px;
     text-align: center;
-    width: 100%;
-    min-width: 200px;
+    /* Sized to its own label. A fixed 200px here crowded the heading beside
+       it, which is the thing the page is actually for. */
+    width: auto;
+    white-space: nowrap;
     font-weight: 500;
     color: #0F1111;
   }
