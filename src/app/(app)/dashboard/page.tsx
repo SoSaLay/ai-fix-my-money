@@ -2,67 +2,28 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { TrendingUp, TrendingDown, RefreshCw, Upload, Calendar, Wallet, PiggyBank, RotateCcw } from 'lucide-react'
+import { TrendingUp, TrendingDown, RefreshCw, Upload, Calendar, Wallet, PiggyBank, RotateCcw, ChevronDown } from 'lucide-react'
 import { TopNav } from '@/components/layout/top-nav'
-import { RecentActivity } from '@/components/dashboard/recent-activity'
-import type { Transaction } from '@/components/dashboard/recent-activity'
-import { useDashboardSummary, useTransactions } from '@/hooks/use-data'
+import { useDashboardSummary } from '@/hooks/use-data'
 import { useFinancialData } from '@/contexts/financial-data-context'
 
 export default function DashboardPage() {
-  const { hasData, resetAllocations } = useFinancialData()
+  const { hasData, resetAllocations, financialData } = useFinancialData()
   const [showResetConfirm, setShowResetConfirm] = useState(false)
   const { data: summary, loading, error, refresh } = useDashboardSummary()
-  const { transactions: recentTransactions, loading: txLoading } = useTransactions({ limit: 5 })
 
-  // Stable date strings for 7-day window
-  const todayStr = useMemo(() => new Date().toISOString().split('T')[0], [])
-  const sevenDaysAgoStr = useMemo(() => {
-    const d = new Date()
-    d.setDate(d.getDate() - 6)
-    return d.toISOString().split('T')[0]
-  }, [])
+  const [showRecurring, setShowRecurring] = useState(false)
 
-  const { transactions: weeklyTransactions } = useTransactions({
-    startDate: sevenDaysAgoStr,
-    endDate: todayStr,
-  })
-
-  // Recurring transactions from the 7-day window
+  // The fixed costs the learner recorded in Income vs. Spending. Reading them
+  // straight off the profile is what makes the figure monthly — the old
+  // seven-day transaction window missed everything billed on the 1st.
   const recurringItems = useMemo(
-    () => weeklyTransactions
-      .filter(tx => tx.amount > 0 && tx.is_recurring)
-      .reduce<Array<{ name: string; amount: number }>>((acc, tx) => {
-        const name = tx.merchant_name || tx.name
-        const existing = acc.find(i => i.name === name)
-        if (existing) {
-          existing.amount += tx.amount
-        } else {
-          acc.push({ name, amount: tx.amount })
-        }
-        return acc
-      }, [])
-      .sort((a, b) => b.amount - a.amount)
-      .slice(0, 6),
-    [weeklyTransactions],
+    () => [...(financialData?.expenses_fixed ?? [])]
+      .map(exp => ({ name: exp.name, amount: exp.amount }))
+      .sort((a, b) => b.amount - a.amount),
+    [financialData],
   )
   const recurringTotal = recurringItems.reduce((sum, i) => sum + i.amount, 0)
-
-  // Top variable categories for this month
-  const topCategories = useMemo(() => {
-    if (!summary) return []
-    const combined: Record<string, number> = {}
-    recentTransactions
-      .filter(tx => tx.amount > 0)
-      .forEach(tx => {
-        const cat = tx.personal_finance_category || tx.plaid_category || 'Other'
-        combined[cat] = (combined[cat] ?? 0) + tx.amount
-      })
-    return Object.entries(combined)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 4)
-      .map(([name, amount]) => ({ name, amount: Math.round(amount) }))
-  }, [recentTransactions, summary])
 
   // Loading skeleton
   if (loading) {
@@ -140,16 +101,6 @@ export default function DashboardPage() {
   const thisMonthNet = summary.spending.net_cash_flow
   const thisMonthSavingsRate = thisMonthIncome > 0 ? Math.round((thisMonthNet / thisMonthIncome) * 100) : 0
 
-  const formattedTransactions: Transaction[] = recentTransactions.map(tx => ({
-    id: tx.id,
-    merchant_name: tx.merchant_name || tx.name,
-    name: tx.name,
-    plaid_category: tx.plaid_category || 'Uncategorized',
-    amount: tx.amount,
-    transaction_date: tx.transaction_date,
-    pending: tx.pending,
-  }))
-
   return (
     <div className="flex flex-col min-h-full">
       <TopNav title="Dashboard" />
@@ -159,10 +110,7 @@ export default function DashboardPage() {
         <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6">
           <div className="flex items-center gap-2 mb-5">
             <Calendar size={16} className="text-on-surface-variant" />
-            <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">This Month</p>
-            <span className="ml-auto text-label-sm text-on-surface-variant">
-              {new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' })}
-            </span>
+            <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">Monthly</p>
           </div>
 
           {/* Three stat pillars */}
@@ -176,7 +124,7 @@ export default function DashboardPage() {
               <p className="text-headline-md font-bold text-on-surface">
                 ${Math.round(thisMonthIncome).toLocaleString()}
               </p>
-              <p className="text-label-sm text-on-surface-variant">total this month</p>
+              <p className="text-label-sm text-on-surface-variant">total monthly</p>
             </div>
 
             {/* Spending */}
@@ -218,49 +166,54 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Top categories */}
-          {topCategories.length > 0 && (
-            <div>
-              <p className="text-label-sm text-on-surface-variant uppercase tracking-wider mb-3">Top Categories</p>
-              <div className="flex flex-col gap-2">
-                {topCategories.map(cat => {
-                  const barPct = thisMonthSpending > 0 ? Math.round((cat.amount / thisMonthSpending) * 100) : 0
-                  return (
-                    <div key={cat.name} className="flex items-center gap-3">
-                      <p className="text-body-sm text-on-surface w-36 truncate">{cat.name}</p>
-                      <div className="flex-1 h-1.5 bg-surface-container rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all duration-500"
-                          style={{ width: `${barPct}%`, backgroundColor: '#4c49c9' }}
-                        />
-                      </div>
-                      <p className="text-label-sm text-on-surface-variant w-16 text-right">
-                        ${cat.amount.toLocaleString()}
-                      </p>
-                    </div>
-                  )
-                })}
+          {/* Recurring expenses — the fixed costs recorded in Income vs. Spending */}
+          <div className="mt-5 pt-5 border-t border-outline-variant">
+            <button
+              type="button"
+              onClick={() => setShowRecurring(v => !v)}
+              disabled={recurringItems.length === 0}
+              aria-expanded={showRecurring}
+              className="flex w-full items-center justify-between gap-3 text-left disabled:cursor-default"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant flex-shrink-0">
+                  <RefreshCw size={16} />
+                </div>
+                <div>
+                  <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">Recurring Expenses</p>
+                  <p className="text-headline-sm font-bold text-on-surface mt-0.5">
+                    ${recurringTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    <span className="text-label-sm font-normal text-on-surface-variant ml-2">monthly</span>
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
 
-          {/* Recurring Expenses */}
-          <div className="mt-5 pt-5 border-t border-outline-variant flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant flex-shrink-0">
-                <RefreshCw size={16} />
-              </div>
-              <div>
-                <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">Recurring Expenses</p>
-                <p className="text-headline-sm font-bold text-on-surface mt-0.5">
-                  ${recurringTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  <span className="text-label-sm font-normal text-on-surface-variant ml-2">this week</span>
-                </p>
-              </div>
-            </div>
-            <span className="text-label-md text-on-surface-variant">
-              {recurringItems.length} active subscription{recurringItems.length !== 1 ? 's' : ''}
-            </span>
+              <span className="flex items-center gap-2 text-on-surface-variant">
+                <span className="text-headline-sm font-bold text-on-surface tabular-nums">
+                  {recurringItems.length}
+                </span>
+                {recurringItems.length > 0 && (
+                  <ChevronDown
+                    size={16}
+                    className={`transition-transform ${showRecurring ? 'rotate-180' : ''}`}
+                    aria-hidden
+                  />
+                )}
+              </span>
+            </button>
+
+            {showRecurring && recurringItems.length > 0 && (
+              <ul className="mt-4 flex flex-col gap-2">
+                {recurringItems.map(item => (
+                  <li key={item.name} className="flex items-center justify-between gap-3">
+                    <span className="text-body-sm text-on-surface truncate">{item.name}</span>
+                    <span className="text-body-sm text-on-surface-variant tabular-nums shrink-0">
+                      ${item.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
 
@@ -402,8 +355,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Recent activity */}
-        <RecentActivity transactions={formattedTransactions} />
       </div>
     </div>
   )
