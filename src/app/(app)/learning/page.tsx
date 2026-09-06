@@ -40,9 +40,8 @@ export default function LearningPage() {
           <div className="flex flex-col gap-3">
             <p className="text-label-sm text-on-surface-variant uppercase tracking-widest">Learning</p>
             <h3 className="text-headline-md text-on-surface font-semibold max-w-2xl leading-snug">
-              These lessons were created to help you manage and grow your money with
-              objective information. Complete the lessons, unlock the features, and
-              actually understand how your money works.
+              Learn to manage and grow your money. Complete the lessons, unlock the
+              features, understand how your money works.
             </h3>
           </div>
 
