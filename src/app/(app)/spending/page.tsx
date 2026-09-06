@@ -42,7 +42,7 @@ function SpendingPageTool() {
   if (summaryLoading) {
     return (
       <div className="flex flex-col min-h-full">
-        <TopNav title="Money In, Money Out" />
+        <TopNav title="Income vs. Spending" />
         <div className="flex-1 px-8 pb-10 flex flex-col gap-6">
           <div className="h-20 bg-surface-container-lowest rounded-2xl animate-pulse" />
           <div className="h-80 bg-surface-container-lowest rounded-2xl animate-pulse" />
@@ -56,7 +56,7 @@ function SpendingPageTool() {
   if (!hasData || !summary) {
     return (
       <div className="flex flex-col min-h-full">
-        <TopNav title="Money In, Money Out" />
+        <TopNav title="Income vs. Spending" />
         <div className="flex-1 px-8 pb-10 flex flex-col gap-5 max-w-2xl">
           <p className="text-body-lg text-on-surface-variant leading-relaxed">
             Record what comes in and what goes out. The analytics below build
@@ -108,7 +108,7 @@ function SpendingPageTool() {
 
   return (
     <div className="flex flex-col min-h-full">
-      <TopNav title="Money In, Money Out" />
+      <TopNav title="Income vs. Spending" />
 
       <div className="flex-1 px-8 pb-10 flex flex-col gap-6">
         {/* Entry panels — everything below is derived from these */}
