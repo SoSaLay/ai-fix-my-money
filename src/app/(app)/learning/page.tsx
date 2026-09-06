@@ -32,39 +32,37 @@ export default function LearningPage() {
   return (
     <AcknowledgmentGate>
       <div className="flex flex-col gap-8 px-8 py-10 max-w-4xl w-full mx-auto">
-        {/* Header */}
-        <header className="flex flex-col gap-3">
-          <p className="text-label-sm text-on-surface-variant uppercase tracking-widest">Learning</p>
-          <h1 className="text-display-sm text-on-surface font-bold leading-tight">
-            Learn it, then do it with your own money.
-          </h1>
-          <p className="text-body-lg text-on-surface-variant max-w-2xl leading-relaxed">
-            Four tracks, in order. Each one is short lessons broken up by real work —
-            you enter your own numbers as you go, and the feature unlocks when you finish.
-            Nothing you enter is practice data.
-          </p>
-        </header>
+        {/* Header. The review queue sits beside it rather than as its own band —
+            it is a standing prompt, not news, and it should not push the tracks
+            down the page every time something falls due. */}
+        <header className="flex items-start justify-between gap-6">
+          <div className="flex flex-col gap-3">
+            <p className="text-label-sm text-on-surface-variant uppercase tracking-widest">Learning</p>
+            <h3 className="text-headline-md text-on-surface font-semibold max-w-2xl leading-snug">
+              These lessons were created to help you manage and grow your money with
+              objective information. Complete the lessons, unlock the features, and
+              actually understand how your money works.
+            </h3>
+          </div>
 
-        {/* Review queue */}
-        {due.length > 0 && (
-          <Link
-            href="/learning/review"
-            className="flex items-center justify-between gap-4 bg-tertiary-fixed/30 rounded-3xl px-6 py-5 hover:opacity-90 transition-opacity"
-          >
-            <div className="flex items-center gap-3">
-              <RotateCcw size={18} className="text-on-surface" />
-              <div>
-                <p className="text-title-md text-on-surface font-semibold">
-                  {due.length} {due.length === 1 ? 'question' : 'questions'} due for review
-                </p>
-                <p className="text-body-sm text-on-surface-variant mt-0.5">
-                  Things you covered earlier, back at spaced intervals.
-                </p>
+          {due.length > 0 && (
+            <Link
+              href="/learning/review"
+              title={`${due.length} ${due.length === 1 ? 'question' : 'questions'} due for review`}
+              className="shrink-0 w-[124px] flex flex-col items-start gap-2 rounded-2xl bg-tertiary-fixed/30 px-4 py-3.5 hover:opacity-90 transition-opacity"
+            >
+              <div className="flex w-full items-center justify-between gap-2">
+                <RotateCcw size={16} className="text-on-surface" aria-hidden />
+                <span className="rounded-full bg-on-surface/10 px-2 py-0.5 text-label-sm font-semibold tabular-nums text-on-surface">
+                  {due.length}
+                </span>
               </div>
-            </div>
-            <ArrowRight size={18} className="text-on-surface shrink-0" />
-          </Link>
-        )}
+              <span className="text-label-lg font-semibold leading-snug text-on-surface">
+                Review so it sticks
+              </span>
+            </Link>
+          )}
+        </header>
 
         {/* Tracks */}
         <div className="flex flex-col gap-3">
