@@ -31,7 +31,7 @@ export function LessonContent({ lesson }: { lesson: Lesson }) {
           {section.table && (
             // Narrow screens scroll the table rather than the page.
             <div className="-mx-1 overflow-x-auto px-1">
-              <table className="w-full min-w-[380px] border-collapse text-left">
+              <table className="w-full min-w-[520px] border-collapse text-left">
                 <thead>
                   <tr>
                     {section.table.columns.map(column => (
