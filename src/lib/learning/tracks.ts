@@ -747,7 +747,7 @@ const SPENDING: Track = {
     {
       id: 'spd-2',
       title: 'Fixed costs: the part that is already decided',
-      readSeconds: 30,
+      readSeconds: 60,
       intro: 'Fixed costs arrive whether or not you think about them. They set the floor of what any month costs.',
       sections: [
         {
@@ -761,6 +761,11 @@ const SPENDING: Track = {
             { term: 'Fixed is not permanent', text: 'Changing one takes a deliberate decision and usually notice — moving, refinancing, switching plans.' },
             { term: 'They are the floor', text: 'Income below your fixed total cannot be resolved by spending more carefully.' },
           ],
+        },
+        {
+          divider: true,
+          heading: 'Estimate them monthly',
+          body: 'Work out what each one costs you in a typical month, then add them into a single monthly figure. Anything billed on another cycle gets converted first — divide an annual premium by twelve, a quarterly bill by three — so every number is on the same scale.',
         },
       ],
       images: [
@@ -807,7 +812,7 @@ const SPENDING: Track = {
     {
       id: 'spd-3',
       title: 'Variable spending: where the money actually goes',
-      readSeconds: 30,
+      readSeconds: 60,
       intro: 'This is where the gap between what people think they spend and what they spend usually lives.',
       sections: [
         {
@@ -821,6 +826,11 @@ const SPENDING: Track = {
             { term: 'The estimate gap', text: 'Recalled spending is commonly well below the real total, because small frequent charges are easiest to forget.' },
             { term: 'Frequency beats size', text: 'One $200 charge is easy to notice. Twenty $10 charges are the same money and much harder to see.' },
           ],
+        },
+        {
+          divider: true,
+          heading: 'Estimate them monthly',
+          body: 'Give each category one number: roughly what you spend on it in a month. A rough figure you can check against a statement is worth more than a precise one you never write down.',
         },
       ],
       images: [
@@ -1005,8 +1015,8 @@ const SPENDING: Track = {
       'Build the real picture of a month — what came in, what was already committed, and what you chose to spend. Pull the figures from statements rather than memory.',
     tasks: [
       'Record each source of income at the amount that actually lands in your account.',
-      'Record every fixed cost that arrives on a schedule.',
-      'Before you look: guess your three biggest variable categories. Then record the real totals and compare.',
+      'Record every fixed cost that arrives on a schedule, as a monthly amount — convert anything billed annually or quarterly first.',
+      'Before you look: guess what you spend per month on each of your three biggest variable categories. Then record the real monthly totals and compare.',
       'Check every card and your phone’s subscription settings, and record each recurring charge.',
       'Read your net cash flow, then set a monthly spending limit you chose deliberately.',
     ],
