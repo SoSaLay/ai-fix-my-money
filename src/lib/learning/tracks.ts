@@ -123,7 +123,7 @@ const ACCOUNTS: Track = {
     {
       id: 'acc-1',
       title: 'What an account actually is',
-      readSeconds: 30,
+      readSeconds: 60,
       intro: 'Every account you have falls on one of two sides. Getting that split right is what makes everything after it work.',
       sections: [
         {
@@ -133,17 +133,32 @@ const ACCOUNTS: Track = {
         {
           heading: 'The two sides',
           bullets: [
-            { term: 'Asset account', text: 'Holds money that belongs to you. The balance is what you have — checking, savings, brokerage, retirement.' },
-            { term: 'Liability account', text: 'Records money you owe. The balance is what you still have to pay back — credit cards, student loans, auto loans, mortgages.' },
+            { term: 'Asset account', text: 'Holds money that belongs to you.' },
+            { term: 'Liability account', text: 'Records money you owe.' },
           ],
         },
         {
-          heading: 'Why the split matters',
+          heading: 'Asset accounts you are likely to meet',
           bullets: [
-            { text: 'Adding an asset balance to a debt balance produces a meaningless number.' },
-            { text: 'The word "balance" means opposite things on each side.' },
-            { text: 'One institution can hold both kinds for you at the same time.' },
+            { term: 'Checking', text: 'Everyday money moving in and out. Anyone can open one.' },
+            { term: 'Savings', text: 'Money set aside, earning interest while it sits. Anyone can open one; the highest rates are usually at online banks, where it is called a high-yield savings account.' },
+            { term: '401(k)', text: 'A retirement account offered through an employer, often with the employer adding money alongside yours. Usually comes with a salaried job.' },
+            { term: 'IRA', text: 'A retirement account you open yourself, not tied to any job. Available to anyone with earned income.' },
+            { term: 'Brokerage', text: 'Holds investments rather than cash. Anyone can open one.' },
           ],
+        },
+        {
+          heading: 'Liability accounts you are likely to meet',
+          bullets: [
+            { term: 'Credit card', text: 'Borrow up to a limit, repay, borrow again. Usually the first liability account a person has.' },
+            { term: 'Auto loan', text: 'Borrowed to buy a car and repaid monthly. The car itself backs the loan.' },
+            { term: 'Student loan', text: 'Borrowed to pay for education. Repayment usually begins after leaving school.' },
+            { term: 'Mortgage', text: 'Borrowed to buy property and repaid over decades. The property itself backs the loan.' },
+          ],
+        },
+        {
+          divider: true,
+          body: 'The word "balance" means opposite things on each side. On an asset account it is money you have; on a liability account it is money you still owe.',
         },
       ],
       images: [
@@ -171,10 +186,10 @@ const ACCOUNTS: Track = {
         },
         {
           id: 'acc-1-q3',
-          question: 'Can one institution hold both an asset account and a liability account for the same person?',
-          options: ['No, never', 'Yes — a bank can hold your checking account and your credit card', 'Only at credit unions', 'Only for business accounts'],
-          answer: 1,
-          why: 'Institution and account type are separate things. One bank commonly holds several of each for the same person.',
+          question: 'Which of these usually comes with a job rather than being something you open yourself?',
+          options: ['IRA', 'Brokerage account', '401(k)', 'High-yield savings account'],
+          answer: 2,
+          why: 'A 401(k) is offered through an employer, which is why many people only get one once they are employed. An IRA does the same job but you open it yourself.',
         },
       ],
     },
