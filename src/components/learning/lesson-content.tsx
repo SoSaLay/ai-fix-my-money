@@ -1,5 +1,3 @@
-import { clsx } from 'clsx'
-
 import type { Lesson } from '@/lib/learning/tracks'
 
 /**
@@ -33,7 +31,7 @@ export function LessonContent({ lesson }: { lesson: Lesson }) {
           {section.table && (
             // Narrow screens scroll the table rather than the page.
             <div className="-mx-1 overflow-x-auto px-1">
-              <table className="w-full min-w-[520px] border-collapse text-left">
+              <table className="w-full min-w-[380px] border-collapse text-left">
                 <thead>
                   <tr>
                     {section.table.columns.map(column => (
@@ -53,15 +51,11 @@ export function LessonContent({ lesson }: { lesson: Lesson }) {
                       {row.map((cell, k) => (
                         <td
                           key={k}
-                          className={clsx(
-                            'border-b border-outline-variant/30 py-2.5 pr-4 last:pr-0',
+                          className={
                             k === 0
-                              ? 'text-body-md font-semibold text-on-surface'
-                              : 'text-body-md leading-relaxed text-on-surface-variant',
-                            // A cell written as a formula should look like one.
-                            /^[^=]+=[^=]+$/.test(cell) &&
-                              'whitespace-nowrap font-mono text-label-md text-on-surface',
-                          )}
+                              ? 'border-b border-outline-variant/30 py-2.5 pr-4 text-body-md font-semibold text-on-surface'
+                              : 'border-b border-outline-variant/30 py-2.5 pr-4 text-body-md leading-relaxed text-on-surface-variant last:pr-0'
+                          }
                         >
                           {cell}
                         </td>
