@@ -28,6 +28,45 @@ export function LessonContent({ lesson }: { lesson: Lesson }) {
             </p>
           )}
 
+          {section.table && (
+            // Narrow screens scroll the table rather than the page.
+            <div className="-mx-1 overflow-x-auto px-1">
+              <table className="w-full min-w-[380px] border-collapse text-left">
+                <thead>
+                  <tr>
+                    {section.table.columns.map(column => (
+                      <th
+                        key={column}
+                        scope="col"
+                        className="border-b border-outline-variant/60 pb-2 pr-4 text-label-md uppercase tracking-widest text-on-surface-variant last:pr-0"
+                      >
+                        {column}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {section.table.rows.map((row, j) => (
+                    <tr key={j} className="align-top">
+                      {row.map((cell, k) => (
+                        <td
+                          key={k}
+                          className={
+                            k === 0
+                              ? 'border-b border-outline-variant/30 py-2.5 pr-4 text-body-md font-semibold text-on-surface'
+                              : 'border-b border-outline-variant/30 py-2.5 pr-4 text-body-md leading-relaxed text-on-surface-variant last:pr-0'
+                          }
+                        >
+                          {cell}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
           {section.bullets && (
             <ul className="flex flex-col gap-2.5">
               {section.bullets.map((bullet, j) => (

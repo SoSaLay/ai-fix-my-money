@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" font-family="Inter, system-ui, sans-serif">
+  <rect width="640" height="480" fill="#ffffff"/>
+  <text x="40" y="52" fill="#2d2f33" font-size="21" font-weight="700">Three ways, one axis</text>
+  <text x="40" y="78" fill="#5a5b60" font-size="14">How much of the thing you own is what changes the ceiling — and the risk.</text>
+
+  <!-- The axis -->
+  <line x1="70" y1="126" x2="570" y2="126" stroke="#acadb1" stroke-width="2"/>
+  <polygon points="570,126 560,121 560,131" fill="#acadb1"/>
+  <text x="70" y="112" fill="#5a5b60" font-size="12" font-weight="600">NO OWNERSHIP</text>
+  <text x="570" y="112" fill="#5a5b60" font-size="12" font-weight="600" text-anchor="end">FULL OWNERSHIP</text>
+
+  <circle cx="110" cy="126" r="6" fill="#4c49c9"/>
+  <circle cx="320" cy="126" r="6" fill="#7c7ae8"/>
+  <circle cx="530" cy="126" r="6" fill="#ff9817"/>
+
+  <!-- Career -->
+  <rect x="40" y="158" width="176" height="196" rx="14" fill="#e4e3ff"/>
+  <text x="60" y="188" fill="#2d2f33" font-size="16" font-weight="700">Career</text>
+  <text x="60" y="210" fill="#4c49c9" font-size="12" font-weight="600">STARTS YOUR MONEY</text>
+  <text x="60" y="240" fill="#5a5b60" font-size="12.5">Selling your time to</text>
+  <text x="60" y="257" fill="#5a5b60" font-size="12.5">someone who owns.</text>
+  <text x="60" y="288" fill="#2d2f33" font-size="12" font-weight="600">+ Reliable, has benefits</text>
+  <text x="60" y="308" fill="#5a5b60" font-size="12">− Ceiling set by others</text>
+  <text x="60" y="328" fill="#5a5b60" font-size="12">− Costs your hours</text>
+
+  <!-- Investing -->
+  <rect x="232" y="158" width="176" height="196" rx="14" fill="#cfcdff"/>
+  <text x="252" y="188" fill="#2d2f33" font-size="16" font-weight="700">Investing</text>
+  <text x="252" y="210" fill="#4c49c9" font-size="12" font-weight="600">GROWS YOUR MONEY</text>
+  <text x="252" y="240" fill="#5a5b60" font-size="12.5">Owning a slice of</text>
+  <text x="252" y="257" fill="#5a5b60" font-size="12.5">what others run.</text>
+  <text x="252" y="288" fill="#2d2f33" font-size="12" font-weight="600">+ Works without hours</text>
+  <text x="252" y="308" fill="#5a5b60" font-size="12">− Slowest of the three</text>
+  <text x="252" y="328" fill="#5a5b60" font-size="12">− Nothing guaranteed</text>
+
+  <!-- Business -->
+  <rect x="424" y="158" width="176" height="196" rx="14" fill="#ffe6c7"/>
+  <text x="444" y="188" fill="#2d2f33" font-size="16" font-weight="700">Business</text>
+  <text x="444" y="210" fill="#c26a00" font-size="12" font-weight="600">INCREASES YOUR MONEY</text>
+  <text x="444" y="240" fill="#5a5b60" font-size="12.5">Owning the thing that</text>
+  <text x="444" y="257" fill="#5a5b60" font-size="12.5">does the selling.</text>
+  <text x="444" y="288" fill="#2d2f33" font-size="12" font-weight="600">+ No fixed ceiling</text>
+  <text x="444" y="308" fill="#5a5b60" font-size="12">− Highest failure rate</text>
+  <text x="444" y="328" fill="#5a5b60" font-size="12">− Costs money up front</text>
+
+  <line x1="40" y1="388" x2="600" y2="388" stroke="#acadb1" stroke-width="1" stroke-opacity="0.5"/>
+  <text x="40" y="416" fill="#2d2f33" font-size="13.5" font-weight="600">Most people move left to right.</text>
+  <text x="40" y="438" fill="#5a5b60" font-size="13">A career is usually what funds the other two — which is why it comes first.</text>
+</svg>

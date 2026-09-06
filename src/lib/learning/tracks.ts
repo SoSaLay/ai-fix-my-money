@@ -42,11 +42,23 @@ export interface Bullet {
   text: string
 }
 
+/**
+ * A comparison laid out in columns. Reach for this only where the point IS the
+ * comparison — three options against the same two or three criteria. Prose is
+ * better at everything else.
+ */
+export interface LessonTable {
+  columns: string[]
+  /** Each row has one cell per column. The first cell is the row's label. */
+  rows: string[][]
+}
+
 export interface LessonSection {
   heading?: string
   /** A short paragraph. Kept to two sentences or fewer wherever possible. */
   body?: string
   bullets?: Bullet[]
+  table?: LessonTable
   /** A worked example, set apart from the explanation. */
   /** Rule above this section. Used sparingly, only to separate ideas. */
   divider?: boolean
@@ -563,6 +575,95 @@ const SPENDING: Track = {
   unlocks: '/spending',
   status: 'available',
   lessons: [
+    {
+      id: 'spd-intro',
+      title: 'Where money comes from',
+      readSeconds: 60,
+      intro: 'There are three repeatable ways to increase what you have. Everything else in this app is about what happens to that money once it arrives.',
+      sections: [
+        {
+          heading: 'The three',
+          bullets: [
+            { term: 'Career', text: 'Selling your time and skill to someone who owns the business. It starts your money.' },
+            { term: 'Business', text: 'Owning the thing that does the selling. It increases your money.' },
+            { term: 'Investing', text: 'Owning a slice of something someone else runs. It grows your money.' },
+          ],
+        },
+        {
+          heading: 'What each one asks of you',
+          table: {
+            columns: ['', 'Strongest for', 'Costs you'],
+            rows: [
+              [
+                'Career',
+                'Reliability. Pay arrives on a schedule, often with benefits like a 401(k) match.',
+                'A ceiling someone else sets, and the hours themselves.',
+              ],
+              [
+                'Business',
+                'Ceiling. Ownership has no fixed cap on what it can return.',
+                'The highest failure rate of the three, plus your money and time up front.',
+              ],
+              [
+                'Investing',
+                'Time. Money can grow without your hours going into it.',
+                'The slowest of the three, and no return is guaranteed.',
+              ],
+            ],
+          },
+        },
+        {
+          divider: true,
+          heading: 'One axis, three positions',
+          body: 'All three are really a question of how much you own. A career rents your time to someone who owns; a business is owning the thing outright; investing is owning a slice of what someone else runs. Most people move along that line in order, because a career is usually what funds the other two.',
+        },
+        {
+          body: 'This app is about managing and growing money once it reaches you, so it does not teach you how to pick a career or start a business. Investing gets its own track later.',
+        },
+      ],
+      images: [
+        {
+          src: '/learning/spending-three-ways.svg',
+          alt: 'Three ways to increase money arranged along an ownership axis: career at the left with no ownership, investing in the middle owning a slice, and business at the right owning the whole thing. Each is labelled with what it is strongest for and what it costs.',
+          caption: 'The three sit on one axis: how much of the thing you own. Ownership is what raises the ceiling, and what raises the risk.',
+        },
+      ],
+      questions: [
+        {
+          id: 'spd-intro-q1',
+          question: 'Which of the three is described as the one that starts your money?',
+          options: ['Business', 'Career', 'Investing', 'Saving'],
+          answer: 1,
+          imageSrc: '/learning/spending-three-ways.svg',
+          why: 'A career is what most people begin with, and it is usually what funds the other two. Its strength is reliability, not ceiling.',
+        },
+        {
+          id: 'spd-intro-q2',
+          question: 'What is the tradeoff that comes with a business rather than a career?',
+          options: [
+            'It always pays more, with no added risk',
+            'A higher ceiling, but the highest failure rate of the three',
+            'A lower ceiling, but far more reliable income',
+            'It grows without any time or money going in',
+          ],
+          answer: 1,
+          imageSrc: '/learning/spending-three-ways.svg',
+          why: 'Ownership removes the cap on what you can earn and removes the guarantee at the same time. Most small businesses do not survive; that risk is the price of the ceiling.',
+        },
+        {
+          id: 'spd-intro-q3',
+          question: 'What single idea connects all three?',
+          options: [
+            'How much tax each one attracts',
+            'How much of the thing you own',
+            'How many hours each one takes',
+            'How soon each one pays out',
+          ],
+          answer: 1,
+          why: 'Career, business and investing are three positions on one axis. Owning more raises what you can earn and raises what you can lose.',
+        },
+      ],
+    },
     {
       id: 'spd-1',
       title: 'Income: the number most people get wrong',
