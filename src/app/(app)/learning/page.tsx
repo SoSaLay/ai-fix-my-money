@@ -37,13 +37,10 @@ export default function LearningPage() {
             it is a standing prompt, not news, and it should not push the tracks
             down the page every time something falls due. */}
         <header className="flex items-start justify-between gap-6">
-          <div className="flex flex-col gap-3">
-            <p className="text-label-sm text-on-surface-variant uppercase tracking-widest">Learning</p>
-            <h3 className="text-headline-md text-on-surface font-semibold max-w-2xl leading-snug">
-              Learn to manage and grow your money. Complete the lessons, unlock the
-              features, understand how your money works.
-            </h3>
-          </div>
+          <h3 className="max-w-2xl text-body-lg font-normal leading-relaxed text-on-surface-variant">
+            Learn to manage and grow your money. Complete the lessons, unlock the
+            features, understand how your money works.
+          </h3>
 
           {due.length > 0 && (
             <Link
