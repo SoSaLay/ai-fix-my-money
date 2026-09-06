@@ -591,7 +591,7 @@ const ACCOUNTS: Track = {
 
 const SPENDING: Track = {
   id: 'spending',
-  title: 'Spending',
+  title: 'Money In, Money Out',
   outcome: 'You can say where your money actually went last month, and whether more came in than went out.',
   blurb: 'Income, fixed and variable costs, subscription drift, and cash flow.',
   unlocks: '/spending',
@@ -1342,7 +1342,7 @@ const SAVINGS: Track = {
   action: {
     title: 'Build your own savings structure',
     prompt:
-      'Turn the theory into named pools with real targets, sized from the numbers you recorded in the Spending track.',
+      'Turn the theory into named pools with real targets, sized from the numbers you recorded in the Money In, Money Out track.',
     tasks: [
       'Create one savings goal with a name and a target — something you actually want.',
       'Use your recorded fixed costs to work out three and six months of essentials, and set an emergency fund target.',

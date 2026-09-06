@@ -33,7 +33,7 @@ function DashboardMockup() {
     { name: 'Netflix',           cat: 'Subscription', amt: '-$16',    color: '#5a5b60' },
     { name: 'Shell Gas Station', cat: 'Transport',    amt: '-$62',    color: '#5a5b60' },
   ]
-  const navItems = ['Dashboard', 'Accounts', 'Spending', 'Savings', 'Investing', 'AI Adviser']
+  const navItems = ['Dashboard', 'Accounts', 'Money In, Money Out', 'Savings', 'Investing', 'AI Adviser']
 
   return (
     <BrowserChrome>

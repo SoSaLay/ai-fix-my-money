@@ -26,7 +26,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', href: '/dashboard', icon: <LayoutDashboard size={18} /> },
   { label: 'Accounts',  href: '/accounts',  icon: <CreditCard size={18} />,  track: 'accounts' },
-  { label: 'Spending',  href: '/spending',  icon: <PieChart size={18} />,    track: 'spending' },
+  { label: 'Money In, Money Out', href: '/spending',  icon: <PieChart size={18} />,    track: 'spending' },
   { label: 'Savings',   href: '/savings',   icon: <PiggyBank size={18} />,   track: 'savings' },
   { label: 'Investing', href: '/investing', icon: <TrendingUp size={18} />,  track: 'investing' },
 ]
