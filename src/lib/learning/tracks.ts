@@ -138,23 +138,30 @@ const ACCOUNTS: Track = {
           ],
         },
         {
-          heading: 'Asset accounts you are likely to meet',
-          bullets: [
-            { term: 'Checking', text: 'Everyday money moving in and out.' },
-            { term: 'Savings', text: 'Money set aside, earning interest while it sits. A high-yield savings account is the same thing paying a higher rate, usually at an online bank.' },
-            { term: '401(k)', text: 'A retirement account sponsored by an employer, who often adds money alongside yours.' },
-            { term: 'IRA', text: 'A retirement account held in your own name, independent of any employer.' },
-            { term: 'Brokerage', text: 'Holds investments rather than cash.' },
-          ],
+          heading: 'Assets:',
+          table: {
+            columns: ['Account', 'What it is'],
+            rows: [
+              ['Checking', 'Everyday money moving in and out.'],
+              ['Savings', 'Money set aside, earning a little interest while it sits.'],
+              ['High-yield savings', 'The same thing paying a much higher rate. Usually online-only, and transfers out take a day or two.'],
+              ['401(k)', 'A retirement account sponsored by an employer, who often contributes alongside you.'],
+              ['IRA', 'A retirement account held in your own name, independent of any employer.'],
+              ['Brokerage', 'Holds investments rather than cash.'],
+            ],
+          },
         },
         {
-          heading: 'Liability accounts you are likely to meet',
-          bullets: [
-            { term: 'Credit card', text: 'Borrow up to a limit, repay, borrow again. Usually the first liability account a person has.' },
-            { term: 'Auto loan', text: 'Borrowed to buy a car and repaid monthly. The car itself backs the loan.' },
-            { term: 'Student loan', text: 'Borrowed to pay for education. Repayment usually begins after leaving school.' },
-            { term: 'Mortgage', text: 'Borrowed to buy property and repaid over decades. The property itself backs the loan.' },
-          ],
+          heading: 'Liabilities:',
+          table: {
+            columns: ['Account', 'What it is'],
+            rows: [
+              ['Credit card', 'Borrow up to a limit, repay, borrow again.'],
+              ['Auto loan', 'Borrowed to buy a car. The car backs the loan.'],
+              ['Student loan', 'Borrowed to pay for education. Repayment usually starts after leaving school.'],
+              ['Mortgage', 'Borrowed to buy property, repaid over decades. The property backs the loan.'],
+            ],
+          },
         },
         {
           divider: true,
