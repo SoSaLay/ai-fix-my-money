@@ -140,11 +140,11 @@ const ACCOUNTS: Track = {
         {
           heading: 'Asset accounts you are likely to meet',
           bullets: [
-            { term: 'Checking', text: 'Everyday money moving in and out. Anyone can open one.' },
-            { term: 'Savings', text: 'Money set aside, earning interest while it sits. Anyone can open one; the highest rates are usually at online banks, where it is called a high-yield savings account.' },
-            { term: '401(k)', text: 'A retirement account offered through an employer, often with the employer adding money alongside yours. Usually comes with a salaried job.' },
-            { term: 'IRA', text: 'A retirement account you open yourself, not tied to any job. Available to anyone with earned income.' },
-            { term: 'Brokerage', text: 'Holds investments rather than cash. Anyone can open one.' },
+            { term: 'Checking', text: 'Everyday money moving in and out.' },
+            { term: 'Savings', text: 'Money set aside, earning interest while it sits. A high-yield savings account is the same thing paying a higher rate, usually at an online bank.' },
+            { term: '401(k)', text: 'A retirement account sponsored by an employer, who often adds money alongside yours.' },
+            { term: 'IRA', text: 'A retirement account held in your own name, independent of any employer.' },
+            { term: 'Brokerage', text: 'Holds investments rather than cash.' },
           ],
         },
         {
@@ -186,10 +186,10 @@ const ACCOUNTS: Track = {
         },
         {
           id: 'acc-1-q3',
-          question: 'Which of these usually comes with a job rather than being something you open yourself?',
+          question: 'Which retirement account is sponsored by an employer?',
           options: ['IRA', 'Brokerage account', '401(k)', 'High-yield savings account'],
           answer: 2,
-          why: 'A 401(k) is offered through an employer, which is why many people only get one once they are employed. An IRA does the same job but you open it yourself.',
+          why: 'A 401(k) is sponsored by an employer, who often contributes alongside you. An IRA is the retirement account held in your own name instead.',
         },
       ],
     },
