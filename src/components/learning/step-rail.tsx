@@ -3,6 +3,7 @@
 import { Check } from 'lucide-react'
 
 import type { Stage } from '@/contexts/learning-context'
+import { PROGRESS_GREEN, PROGRESS_YELLOW } from '@/lib/learning/progress-colors'
 
 export interface RailItem {
   key: string
@@ -88,7 +89,7 @@ function Connector({ visible, filled }: { visible: boolean; filled: boolean }) {
       aria-hidden
       className="h-0.5 flex-1 rounded-full"
       style={{
-        background: !visible ? 'transparent' : filled ? '#1a6b3a' : 'rgba(0,0,0,0.12)',
+        background: !visible ? 'transparent' : filled ? PROGRESS_GREEN : 'rgba(0,0,0,0.12)',
       }}
     />
   )
@@ -104,10 +105,10 @@ interface StepMarkerProps {
 }
 
 function StepMarker({ index, done, current, reachable, label, onSelect }: StepMarkerProps) {
-  // Done is green, the step you are on is ringed in brand purple, and anything
-  // still ahead is a plain outline — three states, readable at a glance.
-  const ring = done ? '#1a6b3a' : current ? '#4c49c9' : 'rgba(0,0,0,0.22)'
-  const text = done ? '#ffffff' : current ? '#4c49c9' : undefined
+  // Done is green, the step in progress is yellow, and anything still ahead is
+  // a plain outline — the same three-colour language as the track bars.
+  const ring = done ? PROGRESS_GREEN : current ? PROGRESS_YELLOW : 'rgba(0,0,0,0.22)'
+  const text = done ? '#ffffff' : current ? '#8a6400' : undefined
 
   return (
     <button
@@ -122,7 +123,7 @@ function StepMarker({ index, done, current, reachable, label, onSelect }: StepMa
       }`}
       style={{
         borderColor: ring,
-        background: done ? '#1a6b3a' : 'transparent',
+        background: done ? PROGRESS_GREEN : 'transparent',
         color: text,
       }}
     >

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { BookOpen } from 'lucide-react'
+import { PROGRESS_YELLOW } from '@/lib/learning/progress-colors'
 
 /**
  * The reading window, running full width above the material. It counts down on
@@ -42,7 +43,7 @@ export function ReadTimer({
           className="h-full rounded-full"
           style={{
             width: `${elapsedPct}%`,
-            background: '#4c49c9',
+            background: PROGRESS_YELLOW,
             transition: 'width 1s linear',
           }}
         />

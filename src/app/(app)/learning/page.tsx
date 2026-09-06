@@ -8,6 +8,7 @@ import {
 import { useLearning } from '@/contexts/learning-context'
 import { TRACKS, readingMinutes, type Track } from '@/lib/learning/tracks'
 import { DISCLAIMER_MEDIUM } from '@/lib/learning/disclaimer'
+import { progressColor } from '@/lib/learning/progress-colors'
 import { LEGAL_ROOT } from '@/lib/legal/documents'
 import { AcknowledgmentGate } from '@/components/learning/acknowledgment-gate'
 
@@ -49,17 +50,11 @@ export default function LearningPage() {
             <Link
               href="/learning/review"
               title={`${due.length} ${due.length === 1 ? 'question' : 'questions'} due for review`}
-              className="shrink-0 w-[124px] flex flex-col items-start gap-2 rounded-2xl bg-tertiary-fixed/30 px-4 py-3.5 hover:opacity-90 transition-opacity"
+              className="btn-review shrink-0 flex items-center justify-center gap-2"
             >
-              <div className="flex w-full items-center justify-between gap-2">
-                <RotateCcw size={16} className="text-on-surface" aria-hidden />
-                <span className="rounded-full bg-on-surface/10 px-2 py-0.5 text-label-sm font-semibold tabular-nums text-on-surface">
-                  {due.length}
-                </span>
-              </div>
-              <span className="text-label-lg font-semibold leading-snug text-on-surface">
-                Review so it sticks
-              </span>
+              <RotateCcw size={14} aria-hidden />
+              Review so it sticks
+              <span className="tabular-nums font-semibold">({due.length})</span>
             </Link>
           )}
         </header>
@@ -148,12 +143,9 @@ function TrackCard({
                 </span>
               )}
             </div>
-            <p className="text-body-md text-on-surface-variant mt-1 leading-relaxed">
+            <p className="text-body-md text-on-surface mt-1.5 leading-relaxed">
+              <span className="text-on-surface-variant">What you&apos;ll learn: </span>
               {track.blurb}
-            </p>
-            <p className="text-body-sm text-on-surface mt-2.5 leading-relaxed">
-              <span className="text-on-surface-variant">You&apos;ll be able to: </span>
-              {track.outcome}
             </p>
           </div>
         </div>
@@ -172,8 +164,11 @@ function TrackCard({
               <div
                 className="h-full rounded-full transition-all"
                 style={{
-                  width: `${completion.pct}%`,
-                  background: complete ? '#1a6b3a' : '#4c49c9',
+                  // An untouched track has nothing to fill, so the track itself
+                  // carries the red rather than a zero-width bar.
+                  width: completion.done === 0 ? '100%' : `${completion.pct}%`,
+                  background: progressColor(completion.done, completion.total),
+                  opacity: completion.done === 0 ? 0.25 : 1,
                 }}
               />
             </div>

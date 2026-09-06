@@ -69,4 +69,29 @@
   .scrollbar-thin::-webkit-scrollbar { width: 4px; }
   .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
   .scrollbar-thin::-webkit-scrollbar-thumb { background-color: #e7e8ee; border-radius: 999px; }
+
+  /* Review call-to-action. Deliberately not a brand colour — it is the one
+     thing on the page competing with the track list for attention. */
+  .btn-review {
+    display: inline-block;
+    outline: 0;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px 0 rgb(213 217 217 / 50%);
+    background: #FFD814;
+    border: 1px solid #FCD200;
+    font-size: 13px;
+    height: 31px;
+    padding: 0 11px;
+    text-align: center;
+    width: 100%;
+    min-width: 200px;
+    font-weight: 500;
+    color: #0F1111;
+  }
+  .btn-review:hover {
+    background: #F7CA00;
+    border-color: #F2C200;
+    box-shadow: 0 2px 5px 0 rgb(213 217 217 / 50%);
+  }
 }

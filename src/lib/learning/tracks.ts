@@ -116,7 +116,7 @@ const ACCOUNTS: Track = {
   id: 'accounts',
   title: 'Accounts',
   outcome: 'You can name every account that holds your money or your debt, and say what each one is for.',
-  blurb: 'Where your money sits, where your debt is owed, and how credit is measured.',
+  blurb: 'What each of your accounts is for, and how credit is measured.',
   unlocks: '/accounts',
   status: 'available',
   lessons: [
@@ -593,7 +593,7 @@ const SPENDING: Track = {
   id: 'spending',
   title: 'Income vs. Spending',
   outcome: 'You can say where your money actually went last month, and whether more came in than went out.',
-  blurb: 'Income, fixed and variable costs, subscription drift, and cash flow.',
+  blurb: 'Where your money goes each month, and whether more comes in than goes out.',
   unlocks: '/spending',
   status: 'available',
   lessons: [
@@ -1033,7 +1033,7 @@ const SAVINGS: Track = {
   id: 'savings',
   title: 'Savings',
   outcome: 'You can explain what each pool of your savings is for, and how much of your surplus is going to it.',
-  blurb: 'Separating savings from spending, emergency funds, named goals, and how interest works.',
+  blurb: 'How to keep savings separate and give every pool a job.',
   unlocks: '/savings',
   status: 'available',
   lessons: [
@@ -1373,7 +1373,7 @@ const INVESTING: Track = {
   id: 'investing',
   title: 'Investing',
   outcome: 'You can read your own positions and explain what you hold and why the value moves.',
-  blurb: 'Account types versus assets, diversification, fees, risk, and time horizon.',
+  blurb: 'What you actually own, why its value moves, and what risk and fees cost you.',
   unlocks: '/investing',
   status: 'coming-soon',
   lessons: [],
