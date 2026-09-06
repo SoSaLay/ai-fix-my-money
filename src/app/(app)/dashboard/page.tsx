@@ -217,6 +217,23 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* ── Investments ─────────────────────────────────────────────────────
+            Placeholder. The Investing track has no lessons yet and the tool it
+            unlocks has nothing to report, so this holds the slot rather than
+            inventing a figure. */}
+        <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <TrendingUp size={16} className="text-on-surface-variant" />
+            <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">Investments</p>
+          </div>
+
+          <div className="rounded-2xl border border-dashed border-outline-variant px-5 py-8 text-center">
+            <p className="text-body-md text-on-surface-variant">
+              Nothing here yet.
+            </p>
+          </div>
+        </div>
+
         {/* Income Allocation Preview */}
         <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6">
           {/* Header */}
