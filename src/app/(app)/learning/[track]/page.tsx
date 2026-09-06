@@ -15,12 +15,13 @@ import { LessonContent } from '@/components/learning/lesson-content'
 import { LessonImages } from '@/components/learning/lesson-images'
 import { ReadTimer } from '@/components/learning/read-timer'
 import { QuestionStack } from '@/components/learning/question-stack'
+import { StepRail, type RailItem } from '@/components/learning/step-rail'
 
 export default function TrackPage({ params }: { params: Promise<{ track: string }> }) {
   const { track: trackParam } = use(params)
   const router = useRouter()
   const {
-    ready, isTrackUnlocked, isTrackComplete, trackProgress, trackCompletion,
+    ready, isTrackUnlocked, isTrackComplete, trackProgress,
     stageFor, recordLesson, recordAction, recordFinal, startGuided,
   } = useLearning()
 
@@ -53,28 +54,30 @@ export default function TrackPage({ params }: { params: Promise<{ track: string 
     return <Missing message="Finish the tracks before this one first — each builds on the last." />
   }
 
-  const completion = trackCompletion(track.id)
   const finished = isTrackComplete(track.id)
   const progress = trackProgress(track.id)
   const live = stageFor(track.id)
 
   // Step rail: lessons, then the action step, then the final.
-  const railItems = [
+  const railItems: RailItem[] = [
     ...track.lessons.map((l, i) => ({
       key: l.id,
       label: l.title,
+      shortLabel: shortTitle(l.title),
       done: !!progress.lessons[l.id]?.answered,
       stage: { kind: 'lesson' as const, id: l.id, index: i },
     })),
     ...(track.action ? [{
       key: 'action',
       label: track.action.title,
+      shortLabel: 'Your turn',
       done: progress.actionDone,
       stage: { kind: 'action' as const },
     }] : []),
     ...(track.finalQuiz.length > 0 ? [{
       key: 'final',
-      label: 'Final quiz',
+      label: 'Final test',
+      shortLabel: 'Final test',
       done: progress.final?.passed === true,
       stage: { kind: 'final' as const },
     }] : []),
@@ -118,9 +121,6 @@ export default function TrackPage({ params }: { params: Promise<{ track: string 
             <h1 className="text-headline-lg text-on-surface font-bold">{track.title}</h1>
 
             <div className="flex items-center gap-3 shrink-0">
-              <span className="text-label-lg text-on-surface-variant tabular-nums">
-                {completion.done}/{completion.total} done
-              </span>
               {finished && (
                 <Link
                   href={track.unlocks}
@@ -132,23 +132,13 @@ export default function TrackPage({ params }: { params: Promise<{ track: string 
             </div>
           </div>
 
-          {/* Step rail */}
-          <div className="flex items-center gap-1.5">
-            {railItems.map((item, i) => (
-              <button
-                key={item.key}
-                onClick={() => canBrowseSteps && i <= furthest ? setView(item.stage) : undefined}
-                disabled={!canBrowseSteps || i > furthest}
-                className="h-1.5 flex-1 rounded-full transition-all disabled:cursor-not-allowed"
-                style={{
-                  background: item.done
-                    ? '#1a6b3a'
-                    : sameStage(item.stage, view) ? '#4c49c9' : 'rgba(0,0,0,0.08)',
-                }}
-                aria-label={item.label}
-              />
-            ))}
-          </div>
+          <StepRail
+            items={railItems}
+            currentIndex={viewIndex}
+            furthestIndex={furthest}
+            browsable={canBrowseSteps}
+            onSelect={setView}
+          />
         </div>
 
         {track.id === 'investing' && (

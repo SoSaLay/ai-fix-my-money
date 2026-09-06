@@ -168,9 +168,6 @@ function TrackCard({
             <span className="flex items-center gap-1.5 text-label-sm text-on-surface-variant">
               <Clock size={12} /> ~{minutes} min
             </span>
-            <span className="text-label-sm text-on-surface-variant">
-              {completion.done} of {completion.total} steps
-            </span>
             <div className="flex-1 min-w-[80px] h-1 rounded-full bg-outline-variant/40 overflow-hidden">
               <div
                 className="h-full rounded-full transition-all"
@@ -180,6 +177,11 @@ function TrackCard({
                 }}
               />
             </div>
+            {/* After the bar, so the count reads as the bar's value rather
+                than as another label competing with the time. */}
+            <span className="text-label-sm text-on-surface-variant tabular-nums shrink-0">
+              {completion.done} of {completion.total} steps
+            </span>
           </>
         )}
         {!unlocked && !comingSoon && (
