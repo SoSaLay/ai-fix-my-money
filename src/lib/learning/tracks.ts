@@ -592,25 +592,25 @@ const SPENDING: Track = {
         {
           heading: 'What each one asks of you',
           table: {
-            columns: ['', 'The trade', 'Strongest for', 'Costs you'],
+            columns: ['', 'Strongest for', 'Costs you', 'The math'],
             rows: [
               [
                 'Career',
-                'Time and skill for money.',
                 'Reliability. Pay arrives on a schedule, often with benefits like a 401(k) match.',
-                'A ceiling someone else sets, and the hours themselves.',
+                'The hours themselves, and a ceiling someone else sets. Raises and bonuses move that ceiling; they do not remove it.',
+                'Time + skill = capped money',
               ],
               [
                 'Business',
-                'Time and money for money.',
                 'Ceiling. Ownership has no fixed cap on what it can return.',
                 'The highest failure rate of the three, plus your money and time up front.',
+                'Time + money = uncapped money',
               ],
               [
                 'Investing',
-                'Money for money, and time does the work.',
                 'Time. Money can grow without your hours going into it.',
                 'The slowest of the three, and no return is guaranteed.',
+                'Money + time = uncapped money, slowly',
               ],
             ],
           },

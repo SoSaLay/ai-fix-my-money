@@ -1,3 +1,5 @@
+import { clsx } from 'clsx'
+
 import type { Lesson } from '@/lib/learning/tracks'
 
 /**
@@ -51,11 +53,15 @@ export function LessonContent({ lesson }: { lesson: Lesson }) {
                       {row.map((cell, k) => (
                         <td
                           key={k}
-                          className={
+                          className={clsx(
+                            'border-b border-outline-variant/30 py-2.5 pr-4 last:pr-0',
                             k === 0
-                              ? 'border-b border-outline-variant/30 py-2.5 pr-4 text-body-md font-semibold text-on-surface'
-                              : 'border-b border-outline-variant/30 py-2.5 pr-4 text-body-md leading-relaxed text-on-surface-variant last:pr-0'
-                          }
+                              ? 'text-body-md font-semibold text-on-surface'
+                              : 'text-body-md leading-relaxed text-on-surface-variant',
+                            // A cell written as a formula should look like one.
+                            /^[^=]+=[^=]+$/.test(cell) &&
+                              'whitespace-nowrap font-mono text-label-md text-on-surface',
+                          )}
                         >
                           {cell}
                         </td>
