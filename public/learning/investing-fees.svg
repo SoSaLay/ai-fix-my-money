@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" font-family="Inter, system-ui, sans-serif">
+  <rect width="640" height="480" fill="#ffffff"/>
+  <text x="40" y="52" fill="#2d2f33" font-size="21" font-weight="700">Same contributions. Same return. Different fee.</text>
+  <text x="40" y="78" fill="#5a5b60" font-size="14">$300 a month for 30 years at an assumed 7%. Illustration only.</text>
+
+  <line x1="40" y1="368" x2="600" y2="368" stroke="#e3e3ec" stroke-width="1.5"/>
+
+  <rect x="120" y="128" width="130" height="240" rx="8" fill="#4c49c9"/>
+  <text x="185" y="112" fill="#2d2f33" font-size="17" font-weight="700" text-anchor="middle">$362,000</text>
+  <text x="185" y="394" fill="#2d2f33" font-size="13.5" font-weight="700" text-anchor="middle">0.05% a year</text>
+  <text x="185" y="414" fill="#5a5b60" font-size="12" text-anchor="middle">A plain index fund</text>
+
+  <rect x="390" y="188" width="130" height="180" rx="8" fill="#4c49c9"/>
+  <rect x="390" y="128" width="130" height="58" rx="8" fill="#e0dffa"/>
+  <text x="455" y="112" fill="#2d2f33" font-size="17" font-weight="700" text-anchor="middle">$300,000</text>
+  <text x="455" y="394" fill="#2d2f33" font-size="13.5" font-weight="700" text-anchor="middle">1.00% a year</text>
+  <text x="455" y="414" fill="#5a5b60" font-size="12" text-anchor="middle">A higher-cost fund</text>
+
+  <text x="455" y="163" fill="#4c49c9" font-size="12.5" font-weight="700" text-anchor="middle">~$62,000</text>
+  <text x="455" y="180" fill="#4c49c9" font-size="11.5" text-anchor="middle">taken in fees</text>
+
+  <rect x="40" y="434" width="560" height="34" rx="10" fill="#f0f0f6"/>
+  <text x="60" y="456" fill="#5a5b60" font-size="12.5">The fee is charged on the whole balance every year, in good years and bad.</text>
+</svg>

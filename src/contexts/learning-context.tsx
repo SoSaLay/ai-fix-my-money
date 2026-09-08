@@ -132,6 +132,8 @@ interface LearningContextValue {
 
   reviewQueue: ReviewItem[]
   dueReviews: () => ReviewItem[]
+  /** Questions to practise when nothing is scheduled. Drawn from finished lessons. */
+  practiceReviews: (limit?: number) => ReviewItem[]
   completeReview: (item: ReviewItem, correct: boolean) => void
 
   guided: GuidedSession | null
@@ -144,6 +146,82 @@ interface LearningContextValue {
   resetProgress: () => void
 }
 
+/**
+ * Development only. `?unlock=all` writes a completed record for every track
+ * with content, so lessons and questions can be reviewed without answering
+ * them; `?unlock=reset` clears it again. The parameter is removed from the URL
+ * afterwards so a refresh does not keep re-seeding.
+ *
+ * Guarded by NODE_ENV at both the call site and here, so a production build
+ * cannot reach it.
+ */
+function devUnlockAll() {
+  if (process.env.NODE_ENV !== 'development' || typeof window === 'undefined') return
+
+  const mode = new URLSearchParams(window.location.search).get('unlock')
+  if (mode !== 'all' && mode !== 'reset') return
+
+  if (mode === 'reset') {
+    localStorage.removeItem(STORAGE_KEY_PROGRESS)
+    localStorage.removeItem(STORAGE_KEY_REVIEW)
+    localStorage.removeItem(STORAGE_KEY_ACK)
+    localStorage.removeItem(STORAGE_KEY_GUIDED)
+  } else {
+    const now = new Date().toISOString()
+    const seeded: ProgressMap = {}
+    for (const track of TRACKS) {
+      if (track.lessons.length === 0) continue
+      const lessons: Record<string, LessonProgress> = {}
+      for (const lesson of track.lessons) {
+        lessons[lesson.id] = { answered: true, missed: [], completedAt: now }
+      }
+      seeded[track.id] = {
+        lessons,
+        actionDone: true,
+        final: {
+          attempts: 1,
+          best: track.finalQuiz.length,
+          total: track.finalQuiz.length,
+          passed: true,
+          passedAt: now,
+        },
+      }
+    }
+    // Every lesson question, due now. An empty queue hides the review button
+    // entirely, which makes the unlocked app look like it is missing a feature.
+    const queue: ReviewItem[] = TRACKS.flatMap(track =>
+      track.lessons.flatMap(lesson =>
+        lesson.questions.map(q => ({
+          trackId: track.id,
+          lessonId: lesson.id,
+          questionId: q.id,
+          stage: 0,
+          dueAt: now,
+        })),
+      ),
+    )
+
+    write(STORAGE_KEY_PROGRESS, seeded)
+    write(STORAGE_KEY_REVIEW, queue)
+    write(STORAGE_KEY_ACK, true)
+    localStorage.removeItem(STORAGE_KEY_GUIDED)
+  }
+
+  const url = new URL(window.location.href)
+  url.searchParams.delete('unlock')
+  window.history.replaceState(null, '', url.toString())
+}
+
+/** Whether a queued review still points at a question that exists. */
+function questionExists(item: ReviewItem): boolean {
+  const track = getTrack(item.trackId)
+  if (!track) return false
+  return (
+    track.lessons.some(l => l.questions.some(q => q.id === item.questionId)) ||
+    track.finalQuiz.some(q => q.id === item.questionId)
+  )
+}
+
 const LearningContext = createContext<LearningContextValue | null>(null)
 
 export function LearningProvider({ children }: { children: ReactNode }) {
@@ -154,6 +232,11 @@ export function LearningProvider({ children }: { children: ReactNode }) {
   const [guided, setGuided] = useState<GuidedSession | null>(null)
 
   useEffect(() => {
+    // Authoring escape hatch: `?unlock=all` in development marks every track
+    // finished so the whole curriculum can be read through without sitting the
+    // quizzes. Stripped from production builds — see devUnlockAll.
+    if (process.env.NODE_ENV === 'development') devUnlockAll()
+
     setProgress(read<ProgressMap>(STORAGE_KEY_PROGRESS) ?? {})
     setReviewQueue(read<ReviewItem[]>(STORAGE_KEY_REVIEW) ?? [])
     setAcknowledged(read<boolean>(STORAGE_KEY_ACK) ?? false)
@@ -335,8 +418,46 @@ export function LearningProvider({ children }: { children: ReactNode }) {
 
   const dueReviews = useCallback(() => {
     const now = Date.now()
-    return reviewQueue.filter(r => new Date(r.dueAt).getTime() <= now)
+    return reviewQueue.filter(
+      // A question removed from a lesson leaves its review items behind. They
+      // would otherwise be counted as due with nothing to show for them.
+      r => new Date(r.dueAt).getTime() <= now && questionExists(r),
+    )
   }, [reviewQueue])
+
+  /**
+   * Review is also a place to test yourself on demand, not only a queue that
+   * comes due. When nothing is scheduled this draws from lessons already
+   * finished, so the review screen always has something to offer. Answering
+   * one schedules it normally — practising a question is the same signal as
+   * meeting it on its due date.
+   */
+  const practiceReviews = useCallback(
+    (limit = 10) => {
+      const queued = new Set(reviewQueue.map(r => `${r.trackId}:${r.questionId}`))
+      const now = new Date().toISOString()
+      const pool: ReviewItem[] = []
+
+      for (const track of TRACKS) {
+        for (const lesson of track.lessons) {
+          if (!progress[track.id]?.lessons?.[lesson.id]?.answered) continue
+          for (const q of lesson.questions) {
+            if (queued.has(`${track.id}:${q.id}`)) continue
+            pool.push({
+              trackId: track.id,
+              lessonId: lesson.id,
+              questionId: q.id,
+              stage: 0,
+              dueAt: now,
+            })
+          }
+        }
+      }
+
+      return pool.slice(0, limit)
+    },
+    [progress, reviewQueue],
+  )
 
   const completeReview = useCallback((item: ReviewItem, correct: boolean) => {
     setReviewQueue(prev => {
@@ -402,6 +523,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
         currentTrackId,
         reviewQueue,
         dueReviews,
+        practiceReviews,
         completeReview,
         guided,
         startGuided,

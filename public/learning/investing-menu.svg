@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" font-family="Inter, system-ui, sans-serif">
+  <rect width="640" height="480" fill="#ffffff"/>
+  <text x="40" y="46" fill="#2d2f33" font-size="21" font-weight="700">The same account will sell you all of these</text>
+  <text x="40" y="70" fill="#5a5b60" font-size="13.5">Risk rises as you move from owning a business to betting on a price.</text>
+
+  <rect x="40" y="90" width="6" height="330" rx="3" fill="#e3e3ec"/>
+  <text x="26" y="106" fill="#5a5b60" font-size="10.5" font-weight="600" letter-spacing="1.2" transform="rotate(-90 26 106)">LOWER RISK</text>
+
+  <g font-size="13">
+    <rect x="62" y="90" width="538" height="40" rx="10" fill="#eef0fa"/>
+    <text x="82" y="115" fill="#2d2f33" font-weight="700">Index ETFs and index funds</text>
+    <text x="584" y="115" fill="#5a5b60" font-size="12" text-anchor="end">Falls when the market falls</text>
+
+    <rect x="62" y="136" width="538" height="40" rx="10" fill="#eef0fa"/>
+    <text x="82" y="161" fill="#2d2f33" font-weight="700">Mutual funds</text>
+    <text x="584" y="161" fill="#5a5b60" font-size="12" text-anchor="end">Higher fees when actively managed</text>
+
+    <rect x="62" y="182" width="538" height="40" rx="10" fill="#eef0fa"/>
+    <text x="82" y="207" fill="#2d2f33" font-weight="700">Bonds and bond funds</text>
+    <text x="584" y="207" fill="#5a5b60" font-size="12" text-anchor="end">Lose value when rates rise</text>
+
+    <rect x="62" y="228" width="538" height="40" rx="10" fill="#eef0fa"/>
+    <text x="82" y="253" fill="#2d2f33" font-weight="700">REITs</text>
+    <text x="584" y="253" fill="#5a5b60" font-size="12" text-anchor="end">Tied to property markets and rates</text>
+
+    <rect x="62" y="274" width="538" height="40" rx="10" fill="#dcdcf2"/>
+    <text x="82" y="299" fill="#2d2f33" font-weight="700">Individual stocks</text>
+    <text x="584" y="299" fill="#5a5b60" font-size="12" text-anchor="end">One company can fall and not return</text>
+
+    <rect x="62" y="320" width="538" height="40" rx="10" fill="#dcdcf2"/>
+    <text x="82" y="345" fill="#2d2f33" font-weight="700">Crypto</text>
+    <text x="584" y="345" fill="#5a5b60" font-size="12" text-anchor="end">No earnings underneath; 70%+ falls</text>
+
+    <rect x="62" y="366" width="538" height="40" rx="10" fill="#4c49c9"/>
+    <text x="82" y="391" fill="#ffffff" font-weight="700">Options and futures</text>
+    <text x="584" y="391" fill="#d9d8f7" font-size="12" text-anchor="end">Expiry and leverage; can lose more than paid</text>
+
+    <rect x="62" y="412" width="538" height="40" rx="10" fill="#4c49c9"/>
+    <text x="82" y="437" fill="#ffffff" font-weight="700">Day trading</text>
+    <text x="584" y="437" fill="#d9d8f7" font-size="12" text-anchor="end">The large majority lose money over time</text>
+  </g>
+  <text x="26" y="440" fill="#5a5b60" font-size="10.5" font-weight="600" letter-spacing="1.2" transform="rotate(-90 26 440)">HIGHER RISK</text>
+</svg>

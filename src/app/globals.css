@@ -70,9 +70,11 @@
   .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
   .scrollbar-thin::-webkit-scrollbar-thumb { background-color: #e7e8ee; border-radius: 999px; }
 
-  /* Review call-to-action. Deliberately not a brand colour — it is the one
-     thing on the page competing with the track list for attention. */
-  .btn-review {
+  /* The call-to-action across every learning screen — review, open a section,
+     next step, submit. Deliberately not a brand colour: it is the one thing on
+     the page competing with the material for attention, and it should look the
+     same wherever a learner meets it. */
+  .btn-action {
     display: inline-flex;
     outline: 0;
     cursor: pointer;
@@ -91,9 +93,37 @@
     font-weight: 500;
     color: #0F1111;
   }
-  .btn-review:hover {
+  .btn-action:hover {
     background: #F7CA00;
     border-color: #F2C200;
     box-shadow: 0 2px 5px 0 rgb(213 217 217 / 50%);
+  }
+
+  /* Archetype trading cards. The scene holds the perspective, the inner
+     element does the rotating, and both faces sit stacked in the same grid
+     cell so the card keeps one height regardless of which side is showing. */
+  .flip-scene {
+    perspective: 1400px;
+  }
+  .flip-inner {
+    display: grid;
+    transform-style: preserve-3d;
+    transition: transform 480ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .flip-inner.is-flipped {
+    transform: rotateY(180deg);
+  }
+  .flip-face {
+    grid-area: 1 / 1;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .flip-face.is-back {
+    transform: rotateY(180deg);
+  }
+
+  /* Motion here is decorative — the card still turns, just without the sweep. */
+  @media (prefers-reduced-motion: reduce) {
+    .flip-inner { transition-duration: 1ms; }
   }
 }

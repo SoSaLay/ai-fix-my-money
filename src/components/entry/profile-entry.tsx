@@ -6,7 +6,7 @@ import {
   Home, Zap, Smartphone, Wifi, Shield, Car, Landmark, Tv, Baby, Dumbbell,
   ShoppingCart, UtensilsCrossed, Fuel, Bus, ShoppingBag, Clapperboard,
   HeartPulse, Plane, PawPrint, Scissors,
-  Briefcase, Laptop, Gift, Coins, Store, HeartHandshake, PiggyBank, TrendingUp, Banknote,
+  Briefcase, Laptop, Clock, Coins, Store, HeartHandshake, PiggyBank, TrendingUp, Banknote,
   type LucideIcon,
 } from 'lucide-react'
 import { useFinancialData } from '@/contexts/financial-data-context'
@@ -38,17 +38,17 @@ const COPY: Record<Section, { title: string; blurb: string; nameLabel: string; n
 /** Common entries, offered as one tap before anyone types anything. */
 const TEMPLATES: Partial<Record<Section, { name: string; Icon: LucideIcon }[]>> = {
   income: [
-    { name: 'Paycheck',       Icon: Briefcase      },
-    { name: 'Second job',     Icon: Store          },
-    { name: 'Freelance',      Icon: Laptop         },
-    { name: 'Self-employed',  Icon: Coins          },
-    { name: 'Tips',           Icon: Banknote       },
-    { name: 'Bonus',          Icon: Gift           },
-    { name: 'Benefits',       Icon: Landmark       },
-    { name: 'Pension',        Icon: PiggyBank      },
-    { name: 'Rental income',  Icon: Home           },
-    { name: 'Investments',    Icon: TrendingUp     },
-    { name: 'Support',        Icon: HeartHandshake },
+    { name: 'Paycheck',        Icon: Briefcase  },
+    { name: 'Business profit', Icon: Store      },
+    { name: 'Freelance',       Icon: Laptop     },
+    { name: 'Self-employed',   Icon: Coins      },
+    { name: 'Tips',            Icon: Banknote   },
+    { name: 'Second job',      Icon: Clock      },
+    { name: 'Benefits',        Icon: Landmark       },
+    { name: 'Pension',         Icon: PiggyBank      },
+    { name: 'Rental income',   Icon: Home           },
+    { name: 'Investments',     Icon: TrendingUp     },
+    { name: 'Support',         Icon: HeartHandshake },
   ],
   fixed: [
     { name: 'Rent',          Icon: Home       },
@@ -180,7 +180,7 @@ export function ProfileEntry({ section }: { section: Section }) {
         <div className="flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
             <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">
-              Quick select
+              Quick select (monthly)
             </p>
             <button
               onClick={reset}

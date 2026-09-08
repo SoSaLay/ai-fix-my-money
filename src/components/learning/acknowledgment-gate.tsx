@@ -44,7 +44,7 @@ export function AcknowledgmentGate({ children }: { children: React.ReactNode }) 
         <div className="flex items-center gap-5 flex-wrap">
           <button
             onClick={acknowledge}
-            className="bg-secondary text-white rounded-2xl px-6 py-3.5 text-label-lg font-medium hover:opacity-90 transition-opacity"
+            className="btn-action items-center justify-center gap-1.5"
           >
             I understand — start learning
           </button>

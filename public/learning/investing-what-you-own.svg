@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" font-family="Inter, system-ui, sans-serif">
+  <rect width="640" height="480" fill="#ffffff"/>
+  <text x="40" y="52" fill="#2d2f33" font-size="21" font-weight="700">You own a slice of a real business</text>
+  <text x="40" y="78" fill="#5a5b60" font-size="14">Someone else started it and runs it. Your result is their result.</text>
+
+  <text x="40" y="118" fill="#5a5b60" font-size="11.5" font-weight="600" letter-spacing="1.3">ONE BUSINESS, DIVIDED INTO SHARES</text>
+
+  <rect x="40" y="132" width="560" height="118" rx="16" fill="#f0f0f6"/>
+  <g fill="#d7d7e4">
+    <rect x="58" y="150" width="46" height="36" rx="7"/><rect x="112" y="150" width="46" height="36" rx="7"/>
+    <rect x="166" y="150" width="46" height="36" rx="7"/><rect x="220" y="150" width="46" height="36" rx="7"/>
+    <rect x="274" y="150" width="46" height="36" rx="7"/><rect x="328" y="150" width="46" height="36" rx="7"/>
+    <rect x="382" y="150" width="46" height="36" rx="7"/><rect x="436" y="150" width="46" height="36" rx="7"/>
+    <rect x="490" y="150" width="46" height="36" rx="7"/>
+    <rect x="58" y="196" width="46" height="36" rx="7"/><rect x="112" y="196" width="46" height="36" rx="7"/>
+    <rect x="166" y="196" width="46" height="36" rx="7"/><rect x="274" y="196" width="46" height="36" rx="7"/>
+    <rect x="328" y="196" width="46" height="36" rx="7"/><rect x="382" y="196" width="46" height="36" rx="7"/>
+    <rect x="436" y="196" width="46" height="36" rx="7"/><rect x="490" y="196" width="46" height="36" rx="7"/>
+  </g>
+  <rect x="220" y="196" width="46" height="36" rx="7" fill="#4c49c9"/>
+  <text x="243" y="219" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle">YOU</text>
+  <text x="544" y="172" fill="#5a5b60" font-size="12">Every other</text>
+  <text x="544" y="188" fill="#5a5b60" font-size="12">owner</text>
+
+  <text x="40" y="296" fill="#5a5b60" font-size="11.5" font-weight="600" letter-spacing="1.3">THE ONLY TWO WAYS VALUE REACHES YOU</text>
+
+  <rect x="40" y="312" width="272" height="126" rx="16" fill="#f0f0f6"/>
+  <circle cx="70" cy="344" r="11" fill="#4c49c9"/>
+  <path d="M65 348 l5 -7 l5 7" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="92" y="349" fill="#2d2f33" font-size="15" font-weight="700">Growth</text>
+  <text x="66" y="378" fill="#5a5b60" font-size="13">The business becomes worth</text>
+  <text x="66" y="398" fill="#5a5b60" font-size="13">more, so your slice does too.</text>
+  <text x="66" y="422" fill="#5a5b60" font-size="12" font-style="italic">Takes years, not days.</text>
+
+  <rect x="328" y="312" width="272" height="126" rx="16" fill="#f0f0f6"/>
+  <circle cx="358" cy="344" r="11" fill="#4c49c9"/>
+  <circle cx="358" cy="344" r="4" fill="#ffffff"/>
+  <text x="380" y="349" fill="#2d2f33" font-size="15" font-weight="700">Income</text>
+  <text x="354" y="378" fill="#5a5b60" font-size="13">It hands owners part of its</text>
+  <text x="354" y="398" fill="#5a5b60" font-size="13">earnings as a dividend.</text>
+  <text x="354" y="422" fill="#5a5b60" font-size="12" font-style="italic">Not promised. Can be cut.</text>
+</svg>

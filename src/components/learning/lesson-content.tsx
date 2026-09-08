@@ -1,4 +1,4 @@
-import type { Lesson } from '@/lib/learning/tracks'
+import type { Lesson, LessonTable } from '@/lib/learning/tracks'
 
 /**
  * The left column: the material itself. Headings carry the structure, bullets
@@ -8,7 +8,9 @@ import type { Lesson } from '@/lib/learning/tracks'
 export function LessonContent({ lesson }: { lesson: Lesson }) {
   return (
     <article className="flex flex-col gap-6">
-      <p className="text-body-lg text-on-surface leading-relaxed">{lesson.intro}</p>
+      {lesson.intro && (
+        <p className="text-body-lg text-on-surface leading-relaxed">{lesson.intro}</p>
+      )}
 
       {lesson.sections.map((section, i) => (
         <section key={i} className="flex flex-col gap-2.5">
@@ -67,6 +69,8 @@ export function LessonContent({ lesson }: { lesson: Lesson }) {
             </div>
           )}
 
+          {section.gridTable && <GridTable table={section.gridTable} />}
+
           {section.bullets && (
             <ul className="flex flex-col gap-2.5">
               {section.bullets.map((bullet, j) => (
@@ -88,5 +92,51 @@ export function LessonContent({ lesson }: { lesson: Lesson }) {
         </section>
       ))}
     </article>
+  )
+}
+
+/**
+ * A reference table with every cell ruled, the way a spreadsheet draws one.
+ * The full grid is the point: these are rows you scan across and compare, and
+ * the underline-only style used for an inline `table` reads as prose instead.
+ */
+function GridTable({ table }: { table: LessonTable }) {
+  return (
+    // Narrow screens scroll the table rather than the page.
+    <div className="overflow-x-auto rounded-xl">
+      <table className="w-full min-w-[380px] border-collapse text-left">
+        <thead>
+          <tr>
+            {table.columns.map((column, i) => (
+              <th
+                key={column}
+                scope="col"
+                className={`border border-outline-variant/70 bg-surface-container px-3 py-2 text-label-sm uppercase tracking-wider text-on-surface-variant ${
+                  i === 0 ? 'w-[30%]' : ''
+                }`}
+              >
+                {column}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {table.rows.map((row, j) => (
+            <tr key={j} className="align-top">
+              {row.map((cell, k) => (
+                <td
+                  key={k}
+                  className={`border border-outline-variant/70 px-3 py-2.5 text-body-md leading-relaxed ${
+                    k === 0 ? 'font-semibold text-on-surface' : 'text-on-surface-variant'
+                  }`}
+                >
+                  {cell}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   )
 }

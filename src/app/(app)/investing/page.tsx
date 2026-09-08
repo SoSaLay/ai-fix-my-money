@@ -7,18 +7,23 @@ import { TopNav } from '@/components/layout/top-nav'
 import { CircularDial } from '@/components/savings/circular-dial'
 import { useDashboardSummary, useInvestingGoal } from '@/hooks/use-data'
 import { SectionGate } from '@/components/learning/section-gate'
+import { ArchetypeCards } from '@/components/investing/archetype-cards'
+import { ArchetypeAssets } from '@/components/investing/archetype-assets'
+import { getArchetype, type ArchetypeId } from '@/lib/investing/archetypes'
 
 function InvestingPageTool() {
   const { data: summary, loading: summaryLoading } = useDashboardSummary()
   const { goal, loading: goalLoading, updateGoal, updating } = useInvestingGoal()
 
   const [allocationPct, setAllocationPct] = useState(0)
+  const [archetype, setArchetype] = useState<ArchetypeId | null>(null)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
   // Load existing goal data
   useEffect(() => {
     if (goal) {
       setAllocationPct(Number(goal.allocation_pct))
+      setArchetype(goal.archetype ?? null)
     }
   }, [goal])
 
@@ -45,7 +50,7 @@ function InvestingPageTool() {
             </div>
             <p className="text-headline-sm text-on-surface font-semibold mb-2">Nothing recorded yet</p>
             <p className="text-body-md text-on-surface-variant mb-6 leading-relaxed">
-              The Investing track is still being written. Everything else is ready now.
+              Record your income and spending first — this page allocates from those figures.
             </p>
             <Link
               href="/learning"
@@ -82,7 +87,10 @@ function InvestingPageTool() {
   const handleLockIn = async () => {
     const success = await updateGoal({
       allocation_pct: allocationPct,
-      risk_profile: 'moderate',
+      // The archetype is what the learner actually chose; the risk profile is
+      // the internal shape the stored goal has always carried.
+      risk_profile: getArchetype(archetype)?.risk ?? 'moderate',
+      archetype: archetype ?? undefined,
     })
     if (success) {
       setHasUnsavedChanges(false)
@@ -94,13 +102,21 @@ function InvestingPageTool() {
     setHasUnsavedChanges(true)
   }
 
+  const handleArchetypeChange = (id: ArchetypeId) => {
+    setArchetype(id)
+    setHasUnsavedChanges(true)
+  }
+
   return (
     <div className="flex flex-col min-h-full">
       <TopNav title="Investing" />
 
-      <div className="flex-1 px-8 pb-10 flex flex-col gap-6">
-        {/* Main investing card */}
-        <div className="bg-surface-container-lowest rounded-2xl shadow-card p-8 flex flex-col items-center gap-8 max-w-xl mx-auto w-full">
+      {/* Allocation on the left, the archetype picker on the right. They stack
+          on narrow screens, allocation first — it is the thing that has to be
+          set regardless of whether an archetype is chosen. */}
+      <div className="flex-1 px-8 pb-10 flex flex-col lg:flex-row gap-6 items-start max-w-6xl mx-auto w-full">
+        {/* Left: monthly income, the dial, and what the chosen archetype holds */}
+        <div className="bg-surface-container-lowest rounded-2xl shadow-card p-8 flex flex-col items-center gap-8 w-full lg:max-w-md lg:shrink-0">
           {/* Monthly Income — the allocation base */}
           <div className="w-full">
             <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">
@@ -186,6 +202,13 @@ function InvestingPageTool() {
               </>
             )}
           </button>
+
+          <ArchetypeAssets archetypeId={archetype} />
+        </div>
+
+        {/* Right: the archetype picker */}
+        <div className="w-full lg:flex-1 bg-surface-container-lowest rounded-2xl shadow-card p-6">
+          <ArchetypeCards selected={archetype} onSelect={handleArchetypeChange} />
         </div>
       </div>
     </div>

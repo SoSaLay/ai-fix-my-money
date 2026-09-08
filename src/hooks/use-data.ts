@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { useFinancialData } from '@/contexts/financial-data-context'
+import type { ArchetypeId } from '@/lib/investing/archetypes'
 
 // ============================================================================
 // Types (kept identical so existing pages need zero changes)
@@ -78,6 +79,8 @@ export interface InvestingGoal {
   user_id: string
   allocation_pct: number
   risk_profile: 'conservative' | 'moderate' | 'aggressive'
+  /** The archetype the learner picked. Absent on goals saved before archetypes. */
+  archetype?: ArchetypeId
   created_at: string
   updated_at: string
 }
@@ -359,6 +362,7 @@ export function useInvestingGoal() {
     async (data: {
       allocation_pct: number
       risk_profile: 'conservative' | 'moderate' | 'aggressive'
+      archetype?: ArchetypeId
     }) => {
       setUpdating(true)
       setInvestingGoal(data)

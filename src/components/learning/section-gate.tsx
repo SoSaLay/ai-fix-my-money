@@ -65,7 +65,7 @@ export function SectionGate({
               <Link
                 href={`/learning/${trackId}`}
                 onClick={() => { recordAction(trackId); endGuided() }}
-                className="flex items-center gap-2 bg-secondary text-white rounded-2xl px-5 py-2.5 text-label-lg font-medium hover:opacity-90 transition-opacity shrink-0"
+                className="btn-action items-center justify-center gap-1.5 shrink-0"
               >
                 <CheckCircle2 size={16} /> I&apos;ve done this
               </Link>
@@ -108,7 +108,7 @@ export function SectionGate({
 
             <Link
               href={`/learning/${trackId}`}
-              className="flex items-center gap-2 bg-secondary text-white rounded-2xl px-6 py-3.5 text-label-lg font-medium hover:opacity-90 transition-opacity"
+              className="btn-action items-center justify-center gap-1.5"
             >
               {started ? `Continue — ${done} of ${total} done` : 'Start the course'}
               <ArrowRight size={16} />

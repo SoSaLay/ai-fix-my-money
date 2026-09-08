@@ -7,10 +7,9 @@ import {
 } from 'lucide-react'
 import { useLearning } from '@/contexts/learning-context'
 import { TRACKS, readingMinutes, type Track } from '@/lib/learning/tracks'
-import { DISCLAIMER_MEDIUM } from '@/lib/learning/disclaimer'
 import { progressColor } from '@/lib/learning/progress-colors'
-import { LEGAL_ROOT } from '@/lib/legal/documents'
 import { AcknowledgmentGate } from '@/components/learning/acknowledgment-gate'
+import { DisclaimerFooter } from '@/components/learning/disclaimer-footer'
 
 const ICONS: Record<string, React.ReactNode> = {
   accounts:  <CreditCard size={20} />,
@@ -32,56 +31,54 @@ export default function LearningPage() {
 
   return (
     <AcknowledgmentGate>
-      <div className="flex flex-col gap-8 px-8 py-10 max-w-4xl w-full mx-auto">
-        {/* Header. The review queue sits beside it rather than as its own band —
-            it is a standing prompt, not news, and it should not push the tracks
-            down the page every time something falls due. */}
-        <header className="flex items-start justify-between gap-6">
-          <h3 className="max-w-2xl text-body-lg font-normal leading-relaxed text-on-surface-variant">
-            Learn to manage and grow your money. Complete the lessons, unlock the
-            features, understand how your money works.
-          </h3>
+      <div className="flex flex-col">
+        <div className="flex flex-col gap-8 px-8 py-10 max-w-4xl w-full mx-auto">
+          {/* Header. The review queue sits beside it rather than as its own band —
+              it is a standing prompt, not news, and it should not push the tracks
+              down the page every time something falls due. */}
+          <header className="flex items-start justify-between gap-6">
+            <h3 className="max-w-2xl text-body-lg font-normal leading-relaxed text-on-surface-variant">
+              Learn to manage and grow your money. Complete the lessons, unlock the
+              features, understand how your money works.
+            </h3>
 
-          {due.length > 0 && (
+            {/* Always here. Review is somewhere to test yourself whenever you
+                want, not a notification that only appears when something falls
+                due — a finished learner still has everything to practise. */}
             <Link
               href="/learning/review"
-              title={`${due.length} ${due.length === 1 ? 'question' : 'questions'} due for review`}
-              className="btn-review shrink-0 items-center justify-center gap-1.5"
+              title={
+                due.length > 0
+                  ? `${due.length} ${due.length === 1 ? 'question' : 'questions'} due for review`
+                  : 'Practise questions from the lessons you have finished'
+              }
+              className="btn-action items-center justify-center gap-1.5 shrink-0"
             >
               <RotateCcw size={13} aria-hidden />
               Go to review mode
-              <span className="tabular-nums font-semibold">({due.length})</span>
+              {due.length > 0 && (
+                <span className="tabular-nums font-semibold">({due.length})</span>
+              )}
             </Link>
-          )}
-        </header>
+          </header>
 
-        {/* Tracks */}
-        <div className="flex flex-col gap-3">
-          {TRACKS.map((track, i) => (
-            <TrackCard
-              key={track.id}
-              track={track}
-              index={i}
-              unlocked={isTrackUnlocked(track.id)}
-              complete={isTrackComplete(track.id)}
-              isCurrent={track.id === current}
-              completion={trackCompletion(track.id)}
-            />
-          ))}
+          {/* Tracks */}
+          <div className="flex flex-col gap-3">
+            {TRACKS.map((track, i) => (
+              <TrackCard
+                key={track.id}
+                track={track}
+                index={i}
+                unlocked={isTrackUnlocked(track.id)}
+                complete={isTrackComplete(track.id)}
+                isCurrent={track.id === current}
+                completion={trackCompletion(track.id)}
+              />
+            ))}
+          </div>
         </div>
 
-        {/* Standing disclaimer */}
-        <div className="border-t border-outline-variant/40 pt-6 flex flex-col gap-3 items-start">
-          <p className="text-body-sm text-on-surface-variant leading-relaxed max-w-2xl">
-            {DISCLAIMER_MEDIUM}
-          </p>
-          <Link
-            href={LEGAL_ROOT}
-            className="text-label-lg font-medium text-on-surface-variant underline underline-offset-4 hover:text-on-surface transition-colors"
-          >
-            Disclosures, terms, and privacy
-          </Link>
-        </div>
+        <DisclaimerFooter />
       </div>
     </AcknowledgmentGate>
   )

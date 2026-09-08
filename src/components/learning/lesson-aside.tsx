@@ -1,17 +1,19 @@
 import Image from 'next/image'
 import { ImageIcon } from 'lucide-react'
-import type { LessonImage } from '@/lib/learning/tracks'
+import type { Lesson } from '@/lib/learning/tracks'
 
 /**
  * The right column: reference art for the lesson. The same images are what the
- * questions will point back at, so a learner can check the picture rather than
+ * questions point back at, so a learner can check the picture rather than
  * re-reading the text.
  *
- * Renders nothing when a lesson has no imagery yet, so the material takes the
- * full width until the art exists.
+ * Renders nothing when a lesson has no imagery, so the material takes the full
+ * width instead of leaving a gap.
  */
-export function LessonImages({ images }: { images?: LessonImage[] }) {
-  if (!images || images.length === 0) return null
+export function LessonAside({ lesson }: { lesson: Lesson }) {
+  const images = lesson.images ?? []
+
+  if (images.length === 0) return null
 
   return (
     <aside className="w-full lg:w-[340px] shrink-0 flex flex-col gap-4">

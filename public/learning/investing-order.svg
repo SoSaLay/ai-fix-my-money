@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" font-family="Inter, system-ui, sans-serif">
+  <rect width="640" height="480" fill="#ffffff"/>
+  <text x="40" y="46" fill="#2d2f33" font-size="21" font-weight="700">The ordering most people are taught</text>
+  <text x="40" y="70" fill="#5a5b60" font-size="13.5">Ranked by guaranteed return and risk removed. Not a recommendation for you.</text>
+
+  <g font-size="13">
+    <rect x="40" y="88" width="560" height="42" rx="10" fill="#f0f0f6"/>
+    <text x="60" y="115" fill="#4c49c9" font-size="12.5" font-weight="700">7</text>
+    <text x="82" y="115" fill="#2d2f33" font-weight="700">Taxable brokerage</text>
+    <text x="590" y="115" fill="#5a5b60" font-size="12" text-anchor="end">No limits, no lock-up, gains taxed</text>
+
+    <rect x="40" y="136" width="560" height="42" rx="10" fill="#f0f0f6"/>
+    <text x="60" y="163" fill="#4c49c9" font-size="12.5" font-weight="700">6</text>
+    <text x="82" y="163" fill="#2d2f33" font-weight="700">HSA, if eligible</text>
+    <text x="590" y="163" fill="#5a5b60" font-size="12" text-anchor="end">Untaxed in, growing and out for medical</text>
+
+    <rect x="40" y="184" width="560" height="42" rx="10" fill="#f0f0f6"/>
+    <text x="60" y="211" fill="#4c49c9" font-size="12.5" font-weight="700">5</text>
+    <text x="82" y="211" fill="#2d2f33" font-weight="700">Rest of the 401(k)</text>
+    <text x="590" y="211" fill="#5a5b60" font-size="12" text-anchor="end">Lowers taxable income now</text>
+
+    <rect x="40" y="232" width="560" height="42" rx="10" fill="#f0f0f6"/>
+    <text x="60" y="259" fill="#4c49c9" font-size="12.5" font-weight="700">4</text>
+    <text x="82" y="259" fill="#2d2f33" font-weight="700">Roth IRA</text>
+    <text x="590" y="259" fill="#5a5b60" font-size="12" text-anchor="end">Taxed now, growth comes out untaxed</text>
+
+    <rect x="40" y="280" width="560" height="42" rx="10" fill="#e0dffa"/>
+    <text x="60" y="307" fill="#4c49c9" font-size="12.5" font-weight="700">3</text>
+    <text x="82" y="307" fill="#2d2f33" font-weight="700">401(k) employer match</text>
+    <text x="590" y="307" fill="#5a5b60" font-size="12" text-anchor="end">Pay you only get by contributing</text>
+
+    <rect x="40" y="328" width="560" height="42" rx="10" fill="#e0dffa"/>
+    <text x="60" y="355" fill="#4c49c9" font-size="12.5" font-weight="700">2</text>
+    <text x="82" y="355" fill="#2d2f33" font-weight="700">3–6 months of essentials</text>
+    <text x="590" y="355" fill="#5a5b60" font-size="12" text-anchor="end">Stops a bad month forcing a sale</text>
+
+    <rect x="40" y="376" width="560" height="42" rx="10" fill="#4c49c9"/>
+    <text x="60" y="403" fill="#ffffff" font-size="12.5" font-weight="700">1</text>
+    <text x="82" y="403" fill="#ffffff" font-weight="700">High-interest debt</text>
+    <text x="590" y="403" fill="#d9d8f7" font-size="12" text-anchor="end">A guaranteed return nothing else matches</text>
+  </g>
+
+  <text x="40" y="446" fill="#5a5b60" font-size="12">Investing sits above the rungs that make staying invested possible.</text>
+  <text x="40" y="466" fill="#5a5b60" font-size="12">Contribution caps reset every year — always check the current figures.</text>
+</svg>

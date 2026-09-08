@@ -59,7 +59,12 @@ export interface LessonSection {
   body?: string
   bullets?: Bullet[]
   table?: LessonTable
-  /** A worked example, set apart from the explanation. */
+  /**
+   * The same data drawn as a fully ruled card, the way a spreadsheet draws one.
+   * Use it for reference rows you scan across and compare; `table` is the
+   * lighter, underline-only style that reads as part of the prose.
+   */
+  gridTable?: LessonTable
   /** Rule above this section. Used sparingly, only to separate ideas. */
   divider?: boolean
 }
@@ -77,8 +82,8 @@ export interface Lesson {
   title: string
   /** Reading window in seconds before the questions appear. */
   readSeconds: 30 | 60
-  /** One-line framing shown above the content. */
-  intro: string
+  /** One-line framing shown above the content. Omit where it would repeat. */
+  intro?: string
   sections: LessonSection[]
   /** Shown in the right column. Absent until reference art exists. */
   images?: LessonImage[]
@@ -122,238 +127,132 @@ const ACCOUNTS: Track = {
   lessons: [
     {
       id: 'acc-1',
-      title: 'What an account actually is',
-      readSeconds: 60,
-      intro: 'Every account you have falls on one of two sides. Getting that split right is what makes everything after it work.',
+      title: 'Account definition',
+      readSeconds: 30,
       sections: [
         {
-          heading: 'The definition',
-          body: 'An account is a record held by an institution showing what you own with them, or what you owe them.',
+          body: 'Why start here? Accounts are how you manage your money, and every number you enter on this platform comes off one. An account is a record held by an institution showing what you own with them, or what you owe them.',
         },
         {
-          heading: 'The two sides',
+          heading: 'Every account is either:',
           bullets: [
             { term: 'Asset account', text: 'Holds money that belongs to you.' },
             { term: 'Liability account', text: 'Records money you owe.' },
           ],
         },
+      ],
+      // No questions. This lesson is one definition and the split that follows
+      // from it — there is nothing here to test that acc-2 does not test better
+      // against the actual list of accounts.
+      questions: [],
+    },
+    {
+      id: 'acc-2',
+      title: 'Account types',
+      readSeconds: 60,
+      sections: [
         {
-          heading: 'Assets:',
-          table: {
-            columns: ['Account', 'What it is'],
+          gridTable: {
+            columns: ['Asset account', 'What it is'],
             rows: [
-              ['Checking', 'Everyday money moving in and out.'],
-              ['Savings', 'Money set aside, earning a little interest while it sits.'],
+              ['Checking', 'Everyday money moving in and out. Usually pays little or no interest.'],
+              ['Savings', 'Money set aside, earning a little interest while it sits. May limit certain withdrawals.'],
               ['High-yield savings', 'The same thing paying a much higher rate. Usually online-only, and transfers out take a day or two.'],
-              ['401(k)', 'A retirement account sponsored by an employer, who often contributes alongside you.'],
+              ['Money market', 'A savings account that typically pays more, and may come with a card or cheques.'],
+              ['Certificate of deposit', 'Money locked in for a fixed term at a fixed rate. Taking it out early costs a penalty.'],
+              ['Brokerage', 'Holds investments rather than cash. Cash sitting in it is usually waiting to be invested or withdrawn.'],
+              ['401(k)', 'A retirement account sponsored by an employer, who often contributes alongside you. Rules apply to when money can come out.'],
               ['IRA', 'A retirement account held in your own name, independent of any employer.'],
-              ['Brokerage', 'Holds investments rather than cash.'],
+              ['HSA', 'Paired with a high-deductible health plan. Untaxed going in, and coming out for qualifying medical costs.'],
             ],
           },
         },
         {
-          heading: 'Liabilities:',
-          table: {
-            columns: ['Account', 'What it is'],
+          gridTable: {
+            columns: ['Liability account', 'What it is'],
             rows: [
-              ['Credit card', 'Borrow up to a limit, repay, borrow again.'],
-              ['Auto loan', 'Borrowed to buy a car. The car backs the loan.'],
+              ['Credit card', 'Revolving: borrow up to a limit, repay, and borrow again. Interest applies to balances carried past the due date.'],
+              ['Personal loan', 'A fixed amount borrowed once and repaid on a schedule. Nothing backs it, so the rate is usually higher.'],
+              ['Auto loan', 'Borrowed to buy a car and repaid on a schedule. The car backs the loan.'],
               ['Student loan', 'Borrowed to pay for education. Repayment usually starts after leaving school.'],
               ['Mortgage', 'Borrowed to buy property, repaid over decades. The property backs the loan.'],
             ],
           },
         },
-        {
-          divider: true,
-          body: 'The word "balance" means opposite things on each side. On an asset account it is money you have; on a liability account it is money you still owe.',
-        },
-      ],
-      images: [
-        {
-          src: '/learning/accounts-two-sides.svg',
-          alt: 'Two columns side by side. On the left, asset accounts — checking, savings, brokerage, retirement — each with a positive balance. On the right, liability accounts — credit card, student loan, auto loan, mortgage — each with an amount owed.',
-          caption: 'Assets on one side, liabilities on the other. The same word — balance — points in opposite directions.',
-        },
       ],
       questions: [
         {
-          id: 'acc-1-q1',
+          id: 'acc-2-q1',
           question: 'A credit card account shows a balance of $840. What does that number represent?',
           options: ['Money available to you', 'Money you owe', 'Money already paid', 'Your credit limit'],
           answer: 1,
-          imageSrc: '/learning/accounts-two-sides.svg',
           why: 'On a liability account the balance is the amount still owed. On an asset account the same word means the opposite — money you hold.',
         },
         {
-          id: 'acc-1-q2',
+          id: 'acc-2-q2',
           question: 'Which of these is an asset account?',
-          options: ['Auto loan', 'Mortgage', 'Savings account', 'Store credit card'],
+          options: ['Auto loan', 'Mortgage', 'Money market', 'Store credit card'],
           answer: 2,
-          why: 'A savings account holds money that belongs to you. The other three are records of money owed to a lender.',
+          why: 'A money market account holds money that belongs to you. The other three are records of money owed to a lender.',
         },
         {
-          id: 'acc-1-q3',
+          id: 'acc-2-q3',
           question: 'Which retirement account is sponsored by an employer?',
           options: ['IRA', 'Brokerage account', '401(k)', 'High-yield savings account'],
           answer: 2,
           why: 'A 401(k) is sponsored by an employer, who often contributes alongside you. An IRA is the retirement account held in your own name instead.',
         },
-      ],
-    },
-    {
-      id: 'acc-2',
-      title: 'Account types, and why the type changes the rules',
-      readSeconds: 60,
-      intro: 'The type of an account decides how money moves in and out, what it costs, and what protections apply.',
-      sections: [
         {
-          heading: 'Accounts that hold cash',
-          bullets: [
-            { term: 'Checking', text: 'Built for movement. Money goes in and out often. Usually pays little or no interest.' },
-            { term: 'Savings / money market', text: 'Built for holding. Typically pays interest and may limit certain withdrawals.' },
-          ],
+          id: 'acc-2-q4',
+          question: 'Which liability lets you borrow again after you have repaid it?',
+          options: ['Credit card', 'Auto loan', 'Student loan', 'Mortgage'],
+          answer: 0,
+          why: 'A credit card revolves — the amount available goes back up as you repay. The other three are borrowed once and the balance only goes down.',
         },
         {
-          heading: 'Accounts that record debt',
-          bullets: [
-            { term: 'Credit card', text: 'A revolving line. You borrow up to a limit, repay, and can borrow again. Interest applies to balances carried past the due date.' },
-            { term: 'Instalment loan', text: 'A fixed amount borrowed once and repaid on a schedule — auto, student, personal, mortgage. The balance only goes down.' },
-          ],
-        },
-        {
-          heading: 'Accounts that hold investments',
-          bullets: [
-            { term: 'Brokerage', text: 'Holds securities rather than cash. Cash sitting in it is usually waiting to be invested or withdrawn.' },
-            { term: 'Retirement', text: 'Adds rules about when money can be withdrawn and how it is taxed.' },
-          ],
-        },
-        {
-          divider: true,
-          heading: 'The practical consequence',
-          body: 'Withdrawal rules, fees, and tax treatment attach to the account type, not to the amount.',
-        },
-      ],
-      images: [
-        {
-          src: '/learning/accounts-types.svg',
-          alt: 'Six account types laid out as cards: checking, savings, brokerage, retirement, credit card and instalment loan, each with a note on how it behaves and which side it sits on.',
-          caption: 'The type is what sets the rules — access, interest, and whether the balance is yours or owed.',
-        },
-      ],
-      questions: [
-        {
-          id: 'acc-2-q1',
-          question: 'What makes a credit card "revolving" rather than an instalment loan?',
+          id: 'acc-2-q5',
+          question: 'Two accounts hold $5,000 each: a checking account and a certificate of deposit. What differs?',
           options: [
-            'It has a higher interest rate',
-            'You can borrow, repay, and borrow again up to a limit',
-            'It is issued by a bank',
-            'It is repaid monthly',
+            'Nothing — the amount is the same',
+            'The rules on getting the money out, which come with the account type',
+            'Only the institution',
+            'Only the interest rate',
           ],
           answer: 1,
-          why: 'Revolving means the borrowed amount can go back up after you repay. An instalment loan is borrowed once and the balance only decreases.',
+          why: 'Access, fees, and tax treatment attach to the type of account, not to the amount in it. The CD is locked for a term; the checking account is not.',
         },
         {
-          id: 'acc-2-q2',
-          question: 'Which account type is designed to hold investments rather than cash?',
-          options: ['Checking', 'Money market', 'Brokerage', 'Certificate of deposit'],
-          answer: 2,
-          why: 'A brokerage account holds securities. The cash sitting in it is usually just waiting to be invested or withdrawn.',
-        },
-        {
-          id: 'acc-2-q3',
-          question: 'Why does account type matter when you want to move money out?',
-          options: [
-            'It does not — money is money',
-            'Type determines the rules, costs, and possible penalties on withdrawal',
-            'Only the balance matters',
-            'Only the institution matters',
-          ],
+          id: 'acc-2-q6',
+          question: 'What backs an auto loan that does not back a personal loan?',
+          options: ['Your income', 'The car itself', 'Your credit score', 'Nothing'],
           answer: 1,
-          why: 'Withdrawal rules, fees, and tax treatment are attached to the account type, not to the amount.',
-        },
-      ],
-    },
-    {
-      id: 'acc-3',
-      title: 'Balances: what the number is telling you',
-      readSeconds: 30,
-      intro: 'The number on the screen is not always the money you can use. Banks report several balances and they rarely match.',
-      sections: [
-        {
-          heading: 'The balances you will see',
-          bullets: [
-            { term: 'Current balance', text: 'Everything that has settled, including transactions that may not have cleared.' },
-            { term: 'Available balance', text: 'What you can actually spend right now — current balance minus holds and pending charges.' },
-            { term: 'Pending transactions', text: 'Charges authorised but not settled. They cut available balance before appearing in your history.' },
-            { term: 'Statement balance', text: 'On a credit card, what you owed at the close of the billing cycle. Interest and reporting are usually based on it.' },
-          ],
-        },
-      ],
-      images: [
-        {
-          src: '/learning/accounts-balances.svg',
-          alt: 'One account shown three ways: a current balance of $1,200, pending charges of $150 subtracted from it, an available balance of $1,050, and a separate statement balance of $840 from the last closing date.',
-          caption: 'Current, less what is pending, gives available. The statement balance is a separate, older number.',
-        },
-      ],
-      questions: [
-        {
-          id: 'acc-3-q1',
-          question: 'Which balance tells you what you can spend right now?',
-          options: ['Current balance', 'Available balance', 'Statement balance', 'Opening balance'],
-          answer: 1,
-          imageSrc: '/learning/accounts-balances.svg',
-          why: 'Available balance already accounts for pending charges and holds. Current balance does not.',
-        },
-        {
-          id: 'acc-3-q2',
-          question: 'Why can a credit card statement balance differ from its current balance?',
-          options: [
-            'One is in a different currency',
-            'The statement balance is a snapshot at the end of the billing cycle; charges since then are not in it',
-            'They are always the same',
-            'The statement balance excludes interest',
-          ],
-          answer: 1,
-          imageSrc: '/learning/accounts-balances.svg',
-          why: 'The statement balance is frozen at the cycle close. Anything you spend afterwards shows in the current balance but not the statement.',
-        },
-        {
-          id: 'acc-3-q3',
-          question: 'A pending charge has not settled. What has it already affected?',
-          options: ['Nothing', 'Your available balance', 'Your credit score', 'Your statement balance'],
-          answer: 1,
-          imageSrc: '/learning/accounts-balances.svg',
-          why: 'Pending charges reduce what you can spend immediately, even though they have not posted to your transaction history.',
+          why: 'The car secures the loan, which is why the rate is usually lower. A personal loan has nothing behind it, so it typically costs more to borrow.',
         },
       ],
     },
     {
       id: 'acc-4',
-      title: 'Credit: what is being measured',
+      title: 'Credit',
       readSeconds: 60,
-      intro: 'A credit score is a summary of a credit report. Knowing what feeds it is different from being told what to do about it.',
       sections: [
         {
-          heading: 'What the report is',
-          body: 'A record kept by credit bureaus of your accounts, balances, payment history, and inquiries. The score is calculated from it.',
+          body: 'Credit is money you borrow with a promise to repay it. Credit accounts are then reported to credit bureaus, creating your credit report. This is a record lenders, landlords, and sometimes employers use to assess your financial reliability and interest rates. Your credit score summarizes that report as a single number.',
         },
         {
-          heading: 'What feeds the score',
+          heading: 'Credit score components',
           bullets: [
-            { term: 'Payment history', text: 'Whether payments were made on time. Widely described as the largest single factor in common scoring models.' },
-            { term: 'Credit utilisation', text: 'Balance divided by credit limit on revolving accounts. A $300 balance on a $1,000 limit is 30%.' },
-            { term: 'Length of history', text: 'How long accounts have been open. Closing an old account changes this.' },
-            { term: 'Inquiries', text: 'A hard inquiry is recorded when you apply for credit. Checking your own score is a soft inquiry and is not.' },
+            { term: 'Payment history', text: 'Paying on time. The largest factor.' },
+            { term: 'Credit utilisation', text: 'What you owe divided by your limit. Keep it at 30% or lower.' },
+            { term: 'Length of history', text: 'How long your accounts have been open. No history means no score.' },
+            { term: 'Inquiries', text: 'Applying for credit leaves a mark. Checking your own score does not.' },
           ],
         },
         {
-          divider: true,
-          heading: 'What a score is not',
+          heading: 'Pay your credit card',
           bullets: [
-            { text: 'Not a measure of income, savings, or net worth — none of that is in the report.' },
-            { text: 'Not universal. Someone with no borrowing history may have no score at all.' },
+            { term: 'Current balance', text: 'Everything you owe today.' },
+            { term: 'Statement balance', text: 'What you owed at the cycle close. Pay this in full to avoid interest.' },
+            { term: 'What paying it does', text: 'Raises your score, so you get approved for big purchases at a lower rate.' },
           ],
         },
       ],
@@ -408,20 +307,18 @@ const ACCOUNTS: Track = {
     },
     {
       id: 'acc-5',
-      title: 'Net worth: putting the two sides together',
+      title: 'Net worth',
       readSeconds: 30,
-      intro: 'One number, and it only means anything because of the four steps before it.',
       sections: [
         {
-          heading: 'The formula',
           body: 'Everything you own, minus everything you owe. That is the whole calculation.',
         },
         {
-          heading: 'How to read it',
+          heading: 'Calculation',
           bullets: [
-            { term: 'It can be negative', text: 'Common, and a description rather than a verdict. A mortgage or student loans early on will often produce one.' },
-            { term: 'It is a snapshot', text: 'It describes one moment. Direction over time carries more information than any single reading.' },
-            { term: 'It hides cash flow', text: 'A high net worth with no accessible cash is a different situation from the same number sitting in savings.' },
+            { term: 'Assets', text: 'Cash, savings, investments, property — everything you own.' },
+            { term: 'Liabilities', text: 'Cards, loans, mortgage — everything you owe.' },
+            { term: 'The result', text: 'You want to own more than you owe, that starts with managing your income and spending — our very next track!' },
           ],
         },
       ],
@@ -485,18 +382,6 @@ const ACCOUNTS: Track = {
       why: 'A checking account holds money that is yours; an auto loan records money owed. The other pairs are two of the same kind.',
     },
     {
-      id: 'acc-f2',
-      question: 'Your credit card shows a current balance of $1,120 and a statement balance of $780. What explains the gap?',
-      options: [
-        'Interest has been added',
-        'You have spent $340 since the billing cycle closed',
-        'The bank made an error',
-        'The statement balance excludes fees',
-      ],
-      answer: 1,
-      why: 'The statement balance is frozen at the cycle close. Spending after that date shows in the current balance only.',
-    },
-    {
       id: 'acc-f3',
       question: 'You owe $1,800 across cards with a combined limit of $6,000. What is your overall utilisation?',
       options: ['18%', '30%', '33%', '60%'],
@@ -547,18 +432,6 @@ const ACCOUNTS: Track = {
       why: 'Revolving credit can be borrowed again up to the limit. An instalment loan is borrowed once and only decreases.',
     },
     {
-      id: 'acc-f8',
-      question: 'Your bank app shows $900 current and $610 available. What accounts for the difference?',
-      options: [
-        'Interest not yet paid',
-        'Pending charges and holds',
-        'A monthly fee',
-        'Money in a different account',
-      ],
-      answer: 1,
-      why: 'Available balance subtracts pending charges and holds from the current balance. That gap is money already committed.',
-    },
-    {
       id: 'acc-f9',
       question: 'Why does moving $500 out of a retirement account differ from moving $500 out of checking?',
       options: [
@@ -585,10 +458,6 @@ const ACCOUNTS: Track = {
   ],
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 2. SPENDING
-// ─────────────────────────────────────────────────────────────────────────────
-
 const SPENDING: Track = {
   id: 'spending',
   title: 'Income vs. Spending',
@@ -598,11 +467,72 @@ const SPENDING: Track = {
   status: 'available',
   lessons: [
     {
-      id: 'spd-intro',
-      title: 'Where money comes from',
-      readSeconds: 60,
-      intro: 'There are three repeatable ways to increase what you have. Everything else in this app is about what happens to that money once it arrives.',
+      id: 'spd-1',
+      title: 'Income',
+      readSeconds: 30,
       sections: [
+        {
+          body: 'Income is any money you receive.',
+        },
+        {
+          heading: 'Two different numbers',
+          bullets: [
+            { term: 'Gross income', text: 'Your pay before anything is taken out. The number on a job offer.' },
+            { term: 'Net income', text: 'Your pay after taxes and deductions. The number that reaches your account.' },
+          ],
+        },
+        {
+          heading: 'Alternative income forms:',
+          bullets: [
+            { text: 'Side gigs, freelance work, tips, bonuses, business profit, rental income, interest and dividends, money from selling investments.' },
+          ],
+        },
+      ],
+      images: [
+        {
+          src: '/learning/spending-gross-net.svg',
+          alt: 'Gross pay of $4,000 with four deductions listed beneath it — tax, payroll tax, health insurance and a retirement contribution — leaving take-home pay of $2,734.',
+          caption: 'Gross pay, less tax and deductions, gives take-home. Take-home is the figure the month runs on.',
+        },
+      ],
+      questions: [
+        {
+          id: 'spd-1-q1',
+          question: 'Which figure describes money that has actually reached your account?',
+          options: ['Gross income', 'Net income', 'Annual salary', 'Base pay'],
+          answer: 1,
+          imageSrc: '/learning/spending-gross-net.svg',
+          why: 'Net income is what remains after deductions. It is the only figure you can actually spend or move.',
+        },
+        {
+          id: 'spd-1-q2',
+          question: 'Why do deductions make gross income a poor planning number?',
+          options: [
+            'Gross income changes monthly',
+            'Deductions can remove a substantial share before the money arrives',
+            'Gross income is taxed twice',
+            'It is not — gross is more accurate',
+          ],
+          answer: 1,
+          why: 'Taxes and withholdings can take a large fraction of gross pay. Planning against gross assumes money you never receive.',
+        },
+        {
+          id: 'spd-1-q3',
+          question: 'Someone earns between $2,000 and $4,500 a month depending on work volume. Which figure best describes their constraint?',
+          options: ['The average, $3,250', 'The high month, $4,500', 'The low month, $2,000', 'The yearly total'],
+          answer: 2,
+          why: 'Obligations still arrive in the low months. The floor, not the average, is what has to be covered.',
+        },
+      ],
+    },
+    {
+      id: 'spd-intro',
+      title: 'Increasing income',
+      readSeconds: 60,
+      sections: [
+        {
+          body: 'Increasing your income solves a lot of money problems at once — it gives you more freedom and more room to decide where your money goes. There are three repeatable ways to increase what you have.',
+        },
         {
           heading: 'The three',
           bullets: [
@@ -612,35 +542,31 @@ const SPENDING: Track = {
           ],
         },
         {
-          heading: 'What each one asks of you',
           table: {
             columns: ['', 'Strongest for', 'Costs you'],
             rows: [
               [
                 'Career',
-                'Reliability. Pay arrives on a schedule, often with benefits like a 401(k) match.',
-                'The hours themselves, and a ceiling someone else sets. Raises and bonuses move that ceiling; they do not remove it.',
+                'Reliability. The same pay for the same hours, every week.',
+                'Your hours, and a cap someone else sets. A raise moves the cap; it does not remove it.',
               ],
               [
                 'Business',
-                'Ceiling. Ownership has no fixed cap on what it can return.',
-                'The highest failure rate of the three, plus your money and time up front.',
+                'No cap. Solve a problem people pay for and there is no limit on what you can earn.',
+                'The highest failure rate, competitive, and your money, effort, and time go in first.',
               ],
               [
                 'Investing',
-                'Time. Money can grow without your hours going into it.',
-                'The slowest of the three, and no return is guaranteed.',
+                'Using money to make money. It grows without your physical effort or hours. More often than not, time is what makes its value increase.',
+                'The slowest of the three, and nothing is guaranteed.',
               ],
             ],
           },
         },
         {
           divider: true,
-          heading: 'One axis, three positions',
-          body: 'All three are really a question of how much you own. A career rents your time to someone who owns; a business is owning the thing outright; investing is owning a slice of what someone else runs. Most people move along that line in order, because a career is usually what funds the other two.',
-        },
-        {
-          body: 'This app is about managing and growing money once it reaches you, so it does not teach you how to pick a career or start a business. Investing gets its own track later.',
+          heading: 'How they relate',
+          body: 'A career is you working for a business. That business grows because people like you work in it. Other people then want a piece of those businesses, through the stock market or private markets — and that is investing. People use income from jobs, businesses, and investments to fund new businesses that solve evolving problems. Creating new jobs and investment opportunities—and the cycle continually repeats.',
         },
       ],
       images: [
@@ -687,85 +613,29 @@ const SPENDING: Track = {
       ],
     },
     {
-      id: 'spd-1',
-      title: 'Income: the number most people get wrong',
-      readSeconds: 30,
-      intro: 'The figure worth planning around is what lands in your account, not what you are paid on paper.',
-      sections: [
-        {
-          heading: 'Two different numbers',
-          bullets: [
-            { term: 'Gross income', text: 'Total pay before anything is taken out. The number in a job offer.' },
-            { term: 'Net income', text: 'What arrives after taxes, insurance, and other deductions. The money you can actually move.' },
-          ],
-        },
-        {
-          heading: 'What people leave out',
-          bullets: [
-            { text: 'Side work, interest, benefits, and irregular payments all count.' },
-            { text: 'Variable or seasonal income is usually described by its low months, because the low months are the constraint.' },
-          ],
-        },
-      ],
-      images: [
-        {
-          src: '/learning/spending-gross-net.svg',
-          alt: 'Gross pay of $4,000 with four deductions listed beneath it — tax, payroll tax, health insurance and a retirement contribution — leaving take-home pay of $2,734.',
-          caption: 'Gross pay, less tax and deductions, gives take-home. Take-home is the figure the month runs on.',
-        },
-      ],
-      questions: [
-        {
-          id: 'spd-1-q1',
-          question: 'Which figure describes money that has actually reached your account?',
-          options: ['Gross income', 'Net income', 'Annual salary', 'Base pay'],
-          answer: 1,
-          imageSrc: '/learning/spending-gross-net.svg',
-          why: 'Net income is what remains after deductions. It is the only figure you can actually spend or move.',
-        },
-        {
-          id: 'spd-1-q2',
-          question: 'Why do deductions make gross income a poor planning number?',
-          options: [
-            'Gross income changes monthly',
-            'Deductions can remove a substantial share before the money arrives',
-            'Gross income is taxed twice',
-            'It is not — gross is more accurate',
-          ],
-          answer: 1,
-          why: 'Taxes and withholdings can take a large fraction of gross pay. Planning against gross assumes money you never receive.',
-        },
-        {
-          id: 'spd-1-q3',
-          question: 'Someone earns between $2,000 and $4,500 a month depending on work volume. Which figure best describes their constraint?',
-          options: ['The average, $3,250', 'The high month, $4,500', 'The low month, $2,000', 'The yearly total'],
-          answer: 2,
-          why: 'Obligations still arrive in the low months. The floor, not the average, is what has to be covered.',
-        },
-      ],
-    },
-    {
       id: 'spd-2',
-      title: 'Fixed costs: the part that is already decided',
+      title: 'Fixed costs',
       readSeconds: 60,
-      intro: 'Fixed costs arrive whether or not you think about them. They set the floor of what any month costs.',
       sections: [
         {
-          heading: 'What counts as fixed',
-          body: 'Roughly the same amount, on a schedule — rent or mortgage, insurance, loan payments, phone, steady utilities.',
+          body: 'Fixed costs are the bills you have already committed to — rent or mortgage, insurance, loan payments, phone, utilities. They arrive on a schedule whether you think about them or not.',
         },
         {
-          heading: 'Why they sit apart',
+          heading: 'Important to know',
           bullets: [
-            { text: 'They are not decisions you make each month.' },
-            { term: 'Fixed is not permanent', text: 'Changing one takes a deliberate decision and usually notice — moving, refinancing, switching plans.' },
-            { term: 'They are the floor', text: 'Income below your fixed total cannot be resolved by spending more carefully.' },
+            { term: 'Fixed is not permanent', text: 'You can change them, but it takes a real decision — moving, refinancing, switching plans.' },
+            { term: 'They take the first bite', text: 'Like taxes, fixed costs come off your income before you get to choose anything. What is left is the money you actually decide about.' },
           ],
         },
         {
           divider: true,
-          heading: 'Estimate them monthly',
-          body: 'Work out what each one costs you in a typical month, then add them into a single monthly figure. Anything billed on another cycle gets converted first — divide an annual premium by twelve, a quarterly bill by three — so every number is on the same scale.',
+          heading: 'Subscriptions',
+          body: 'Like phone and utilities, subscriptions are a fixed cost — people just do not think of them that way. Most of us now pay for a handful of apps and tools, and they add up quietly.',
+          bullets: [
+            { term: 'Recurring by default', text: 'Decided once, then charged again with no further decision from you.' },
+            { term: 'The real number', text: 'Sites advertise a low monthly price but bill you for the year. That is a fixed cost for the next twelve months.' },
+            { term: 'Before you subscribe', text: 'Whatever you keep becomes a fixed cost. Commit only to what you will use.' },
+          ],
         },
       ],
       images: [
@@ -796,6 +666,13 @@ const SPENDING: Track = {
           why: 'Fixed costs are the floor. They arrive regardless of how carefully you spend on everything else.',
         },
         {
+          id: 'spd-2-q4',
+          question: 'A subscription costs $12.99 a month. What is the annual commitment?',
+          options: ['$129.90', '$155.88', '$142.89', '$168.00'],
+          answer: 1,
+          why: '12.99 × 12 = 155.88. Monthly pricing makes recurring costs feel smaller than the yearly figure they actually represent.',
+        },
+        {
           id: 'spd-2-q3',
           question: 'Does "fixed" mean the cost can never change?',
           options: [
@@ -811,26 +688,19 @@ const SPENDING: Track = {
     },
     {
       id: 'spd-3',
-      title: 'Variable spending: where the money actually goes',
+      title: 'Variable spending',
       readSeconds: 60,
-      intro: 'This is where the gap between what people think they spend and what they spend usually lives.',
       sections: [
         {
-          heading: 'What makes it variable',
-          body: 'The amount changes with choices you make during the month — groceries, dining, transport, shopping, entertainment.',
+          body: 'Variable spending is everything you decide to buy during the month — groceries, eating out, transport, shopping, entertainment. It is variable because the amount changes with the choices you make.',
         },
         {
-          heading: 'Why categories matter',
+          heading: 'Important to know',
           bullets: [
-            { text: 'Fifty individual charges tell you nothing. Four category totals tell you a lot.' },
-            { term: 'The estimate gap', text: 'Recalled spending is commonly well below the real total, because small frequent charges are easiest to forget.' },
-            { term: 'Frequency beats size', text: 'One $200 charge is easy to notice. Twenty $10 charges are the same money and much harder to see.' },
+            { term: 'This is where budgets break', text: 'Your fixed costs are set, variable spending has no set amount, which makes it the spending that go over budget.' },
+            { term: 'Frequency', text: 'purchase can be small, so the total comes from how often you buy. Cutting how many times you spend can do more than cutting what you spend.' },
+            { term: 'Categories', text: 'Most banks and credit cards sort your charges for you. That is the fastest way to see where it went.' },
           ],
-        },
-        {
-          divider: true,
-          heading: 'Estimate them monthly',
-          body: 'Give each category one number: roughly what you spend on it in a month. A rough figure you can check against a statement is worth more than a precise one you never write down.',
         },
       ],
       images: [
@@ -880,90 +750,27 @@ const SPENDING: Track = {
       ],
     },
     {
-      id: 'spd-4',
-      title: 'Subscriptions and the drift problem',
-      readSeconds: 30,
-      intro: 'Recurring charges are structurally different: they were decided once and then continue without any further decision.',
-      sections: [
-        {
-          heading: 'How drift happens',
-          bullets: [
-            { text: 'Starting a subscription is a decision. Continuing one is not.' },
-            { text: 'The total rises without anything being actively chosen.' },
-            { term: 'Trials', text: 'Free trials generally convert automatically. The charge appears without further action.' },
-          ],
-        },
-        {
-          heading: 'Seeing the real number',
-          bullets: [
-            { term: 'Annual framing', text: 'A monthly price times twelve is the actual commitment. $14/month is $168/year.' },
-            { term: 'They are scattered', text: 'Spread across cards and app stores, which is why a full list rarely exists until someone builds it.' },
-          ],
-        },
-      ],
-      images: [
-        {
-          src: '/learning/spending-subscriptions.svg',
-          alt: 'Five subscriptions listed with their monthly and annual cost side by side, totalling $76.96 a month and $923.52 a year.',
-          caption: 'Each subscription is priced to be ignorable monthly. The annual column is the one that is hard to ignore.',
-        },
-      ],
-      questions: [
-        {
-          id: 'spd-4-q1',
-          question: 'A subscription costs $12.99 a month. What is the annual commitment?',
-          options: ['$129.90', '$155.88', '$142.89', '$168.00'],
-          answer: 1,
-          why: '12.99 × 12 = 155.88. Monthly pricing makes recurring costs feel smaller than the yearly figure they represent.',
-        },
-        {
-          id: 'spd-4-q2',
-          question: 'Why do subscription totals tend to rise over time?',
-          options: [
-            'Prices always increase',
-            'Starting one is a decision; continuing one is not',
-            'Banks add fees',
-            'They are usually annual',
-          ],
-          answer: 1,
-          why: 'Nothing prompts a re-decision. The charge repeats by default, so the total only moves one way unless someone reviews it.',
-        },
-        {
-          id: 'spd-4-q3',
-          question: 'What typically happens at the end of a free trial?',
-          options: [
-            'It cancels automatically',
-            'It converts to a paid subscription unless cancelled',
-            'You are asked to confirm',
-            'It pauses',
-          ],
-          answer: 1,
-          why: 'Trials generally convert by default. The absence of a decision is what produces the charge.',
-        },
-      ],
-    },
-    {
       id: 'spd-5',
-      title: 'Cash flow: the number that decides everything else',
+      title: 'Cash flow',
       readSeconds: 30,
-      intro: 'Income minus everything going out. It determines whether saving or investing is even possible yet.',
       sections: [
         {
-          heading: 'The calculation',
-          body: 'Income minus fixed costs, variable spending, and recurring charges, over one month.',
+          body: 'Everything you earn, minus everything you spend, in one month. That is the whole calculation. It decides whether there is anything left to save or invest.',
+        },
+        {
+          heading: 'Cash flow is not net worth',
+          bullets: [
+            { term: 'Cash flow', text: 'Your money over one month. What came in, minus what you spent.' },
+            { term: 'Net worth', text: 'Your money over your whole life so far. Everything you own, minus everything you owe.' },
+            { term: 'The link', text: 'Positive cash flow every month is what grows net worth over years. Increasing your income or setting a spending limit is how you get there.' },
+          ],
         },
         {
           heading: 'Reading the result',
           bullets: [
-            { term: 'Positive', text: 'More arrived than left. The surplus is the only money available for anything else.' },
-            { term: 'Negative', text: 'The gap is being covered by savings or borrowing, whether or not that was intended.' },
-            { term: 'Order of operations', text: 'Saving out of a deficit moves money without creating any. The surplus is the actual source.' },
+            { term: 'Positive cash flow', text: 'You earned more than you spent. What is left over is the money you can save or invest.' },
+            { term: 'Negative cash flow', text: 'You spent more than you earned. The difference came out of your savings or went onto a card.' },
           ],
-        },
-        {
-          divider: true,
-          heading: 'A limit is a boundary, not a plan',
-          body: 'A spending limit is a threshold you set for yourself so overspending becomes visible while the month is still running.',
         },
       ],
       images: [
@@ -1025,10 +832,6 @@ const SPENDING: Track = {
   finalQuiz: [],
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 3. SAVINGS
-// ─────────────────────────────────────────────────────────────────────────────
-
 const SAVINGS: Track = {
   id: 'savings',
   title: 'Savings',
@@ -1039,22 +842,18 @@ const SAVINGS: Track = {
   lessons: [
     {
       id: 'sav-1',
-      title: 'Why savings has to be separate',
+      title: 'Savings',
       readSeconds: 30,
-      intro: 'Money left in a spending account is not saved — it is unspent. The difference is structural.',
       sections: [
         {
-          heading: 'Unspent versus saved',
-          bullets: [
-            { text: 'A surplus sitting in checking is available for anything, and usually gets used.' },
-            { term: 'Friction', text: 'Moving money to a separate account adds a step before it can be spent. That step does most of the work.' },
-            { term: 'Purpose', text: 'Savings with a name and a target behaves differently, because spending it means visibly taking from something.' },
-          ],
+          body: 'Savings is money you set aside instead of spend, to use later. Sometimes the best thing you can do with money is not spend it. It holds its value while it waits for the right opportunity.',
         },
         {
-          divider: true,
-          heading: 'Timing changes the amount',
-          body: 'Money separated when income arrives is not competing with the month’s spending. Money separated at month end is whatever survived.',
+          heading: 'Unspent versus Saved',
+          bullets: [
+            { text: 'Your regular accounts move money in and out. A savings account is a separate account you move money into on purpose.' },
+            { text: "Some savings accounts pay you a higher interest rate than others for keeping your money there. It's worth choosing where you save, not just that you save." },
+          ],
         },
       ],
       images: [
@@ -1093,142 +892,87 @@ const SAVINGS: Track = {
     },
     {
       id: 'sav-2',
-      title: 'The emergency fund',
-      readSeconds: 60,
-      intro: 'It exists to absorb unexpected costs without borrowing. Its defining feature is availability, not returns.',
+      title: 'Types of savings',
+      readSeconds: 30,
       sections: [
         {
-          heading: 'What it covers',
-          body: 'Unpredictable, unavoidable costs — a job loss, a medical bill, a car repair. Not planned expenses that are simply infrequent.',
-        },
-        {
-          heading: 'How it is usually sized',
+          heading: 'Accounts:',
           bullets: [
-            { term: 'The common range', text: 'Three to six months of essential expenses is widely cited. It is a convention, not a rule.' },
-            { term: 'Based on essentials', text: 'Sized against fixed costs rather than total income.' },
-            { term: 'Liquidity first', text: 'It has to be reachable quickly. A fund locked in something hard to access is not doing the job.' },
+            { term: 'Savings account', text: 'A basic account for money you are not spending right now.' },
+            { term: 'High-yield savings account', text: 'The same idea, but specific banks incentivize you with a higher interest rate to keep your money there.' },
+            { term: 'Money market account', text: 'Similar to a savings account and often pays more, can require a higher minimum balance to avoid fees or earn that rate.' },
+            { term: 'CD (certificate of deposit)', text: 'Pays more, but your money is locked in for a set term.' },
           ],
         },
         {
-          divider: true,
-          heading: 'Why it comes up early',
+          heading: 'Methods:',
           bullets: [
-            { text: 'Without it, an unexpected cost is typically covered by credit, turning a one-time event into an ongoing balance.' },
-            { text: 'A partial fund still absorbs partial shocks. Zero to something is the largest step in the range.' },
+            { term: 'Emergency fund', text: 'Money set aside for unpredictable costs — a job loss, a medical bill, a car repair.' },
+            { term: 'Sinking fund', text: 'Money set aside a little at a time for a specific cost you already know is coming.' },
           ],
-        },
-      ],
-      images: [
-        {
-          src: '/learning/savings-emergency-fund.svg',
-          alt: 'Six month-blocks in a row with the first three filled, above essential monthly costs of $1,880 and a balance of $5,640.',
-          caption: 'The unit is months of your own essential costs, which is why a dollar figure on its own says nothing.',
         },
       ],
       questions: [
         {
           id: 'sav-2-q1',
-          question: 'The common three-to-six-month guideline is based on what?',
-          options: ['Gross income', 'Essential monthly expenses', 'Net worth', 'Total debt'],
+          question: 'What is the difference between a savings account and a CD?',
+          options: [
+            'There is no difference',
+            'A CD locks your money in for a set term in exchange for a higher rate',
+            'A CD cannot earn interest',
+            'A savings account is only for emergencies',
+          ],
           answer: 1,
-          imageSrc: '/learning/savings-emergency-fund.svg',
-          why: 'The fund needs to cover what you must pay, not what you normally earn or spend. Essential costs are the relevant base.',
+          why: 'A CD trades access for a better rate. A savings account keeps your money reachable at any time.',
         },
         {
           id: 'sav-2-q2',
-          question: 'What is the most important property of where an emergency fund is held?',
-          options: ['Highest possible return', 'Tax advantages', 'Quick accessibility', 'Long-term growth'],
-          answer: 2,
-          why: 'The fund exists to be reached at short notice. Anything that delays access undermines its only function.',
+          question: 'An emergency fund and a sinking fund are best described as which?',
+          options: [
+            'Separate account types offered by banks',
+            'Methods — ways of using an account, not accounts themselves',
+            'Investment products',
+            'The same thing with different names',
+          ],
+          answer: 1,
+          why: 'Neither is a special account. Both are money set aside for a purpose, usually held in an ordinary savings account.',
         },
         {
           id: 'sav-2-q3',
-          question: 'Which is NOT what an emergency fund is for?',
+          question: 'Which is a sinking fund for, rather than an emergency fund?',
           options: [
-            'An unexpected car repair',
-            'A gap in income after job loss',
-            'An annual insurance premium you know is coming',
+            'A sudden job loss',
             'An urgent medical bill',
+            'An annual insurance premium you know is coming',
+            'An unexpected car repair',
           ],
           answer: 2,
-          why: 'A known, scheduled cost is predictable. It is a planning item, not an emergency — that is what a sinking fund handles.',
+          why: 'A known, scheduled cost is predictable. That is what a sinking fund handles — an emergency fund is for the unpredictable ones.',
         },
       ],
     },
     {
       id: 'sav-3',
-      title: 'Sinking funds: planning for the predictable',
-      readSeconds: 30,
-      intro: 'A sinking fund converts an irregular expense into a regular one.',
-      sections: [
-        {
-          heading: 'The mechanic',
-          body: 'Divide the known cost by the months until it is due. That figure becomes a monthly amount instead of a sudden one.',
-        },
-        {
-          heading: 'How it differs from an emergency fund',
-          bullets: [
-            { text: 'Emergencies are unpredictable. These costs are known in advance.' },
-            { text: 'They only feel like emergencies because nothing was set aside.' },
-            { term: 'Separate targets', text: 'Distinct funds stop one goal from quietly consuming another.' },
-          ],
-        },
-      ],
-      images: [
-        {
-          src: '/learning/savings-sinking-funds.svg',
-          alt: 'Four sinking funds — car insurance, holiday travel, car maintenance and annual renewals — each with a target, a due date, a progress bar and a monthly amount, adding to $320 a month.',
-          caption: 'A known cost divided by the months until it lands. None of these are emergencies.',
-        },
-      ],
-      questions: [
-        {
-          id: 'sav-3-q1',
-          question: 'A $1,400 expense is due in 7 months. What is the monthly sinking amount?',
-          options: ['$140', '$175', '$200', '$233'],
-          answer: 2,
-          why: '1,400 ÷ 7 = 200. Dividing the known cost by the months available is the whole calculation.',
-        },
-        {
-          id: 'sav-3-q2',
-          question: 'What separates a sinking fund from an emergency fund?',
-          options: [
-            'The amount saved',
-            'A sinking fund is for known, scheduled costs',
-            'The interest rate',
-            'Where it is held',
-          ],
-          answer: 1,
-          why: 'Predictability is the distinction. A known cost can be divided across months; an unpredictable one cannot.',
-        },
-      ],
-    },
-    {
-      id: 'sav-4',
-      title: 'Interest and compounding, mechanically',
+      title: 'Interest',
       readSeconds: 60,
-      intro: 'Interest is the cost of money over time. It works identically whether it is paid to you or by you.',
       sections: [
         {
-          heading: 'The vocabulary',
-          bullets: [
-            { term: 'Interest rate', text: 'A percentage applied to a balance over a period. On savings you receive it; on debt you pay it.' },
-            { term: 'APY', text: 'Includes the effect of compounding, so it reflects what a year actually produces.' },
-            { term: 'APR', text: 'The annualised rate before compounding effects are counted.' },
-          ],
+          body: 'This course has only mentioned interest once so far — with credit cards, and that was the bad kind: what borrowing costs you. Savings is where the same mechanism works in your favor instead. We are not recommending a specific bank or rate here — that takes your own research — but plenty of banks compete for your money by offering a higher rate to keep it parked with them.',
         },
         {
-          heading: 'How compounding works',
+          heading: 'The good versus the bad',
           bullets: [
-            { text: 'Interest is calculated on a balance that already includes past interest.' },
-            { text: 'The base grows, so each period adds slightly more than the last.' },
-            { term: 'Frequency matters', text: 'The same nominal rate compounded monthly produces more than compounded annually.' },
+            { term: 'Bad interest', text: 'What a credit card or loan charges you to borrow. The longer you carry a balance, the more it costs you.' },
+            { term: 'Good interest', text: 'What a savings account pays you to keep your money there. The longer it sits, the more you earn.' },
           ],
         },
         {
           divider: true,
-          heading: 'It runs both ways',
-          body: 'Carried credit card balances compound too. The same mechanism that grows savings grows debt.',
+          heading: 'Compounding',
+          bullets: [
+            { term: 'What it is', text: 'Interest calculated on a balance that already includes past interest — the same mechanism grows a savings balance and a carried credit card balance alike.' },
+            { term: 'APY vs. APR', text: 'APY includes the effect of compounding, so it reflects what a year actually produces. APR is the rate before that effect is counted.' },
+          ],
         },
       ],
       images: [
@@ -1240,7 +984,7 @@ const SAVINGS: Track = {
       ],
       questions: [
         {
-          id: 'sav-4-q1',
+          id: 'sav-3-q1',
           question: 'What does compounding mean?',
           options: [
             'Interest is paid more often',
@@ -1253,7 +997,7 @@ const SAVINGS: Track = {
           why: 'The base itself grows. That is why the effect accelerates rather than staying linear.',
         },
         {
-          id: 'sav-4-q2',
+          id: 'sav-3-q2',
           question: 'Why is APY usually the more informative figure on a savings account?',
           options: [
             'It is always higher',
@@ -1265,7 +1009,7 @@ const SAVINGS: Track = {
           why: 'APY builds compounding into the number. A nominal rate alone does not tell you what a year actually produces.',
         },
         {
-          id: 'sav-4-q3',
+          id: 'sav-3-q3',
           question: 'Does compounding apply to credit card balances?',
           options: [
             'No, only to savings',
@@ -1278,81 +1022,11 @@ const SAVINGS: Track = {
         },
       ],
     },
-    {
-      id: 'sav-5',
-      title: 'Allocation: deciding before the month starts',
-      readSeconds: 30,
-      intro: 'Choosing what share of your surplus goes to savings in advance, rather than saving whatever remains.',
-      sections: [
-        {
-          heading: 'Pay yourself first',
-          body: 'Moving the savings amount when income arrives, before the month’s spending competes for it.',
-        },
-        {
-          heading: 'Percentage or fixed amount',
-          bullets: [
-            { term: 'Percentage', text: 'Scales with irregular income — down in low months, up in high ones.' },
-            { term: 'Fixed amount', text: 'Predictable, but can strain a low month.' },
-            { term: 'Splitting', text: 'A surplus can be divided across several targets. The split is your decision.' },
-          ],
-        },
-        {
-          divider: true,
-          heading: 'What "save what is left" actually produces',
-          body: 'The amount is set by whatever the month happened to cost — which is to say, not decided at all.',
-        },
-      ],
-      images: [
-        {
-          src: '/learning/savings-allocation.svg',
-          alt: 'A single bar of $2,734 take-home split into fixed costs at 69 per cent, savings and sinking funds at 12 per cent, and variable spending at 19 per cent.',
-          caption: 'Every dollar given a destination on day one. The percentages are illustrative, not recommended.',
-        },
-      ],
-      questions: [
-        {
-          id: 'sav-5-q1',
-          question: 'What does "pay yourself first" describe mechanically?',
-          options: [
-            'Spending on yourself before bills',
-            'Moving savings out when income arrives, before spending',
-            'Paying debts first',
-            'Saving whatever remains at month end',
-          ],
-          answer: 1,
-          why: 'It is about sequence. Separating the money first removes it from competition with the month’s spending.',
-        },
-        {
-          id: 'sav-5-q2',
-          question: 'Why does a percentage suit irregular income better than a fixed amount?',
-          options: [
-            'It is always larger',
-            'It scales down automatically in low months and up in high ones',
-            'Banks prefer it',
-            'It compounds faster',
-          ],
-          answer: 1,
-          why: 'A percentage adjusts to what actually arrived. A fixed amount stays the same regardless of whether the month supported it.',
-        },
-        {
-          id: 'sav-5-q3',
-          question: 'What determines how much gets saved under a "save what is left" approach?',
-          options: [
-            'A deliberate decision',
-            'Whatever the month happened to cost',
-            'Your income',
-            'Your goals',
-          ],
-          answer: 1,
-          why: 'The amount is a residual. It is an outcome of spending rather than a choice about saving.',
-        },
-      ],
-    },
   ],
   action: {
     title: 'Build your own savings structure',
     prompt:
-      'Turn the theory into named pools with real targets, sized from the numbers you recorded in the Income vs. Spending track.',
+      'Allocation: decide what you will save each month based on your income and spending. You need an actual number in mind, not just an intention, so you know how much you are actually saving.',
     tasks: [
       'Create one savings goal with a name and a target — something you actually want.',
       'Use your recorded fixed costs to work out three and six months of essentials, and set an emergency fund target.',
@@ -1366,18 +1040,743 @@ const SAVINGS: Track = {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 4. INVESTING — content pending
+// 4. INVESTING
+//
+// The hardest track, and the one most likely to be read wrong. The through-line
+// is deliberately repeated in every lesson: investing is buying a piece of
+// something someone else already started, which means the return depends on
+// that business growing, which takes years. Nothing here describes a way to
+// make money quickly, because there is no such thing to describe.
+//
+// The order-of-operations lesson and the instrument menu both describe common
+// practice and the reasoning behind it. Neither tells the learner what to pick.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const INVESTING: Track = {
   id: 'investing',
   title: 'Investing',
-  outcome: 'You can read your own positions and explain what you hold and why the value moves.',
-  blurb: 'What you actually own, why its value moves, and what risk and fees cost you.',
+  outcome: 'You can explain what you own, why its value moves, how long it needs, and what each kind of investment risks.',
+  blurb: 'What you actually own, why it takes years, and what each kind of investment risks.',
   unlocks: '/investing',
-  status: 'coming-soon',
-  lessons: [],
-  action: null,
+  status: 'available',
+  lessons: [
+    {
+      id: 'inv-1',
+      title: 'What you are actually buying',
+      readSeconds: 60,
+      intro: 'Investing is buying a piece of something someone else already started. Every other idea in this track follows from that one sentence.',
+      sections: [
+        {
+          heading: 'The definition',
+          body: 'A share is a unit of ownership in a business that someone else founded, staffed and runs. Buying one makes you a part-owner of that business and entitled to a slice of whatever it is worth and whatever it earns.',
+        },
+        {
+          heading: 'What that means for you',
+          bullets: [
+            { term: 'You are backing an operator', text: 'You are betting that the people running the business grow it. You are not being paid for handing over the money.' },
+            { term: 'Your return is their result', text: 'If the business becomes worth more, your slice becomes worth more. If it does not, your slice does not.' },
+          ],
+        },
+        {
+          divider: true,
+          heading: 'You own it, and you still do not run it',
+          body: 'Buying a share buys you no say in how the business is run. Someone else decides what it sells, who it hires, what it charges and when it changes direction, and you find out at the same time everyone else does.',
+        },
+        {
+          heading: 'That is true all the way up',
+          bullets: [
+            { text: 'An ordinary shareholder gets a vote on a short list of formal matters and nothing at all on day-to-day decisions.' },
+            { text: 'Even the largest holders do not run the company. They can push, vote and take board seats — the operating decisions still belong to management.' },
+            { term: 'So where does the risk come from', text: 'You are putting your money on other people’s judgement, in a market you do not control, over a stretch of years you cannot skip. That is the risk. Not a fee, not a bad week — the fact that the outcome is in someone else’s hands.' },
+          ],
+        },
+        {
+          divider: true,
+          heading: 'The two places a return can come from',
+          bullets: [
+            { term: 'Growth', text: 'The business is worth more later than what you paid, so your slice sells for more.' },
+            { term: 'Income', text: 'The business hands part of its earnings to owners as a dividend, or a borrower pays you interest.' },
+            { text: 'Neither is promised. A business can shrink, and a dividend can be cut.' },
+          ],
+        },
+        {
+          divider: true,
+          heading: 'Why this cannot be fast',
+          body: 'Businesses grow by winning customers, raising revenue and holding margins — work measured in years. A price that jumps in a day is people changing their minds about the same business, not the business changing.',
+        },
+      ],
+      images: [
+        {
+          src: '/learning/investing-what-you-own.svg',
+          alt: 'A business represented as one whole block divided into many small slices, with one slice highlighted as the share you own, and arrows showing the two ways value reaches an owner: growth in what the slice is worth, and income paid out from earnings.',
+          caption: 'You own a slice of an operating business. Its result is your result — and someone else decides what it does.',
+        },
+      ],
+      questions: [
+        {
+          id: 'inv-1-q1',
+          question: 'When you buy a share, what have you actually bought?',
+          options: [
+            'A loan to the government',
+            'A unit of ownership in a business someone else runs',
+            'A guarantee of future payments',
+            'A savings account with a higher rate',
+          ],
+          answer: 1,
+          imageSrc: '/learning/investing-what-you-own.svg',
+          why: 'A share is ownership. That is why the outcome depends on how the business performs rather than on a rate someone promised you.',
+        },
+        {
+          id: 'inv-1-q2',
+          question: 'What are the two ways an ownership stake can return money to you?',
+          options: [
+            'Interest and fees',
+            'Growth in what it is worth, and income paid out of earnings',
+            'Deposits and withdrawals',
+            'Taxes and rebates',
+          ],
+          answer: 1,
+          why: 'Either the slice becomes worth more, or the business pays part of its earnings out to owners. Nothing else is a return.',
+        },
+        {
+          id: 'inv-1-q4',
+          question: 'Who makes the day-to-day decisions in a business you own shares in?',
+          options: [
+            'The shareholders, by vote',
+            'Management — even the largest shareholders do not run the company',
+            'Whoever owns the most shares',
+            'The brokerage that holds your shares',
+          ],
+          answer: 1,
+          why: 'Ownership is not control. Large holders can vote and press for change, but the operating decisions stay with the people running the business.',
+        },
+        {
+          id: 'inv-1-q5',
+          question: 'Where does the underlying risk in owning a share come from?',
+          options: [
+            'Brokerage fees',
+            'Your return depends on decisions other people make, over years you cannot skip',
+            'The share price changing during the day',
+            'Having to file taxes on it',
+          ],
+          answer: 1,
+          why: 'You have handed money to an operation you do not run. Everything that decides the outcome — the decisions, the market, the years it takes — sits outside your control.',
+        },
+        {
+          id: 'inv-1-q3',
+          question: 'A company’s share price falls 6% in one afternoon on no news. What most likely changed?',
+          options: [
+            'The business lost 6% of its customers that afternoon',
+            'What buyers and sellers were willing to pay for the same business',
+            'The company issued a refund to owners',
+            'The company’s earnings dropped 6%',
+          ],
+          answer: 1,
+          why: 'Price is what people will pay today. The underlying business almost never changes at the speed the price does.',
+        },
+      ],
+    },
+    {
+      id: 'inv-2',
+      title: 'Time is the ingredient, not the obstacle',
+      readSeconds: 60,
+      intro: 'Nobody gets rich in a day. Returns accumulate because businesses grow slowly, and because gains start earning on top of gains.',
+      sections: [
+        {
+          heading: 'Compounding, stated plainly',
+          body: 'A return earned this year becomes part of the base that earns next year. The effect is small early and large late, which is why the number of years matters more than the size of any single year.',
+        },
+        {
+          heading: 'Why the early years look disappointing',
+          bullets: [
+            { text: 'Most of the balance in year three is money you deposited, not growth.' },
+            { text: 'Most of the balance in year thirty is growth, not deposits.' },
+            { term: 'The consequence', text: 'Judging investing by its first two years measures your saving rate, not your investing.' },
+          ],
+        },
+        {
+          divider: true,
+          heading: 'Losses cost more than they look',
+          bullets: [
+            { term: 'A 20% fall', text: 'needs a 25% gain to get back to where it was.' },
+            { term: 'A 50% fall', text: 'needs a 100% gain to get back to where it was.' },
+            { text: 'This asymmetry is why avoiding large losses matters more than chasing large wins.' },
+          ],
+        },
+        {
+          divider: true,
+          heading: 'What you see online',
+          body: 'The results shown publicly are the ones that worked. The same strategy loses money for people who never post about it, so the visible sample is not the real one.',
+        },
+      ],
+      images: [
+        {
+          src: '/learning/investing-time.svg',
+          alt: 'A stacked bar chart across years five, fifteen and thirty showing contributions as the large share early on and growth overtaking them by year thirty, beside a note that a 50% fall needs a 100% gain to recover.',
+          caption: 'Contributions dominate early. Growth only takes over with time.',
+        },
+      ],
+      questions: [
+        {
+          id: 'inv-2-q1',
+          question: 'Why does compounding produce so little in the first few years?',
+          options: [
+            'Fees are highest at the start',
+            'The base earning a return is still mostly money you deposited',
+            'Returns are lower for new investors',
+            'Markets ignore small accounts',
+          ],
+          answer: 1,
+          imageSrc: '/learning/investing-time.svg',
+          why: 'Growth compounds on top of growth. Early on there is barely any growth to compound, so the balance is mostly your own deposits.',
+        },
+        {
+          id: 'inv-2-q2',
+          question: 'An investment falls 50%. What gain is needed just to get back to even?',
+          options: ['50%', '75%', '100%', '150%'],
+          answer: 2,
+          why: '$100 falling to $50 has to double to return to $100. Losses need a bigger percentage to undo them than the percentage that caused them.',
+        },
+        {
+          id: 'inv-2-q3',
+          question: 'Why is a wall of successful results online a misleading sample?',
+          options: [
+            'The results are always fabricated',
+            'Only the outcomes that worked get posted, so the failures are invisible',
+            'Returns are illegal to share',
+            'Everyone uses different brokers',
+          ],
+          answer: 1,
+          why: 'People post wins and stay quiet about losses. You are seeing the survivors of a strategy, not its average result.',
+        },
+      ],
+    },
+    {
+      id: 'inv-3',
+      title: 'What usually comes before investing',
+      readSeconds: 60,
+      intro: 'There is a widely taught order for where a spare dollar goes. Understanding why each rung sits where it does matters more than the list itself.',
+      sections: [
+        {
+          heading: 'The ordering, and the reason for it',
+          body: 'Each rung is placed by the return it produces or the risk it removes. Nothing here is a recommendation for your situation.',
+        },
+        {
+          heading: 'The rungs',
+          bullets: [
+            { term: '1. High-interest debt', text: 'Clearing a 24% balance is a guaranteed 24% saved. No investment offers a guaranteed return to compete with that.' },
+            { term: '2. Three to six months of essentials', text: 'Without it, one bad month forces you to sell investments at the worst possible time, or borrow.' },
+            { term: '3. Employer 401(k) match', text: 'Money your employer adds when you contribute. Not taking it leaves part of your agreed pay unclaimed.' },
+            { term: '4. Roth IRA', text: 'You pay tax now; qualifying withdrawals later come out untaxed, including the growth.' },
+            { term: '5. Rest of the 401(k)', text: 'Contributions reduce taxable income now, and the balance grows untaxed until you withdraw.' },
+            { term: '6. HSA, if eligible', text: 'Tied to a high-deductible health plan. Untaxed going in, growing, and coming out for qualifying medical costs.' },
+            { term: '7. Taxable brokerage', text: 'No limits and no lock-up, but gains and dividends are taxable. This is where anything beyond the accounts above goes.' },
+          ],
+        },
+        {
+          divider: true,
+          heading: 'On the contribution limits',
+          body: 'Recent annual caps have been roughly $7,000 for an IRA, $23,000 for employee 401(k) contributions, and $4,300 for an individual HSA. These are reset every year, so check the current figures rather than trusting a number in a lesson.',
+        },
+        {
+          divider: true,
+          heading: 'The point of the order',
+          bullets: [
+            { text: 'The rungs above investing are not delays. They are the conditions that let an investment stay invested.' },
+            { text: 'An investor without an emergency fund is forced to sell during exactly the months when selling hurts most.' },
+          ],
+        },
+      ],
+      images: [
+        {
+          src: '/learning/investing-order.svg',
+          alt: 'Seven numbered rungs from high-interest debt at the bottom up to a taxable brokerage at the top, each labelled with the reason it sits at that height.',
+          caption: 'Ordered by guaranteed return and by risk removed, not by excitement.',
+        },
+      ],
+      questions: [
+        {
+          id: 'inv-3-q1',
+          question: 'Why does high-interest debt usually sit ahead of investing in this ordering?',
+          options: [
+            'Lenders require it',
+            'Clearing it is a guaranteed saving that no investment can guarantee to beat',
+            'Debt blocks you from opening a brokerage account',
+            'Interest is not tax deductible',
+          ],
+          answer: 1,
+          imageSrc: '/learning/investing-order.svg',
+          why: 'A 24% interest rate you stop paying is a certain 24%. An investment return is never certain, so the guaranteed one is placed first.',
+        },
+        {
+          id: 'inv-3-q2',
+          question: 'What is the employer 401(k) match?',
+          options: [
+            'A loan from your employer',
+            'Money your employer adds when you contribute',
+            'A tax refund',
+            'A bonus paid at retirement',
+          ],
+          answer: 1,
+          why: 'It is part of your compensation that only arrives if you contribute. Leaving it unclaimed leaves agreed pay on the table.',
+        },
+        {
+          id: 'inv-3-q3',
+          question: 'Why is an emergency fund placed before investing rather than after?',
+          options: [
+            'It earns a higher return',
+            'It stops a bad month from forcing you to sell investments at a loss',
+            'Brokers require proof of savings',
+            'It is taxed more favourably',
+          ],
+          answer: 1,
+          why: 'The fund is what lets the investment be left alone. Without it, an ordinary emergency turns into a forced sale at whatever price the market offers that week.',
+        },
+      ],
+    },
+    {
+      id: 'inv-4',
+      title: 'Your goal, your horizon, your risk',
+      readSeconds: 60,
+      intro: 'A plan built from someone else’s numbers is not a plan. Six inputs decide what any of this should look like for you.',
+      sections: [
+        {
+          heading: 'The six inputs',
+          bullets: [
+            { term: 'The goal', text: 'What the money is for, and roughly how much it needs to be.' },
+            { term: 'The time horizon', text: 'How many years until you need it. This single number changes everything downstream.' },
+            { term: 'The savings rate', text: 'What you can add regularly. Saving more lowers the return you need; saving less raises it.' },
+            { term: 'Risk tolerance', text: 'How large a fall you can watch without selling. A plan you abandon in a bad year was the wrong plan.' },
+            { term: 'The required return', text: 'What annual return the goal, the horizon and the savings rate actually imply.' },
+            { term: 'Inflation', text: 'Prices rise, so a return that does not beat inflation is a loss in what the money buys.' },
+          ],
+        },
+        {
+          divider: true,
+          heading: 'Why the horizon does the heavy lifting',
+          bullets: [
+            { text: 'A long horizon leaves time to recover from a bad stretch, so a wider range of outcomes is survivable.' },
+            { text: 'A short horizon does not. Money needed in two years cannot wait out a three-year drawdown.' },
+            { term: 'The usual consequence', text: 'The closer a goal gets, the more people move that money toward things that move less.' },
+          ],
+        },
+        {
+          divider: true,
+          heading: 'Risk tolerance is behavioural, not theoretical',
+          body: 'The real test is not what you would accept on paper. It is what you actually do in the month your balance is down a third.',
+        },
+      ],
+      questions: [
+        {
+          id: 'inv-4-q1',
+          question: 'Which input most changes how much short-term movement a plan can absorb?',
+          options: ['The account provider', 'The time horizon', 'The number of holdings', 'The deposit day'],
+          answer: 1,
+          why: 'Years are what let a bad stretch be recovered from. With enough of them, a fall is temporary; without them, it is the outcome.',
+        },
+        {
+          id: 'inv-4-q2',
+          question: 'Why does inflation belong in the calculation?',
+          options: [
+            'It is a fee brokers charge',
+            'A return below inflation still loses buying power',
+            'It sets the tax rate',
+            'It determines the match',
+          ],
+          answer: 1,
+          why: 'The point of the money is what it can buy. If prices rise faster than the balance does, the balance is worth less in real terms.',
+        },
+        {
+          id: 'inv-4-q3',
+          question: 'What is the practical test of someone’s risk tolerance?',
+          options: [
+            'The score on a questionnaire',
+            'What they actually do when the balance is well down',
+            'How much they earn',
+            'How many accounts they hold',
+          ],
+          answer: 1,
+          why: 'Tolerance is revealed by behaviour under loss. A plan is only as good as what the person holding it does in the worst month.',
+        },
+      ],
+    },
+    {
+      id: 'inv-5',
+      title: 'Asset classes, allocation and diversification',
+      readSeconds: 60,
+      intro: 'Allocation is how you split money across kinds of investments. It explains more of a result than any single pick does.',
+      sections: [
+        {
+          heading: 'The three broad classes',
+          bullets: [
+            { term: 'Stocks', text: 'Ownership. The highest long-run growth historically, and the largest falls along the way.' },
+            { term: 'Bonds', text: 'Lending. You are paid interest and repaid the principal, so they move less — and grow less.' },
+            { term: 'Cash', text: 'Stable and immediately available. Steadily loses buying power to inflation.' },
+          ],
+        },
+        {
+          heading: 'How stock holdings get grouped',
+          table: {
+            columns: ['Group', 'What it is', 'Typical behaviour'],
+            rows: [
+              ['Large cap', 'The biggest, most established companies', 'Steadier, slower'],
+              ['Mid and small cap', 'Smaller companies with more room to grow', 'More volatile in both directions'],
+              ['Foreign', 'Companies outside your own country', 'Adds currency and country exposure'],
+              ['Fixed income', 'Bonds and similar lending', 'Least movement, lowest expected growth'],
+            ],
+          },
+        },
+        {
+          divider: true,
+          heading: 'Allocation versus diversification',
+          bullets: [
+            { term: 'Allocation', text: 'The split between classes — how much in stocks, how much in bonds, how much in cash.' },
+            { term: 'Diversification', text: 'Not concentrating within a class. Twenty companies in one industry is one bet wearing a disguise.' },
+            { term: 'Rebalancing', text: 'Periodically returning to your intended split. It mechanically trims what has run up and adds to what has not.' },
+          ],
+        },
+        {
+          divider: true,
+          heading: 'Pooled funds versus individual companies',
+          bullets: [
+            { term: 'A pooled vehicle', text: 'One purchase holding hundreds of companies. Diversification is built in and no single failure sinks you.' },
+            { term: 'Individual companies', text: 'Full control over what you own, and the entire outcome resting on those specific businesses.' },
+          ],
+        },
+      ],
+      images: [
+        {
+          src: '/learning/investing-allocation.svg',
+          alt: 'One portfolio shown split across fixed income, large cap, mid and small cap and foreign holdings, beside a drifted version of the same portfolio and an arrow labelled rebalancing returning it to the intended split.',
+          caption: 'Allocation is the split. Rebalancing is returning to it after the market moves it.',
+        },
+      ],
+      questions: [
+        {
+          id: 'inv-5-q1',
+          question: 'What does rebalancing do?',
+          options: [
+            'Adds money to the account',
+            'Returns a portfolio to its intended split after the market has moved it',
+            'Removes all risk',
+            'Locks in a guaranteed return',
+          ],
+          answer: 1,
+          imageSrc: '/learning/investing-allocation.svg',
+          why: 'Whatever grew fastest becomes an oversized share of the total. Rebalancing trims it back and tops up what lagged.',
+        },
+        {
+          id: 'inv-5-q2',
+          question: 'Someone owns twenty companies, all in one industry. What is the problem?',
+          options: [
+            'Too many holdings to track',
+            'They are concentrated — one industry shock hits all twenty at once',
+            'Fees are higher',
+            'Nothing, twenty is diversified',
+          ],
+          answer: 1,
+          why: 'Diversification is about exposure, not the number of tickers. Twenty holdings that move together behave like one holding.',
+        },
+        {
+          id: 'inv-5-q3',
+          question: 'What is the main structural difference between a pooled fund and buying individual companies?',
+          options: [
+            'Pooled funds are guaranteed',
+            'A pooled fund spreads across many holdings by default; individual picks do not',
+            'Individual stocks cost less',
+            'Pooled funds cannot lose value',
+          ],
+          answer: 1,
+          why: 'One fund purchase can hold hundreds of businesses. Picking individually gives you control and gives you the full consequence of each choice.',
+        },
+      ],
+    },
+    {
+      id: 'inv-6',
+      title: 'The menu: what you can actually buy',
+      readSeconds: 60,
+      intro: 'A brokerage account will sell you all of these. They are not equivalent, and the differences are mostly about risk and how much skill each demands.',
+      sections: [
+        {
+          heading: 'Built to be held',
+          bullets: [
+            { term: 'Index ETFs', text: 'One purchase tracking a whole market. Broad by default, cheap to hold, trades like a share. Falls when the market falls — that is the risk, and it is the honest one.' },
+            { term: 'Mutual funds', text: 'The same pooling idea, priced once a day. Actively managed ones cost more and most do not beat the plain index over long periods.' },
+            { term: 'Bonds and bond funds', text: 'Lending for interest. Lower expected return, and they lose value when interest rates rise.' },
+            { term: 'REITs', text: 'Pooled property. Income-oriented, and exposed to property markets and rates.' },
+          ],
+        },
+        {
+          divider: true,
+          heading: 'Higher risk, more depends on you',
+          bullets: [
+            { term: 'Individual stocks', text: 'A single company can lose most of its value and not come back. Requires real work to research and a tolerance for being wrong.' },
+            { term: 'Crypto', text: 'Extremely volatile, weakly regulated, and with no earnings underneath it. Falls of 70% or more have happened repeatedly. Held in a taxable brokerage, and treated as property for tax.' },
+          ],
+        },
+        {
+          divider: true,
+          heading: 'Technical instruments where losing money is the common outcome',
+          bullets: [
+            { term: 'Options', text: 'Contracts on the price of something else, with expiry dates. Most expire worthless. Some strategies can lose more than you put in.' },
+            { term: 'Futures', text: 'Leveraged contracts to buy or sell later. Leverage magnifies losses as readily as gains, and can be called in.' },
+            { term: 'Day trading', text: 'Buying and selling within the day. Study after study finds the large majority of day traders lose money over time, and the ones who persist mostly lose more.' },
+            { text: 'These are not forbidden and they are not secrets. They are specialist tools that require skill, time and a tolerance for total loss.' },
+          ],
+        },
+        {
+          divider: true,
+          heading: 'Read the pattern',
+          body: 'Risk rises as the thing being bought moves further from part-ownership of an operating business and closer to a bet on a price. The long-term case gets weaker in the same direction.',
+        },
+      ],
+      images: [
+        {
+          src: '/learning/investing-menu.svg',
+          alt: 'A ladder of investment types ordered by risk, from broad index funds and bond funds at the low end through individual stocks and crypto to options, futures and day trading at the high end, each annotated with its main risk.',
+          caption: 'Ordered by how much can go wrong and how much skill it demands.',
+        },
+      ],
+      questions: [
+        {
+          id: 'inv-6-q1',
+          question: 'What is the main risk of a broad index ETF?',
+          options: [
+            'The fund manager can take your shares',
+            'It falls when the market it tracks falls',
+            'It can expire worthless',
+            'It has no risk',
+          ],
+          answer: 1,
+          imageSrc: '/learning/investing-menu.svg',
+          why: 'It holds the market, so it takes the market’s falls. That is a real risk — it is simply not the risk of a single company failing.',
+        },
+        {
+          id: 'inv-6-q2',
+          question: 'Which is true of options as a category?',
+          options: [
+            'They are a safer version of stocks',
+            'They carry expiry dates and most expire worthless',
+            'They guarantee income',
+            'They cannot lose more than you paid, ever',
+          ],
+          answer: 1,
+          why: 'An option is a time-limited contract. When the expiry passes without the price moving as needed, the contract is worth nothing.',
+        },
+        {
+          id: 'inv-6-q3',
+          question: 'What does the research consistently find about day trading?',
+          options: [
+            'Most day traders beat the market',
+            'The large majority lose money over time',
+            'It is risk-free with enough practice',
+            'Results are the same as index investing',
+          ],
+          answer: 1,
+          why: 'The evidence is unusually consistent on this. Frequent trading adds costs and demands skill most people do not have, and the majority end up behind.',
+        },
+        {
+          id: 'inv-6-q4',
+          question: 'What broadly happens to risk as you move down the menu from index funds toward futures?',
+          options: [
+            'Risk falls',
+            'Risk rises as the purchase moves from owning a business to betting on a price',
+            'Risk stays the same',
+            'Risk disappears with leverage',
+          ],
+          answer: 1,
+          why: 'Ownership of a real business has earnings underneath it. A contract on a price does not, so its outcome depends entirely on the price moving your way in time.',
+        },
+      ],
+    },
+    {
+      id: 'inv-7',
+      title: 'Buying it: platforms, fees and consistency',
+      readSeconds: 60,
+      intro: 'Where you buy and what it costs you every year matter more than most people expect, because both compound too.',
+      sections: [
+        {
+          heading: 'Kinds of provider',
+          bullets: [
+            { term: 'Discount brokers', text: 'Low or no commission, you make your own decisions. What most self-directed investors use.' },
+            { term: 'Full-service brokers', text: 'Personal help and higher fees. More hand-holding, less of your return kept.' },
+            { term: 'Advisers and planners', text: 'Paid to design a strategy around your circumstances, usually as a flat fee or a percentage of assets.' },
+            { term: 'Money managers', text: 'Run a portfolio for you, generally aimed at large balances.' },
+          ],
+        },
+        {
+          divider: true,
+          heading: 'Fees are a certainty in a place where returns are not',
+          bullets: [
+            { term: 'The expense ratio', text: 'An annual percentage of your balance taken by a fund. Charged whether the fund gains or loses.' },
+            { text: 'A 1% annual fee instead of 0.05% removes a meaningful share of a lifetime of growth, because it is charged on the compounded balance every year.' },
+            { text: 'Commissions, spreads and account fees all come out of the same place your return does.' },
+          ],
+        },
+        {
+          divider: true,
+          heading: 'Contributing on a schedule',
+          bullets: [
+            { term: 'Dollar-cost averaging', text: 'Investing a fixed amount at a fixed interval regardless of price. You buy more units when prices are low and fewer when they are high.' },
+            { term: 'Automation', text: 'A standing transfer removes the monthly decision, which is where most plans break down.' },
+            { term: 'Timing the market', text: 'Getting out and back in requires being right twice. Missing a small number of the strongest days does most of the damage to a long-run result.' },
+          ],
+        },
+      ],
+      images: [
+        {
+          src: '/learning/investing-fees.svg',
+          alt: 'Two ending balances from the same contributions and the same return, one charged a 0.05% annual expense ratio and one charged 1%, with the gap between them shaded and labelled as fees.',
+          caption: 'The same contributions and the same return. The only difference is the annual fee.',
+        },
+      ],
+      questions: [
+        {
+          id: 'inv-7-q1',
+          question: 'What is an expense ratio?',
+          options: [
+            'A one-off charge when you buy',
+            'An annual percentage of your balance taken by the fund',
+            'The tax on your gains',
+            'The fund’s return',
+          ],
+          answer: 1,
+          imageSrc: '/learning/investing-fees.svg',
+          why: 'It is charged every year on whatever the balance is, in good years and bad. That is why a small difference compounds into a large one.',
+        },
+        {
+          id: 'inv-7-q2',
+          question: 'What does dollar-cost averaging mean?',
+          options: [
+            'Buying only when prices fall',
+            'Investing a fixed amount at a fixed interval regardless of price',
+            'Averaging your account fees',
+            'Selling half your holdings each year',
+          ],
+          answer: 1,
+          why: 'The amount is fixed, so the number of units bought varies with price — more when prices are low, fewer when they are high.',
+        },
+        {
+          id: 'inv-7-q3',
+          question: 'Why is trying to time the market difficult in practice?',
+          options: [
+            'Brokers block it',
+            'It requires being right about when to leave and when to return',
+            'It is taxed at 100%',
+            'Markets are closed most of the year',
+          ],
+          answer: 1,
+          why: 'Two correct calls are needed, not one. Being out during a handful of the strongest days is enough to undo years of otherwise ordinary results.',
+        },
+      ],
+    },
+    {
+      id: 'inv-8',
+      title: 'Staying in: protecting capital, reviewing, and tax',
+      readSeconds: 60,
+      intro: 'The investors who do well are usually the ones still there decades later. Not losing everything is the precondition for everything else.',
+      sections: [
+        {
+          heading: 'Protecting the capital you have',
+          bullets: [
+            { term: 'Risk what you can lose', text: 'Size a position against your whole portfolio, not against how confident you feel.' },
+            { term: 'Do not try to lose more than you are trying to make', text: 'The riskier the play, the larger both outcomes get. The downside is the one that ends the run.' },
+            { term: 'Know what you own', text: 'If you cannot explain what a holding is and how it makes money, you cannot judge what would go wrong.' },
+          ],
+        },
+        {
+          divider: true,
+          heading: 'Reviewing, without fiddling',
+          bullets: [
+            { term: 'Review annually', text: 'Check that the split still matches your goal, horizon and tolerance. Life changes are the usual reason to adjust.' },
+            { term: 'Rebalance when it has drifted', text: 'Move back to the intended split rather than reacting to the last few months.' },
+            { term: 'Do not chase last year’s winner', text: 'Buying whatever performed best recently is a reliable way to buy high.' },
+            { term: 'Decide in advance', text: 'Rules set on a calm day are what carry you through a bad one. Decisions made mid-fall are made by fear.' },
+          ],
+        },
+        {
+          divider: true,
+          heading: 'What you keep is after tax',
+          bullets: [
+            { term: 'After-tax value is the real number', text: 'A balance you have not paid tax on yet is not entirely yours.' },
+            { term: 'Asset location', text: 'Which account holds which investment changes the tax bill, separately from what you hold.' },
+            { term: 'Rebalancing inside tax-advantaged accounts', text: 'Selling to rebalance in a taxable account can trigger a taxable gain; inside a 401(k) or IRA it generally does not.' },
+            { term: 'Roth versus traditional', text: 'A Roth is taxed going in and generally not on the way out. A traditional account is the reverse. Which is better depends on your tax rate now against later — a question about you, not about markets.' },
+          ],
+        },
+        {
+          divider: true,
+          heading: 'The whole track in one line',
+          body: 'You bought a piece of something someone else already started, and still runs. Businesses take years to grow, so your plan has to be built on your own goal, horizon and tolerance — and then left alone long enough to work.',
+        },
+      ],
+      questions: [
+        {
+          id: 'inv-8-q1',
+          question: 'Why does avoiding large losses matter more than finding large wins?',
+          options: [
+            'Losses are taxed higher',
+            'Recovering from a loss requires a larger percentage gain, and being wiped out ends the compounding',
+            'Wins are guaranteed',
+            'Brokers penalise losses',
+          ],
+          answer: 1,
+          why: 'The maths is asymmetric and the consequence is final. Capital that is gone cannot compound, however good the next idea is.',
+        },
+        {
+          id: 'inv-8-q2',
+          question: 'Why does rebalancing inside a 401(k) or IRA differ from doing it in a taxable brokerage?',
+          options: [
+            'It is not allowed in a 401(k)',
+            'Selling to rebalance in a taxable account can trigger a taxable gain',
+            'Fees are higher in retirement accounts',
+            'There is no difference',
+          ],
+          answer: 1,
+          why: 'A sale in a taxable account is a taxable event. Inside a tax-advantaged account the same trade generally is not, which is why rebalancing is often done there.',
+        },
+        {
+          id: 'inv-8-q3',
+          question: 'Whether a Roth or a traditional account works out better depends mainly on what?',
+          options: [
+            'Which fund you buy',
+            'Your tax rate now compared with your tax rate later',
+            'The broker you use',
+            'How often you trade',
+          ],
+          answer: 1,
+          why: 'One is taxed going in and one coming out. The comparison is between the rate you pay now and the rate you expect then — a fact about you, not about markets.',
+        },
+        {
+          id: 'inv-8-q4',
+          question: 'What is the single idea this track keeps returning to?',
+          options: [
+            'Trade often to find the best entry',
+            'You bought a piece of a business someone else runs, and businesses grow over years',
+            'Higher risk always means higher return',
+            'Fees do not matter at small balances',
+          ],
+          answer: 1,
+          why: 'Everything else follows from it. The return depends on a real business growing, and that is measured in years rather than days.',
+        },
+      ],
+    },
+  ],
+  action: {
+    title: 'Write down your own investing plan',
+    prompt:
+      'Pick the archetype that sounds like you, set the share of your income that goes to investing, and record the plan behind it — the goal, the horizon and what you would do in a bad year — using the figures you already recorded in the earlier tracks.',
+    tasks: [
+      'Name the goal this money is for, and roughly what it needs to be worth.',
+      'Write down the time horizon in years, and note whether that leaves room to recover from a bad stretch.',
+      'Check where you currently sit on the ordering from lesson three, and note the rung you are on.',
+      'Turn over the archetype cards and pick the one that honestly sounds like you, not the one that sounds impressive. Read what it says you are accepting.',
+      'Look at the asset classes that archetype points at, and read the risk noted against each one.',
+      'Set the share of your monthly income that goes to investing, alongside what is already committed to spending and savings.',
+      'Write down, in advance, what you will do if the balance falls by a third — before it does.',
+    ],
+    doneWhen: 'Your archetype is chosen, your investing allocation is set from your own numbers, and the goal, horizon and bad-year rule are written down.',
+  },
   finalQuiz: [],
 }
 
@@ -1404,6 +1803,7 @@ function finalFromLessons(track: Track, count = 10): QuizQuestion[] {
 
 SPENDING.finalQuiz = finalFromLessons(SPENDING)
 SAVINGS.finalQuiz = finalFromLessons(SAVINGS)
+INVESTING.finalQuiz = finalFromLessons(INVESTING, 12)
 
 // ─────────────────────────────────────────────────────────────────────────────
 

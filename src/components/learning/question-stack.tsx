@@ -58,6 +58,10 @@ export function QuestionStack({
     [questions, answers],
   )
 
+  // A lesson with nothing to ask shows no heading and no counter — an empty
+  // "0/0 answered" reads as something missing rather than something absent.
+  if (questions.length === 0) return null
+
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3">

@@ -9,10 +9,10 @@ import {
 import { useLearning, type Stage } from '@/contexts/learning-context'
 import { getTrack, passMark, shortTitle, type Track, type Lesson } from '@/lib/learning/tracks'
 import { DISCLAIMER_INVESTING } from '@/lib/learning/disclaimer'
-import { DisclaimerBar } from '@/components/learning/disclaimer-bar'
+import { DisclaimerFooter } from '@/components/learning/disclaimer-footer'
 import { AcknowledgmentGate } from '@/components/learning/acknowledgment-gate'
 import { LessonContent } from '@/components/learning/lesson-content'
-import { LessonImages } from '@/components/learning/lesson-images'
+import { LessonAside } from '@/components/learning/lesson-aside'
 import { ReadTimer } from '@/components/learning/read-timer'
 import { QuestionStack } from '@/components/learning/question-stack'
 import { StepRail, type RailItem } from '@/components/learning/step-rail'
@@ -97,91 +97,94 @@ export default function TrackPage({ params }: { params: Promise<{ track: string 
 
   return (
     <AcknowledgmentGate>
-      <div className="flex flex-col gap-6 px-8 py-8 max-w-6xl w-full mx-auto">
-        {/* Header */}
-        <div className="flex flex-col gap-4">
-          {previous ? (
-            <button
-              onClick={() => setView(previous.stage)}
-              className="flex items-center gap-2 text-label-lg text-on-surface-variant hover:text-on-surface transition-colors w-fit text-left"
-            >
-              <ArrowLeft size={15} className="shrink-0" />
-              <span className="truncate">Back to {shortTitle(previous.label)}</span>
-            </button>
-          ) : (
-            <Link
-              href="/learning"
-              className="flex items-center gap-2 text-label-lg text-on-surface-variant hover:text-on-surface transition-colors w-fit"
-            >
-              <ArrowLeft size={15} /> Learning
-            </Link>
+      <div className="flex flex-col">
+        <div className="flex flex-col gap-6 px-8 py-8 max-w-6xl w-full mx-auto">
+          {/* Header */}
+          <div className="flex flex-col gap-4">
+            {previous ? (
+              <button
+                onClick={() => setView(previous.stage)}
+                className="flex items-center gap-2 text-label-lg text-on-surface-variant hover:text-on-surface transition-colors w-fit text-left"
+              >
+                <ArrowLeft size={15} className="shrink-0" />
+                <span className="truncate">Back to {shortTitle(previous.label)}</span>
+              </button>
+            ) : (
+              <Link
+                href="/learning"
+                className="flex items-center gap-2 text-label-lg text-on-surface-variant hover:text-on-surface transition-colors w-fit"
+              >
+                <ArrowLeft size={15} /> Learning
+              </Link>
+            )}
+
+            <div className="flex items-center justify-between gap-6 flex-wrap">
+              <h1 className="text-headline-lg text-on-surface font-bold">{track.title}</h1>
+
+              <div className="flex items-center gap-3 shrink-0">
+                {finished && (
+                  // Same control as the review button on the hub — both are the
+                  // one thing on their page competing with the material itself.
+                  <Link
+                    href={track.unlocks}
+                    className="btn-action items-center justify-center gap-1.5 shrink-0"
+                  >
+                    <Unlock size={13} aria-hidden /> Open {track.title}
+                  </Link>
+                )}
+              </div>
+            </div>
+
+            <StepRail
+              items={railItems}
+              currentIndex={viewIndex}
+              furthestIndex={furthest}
+              browsable={canBrowseSteps}
+              onSelect={setView}
+            />
+          </div>
+
+          {track.id === 'investing' && (
+            <div className="bg-surface-container rounded-2xl px-5 py-4">
+              <p className="text-body-sm text-on-surface-variant leading-relaxed">
+                {DISCLAIMER_INVESTING}
+              </p>
+            </div>
           )}
 
-          <div className="flex items-center justify-between gap-6 flex-wrap">
-            <h1 className="text-headline-lg text-on-surface font-bold">{track.title}</h1>
+          {view.kind === 'lesson' && (
+            <LessonStage
+              key={view.id}
+              lesson={track.lessons.find(l => l.id === view.id)!}
+              alreadyAnswered={!!progress.lessons[view.id]?.answered}
+              onComplete={missed => { recordLesson(track.id, view.id, missed); advance() }}
+            />
+          )}
 
-            <div className="flex items-center gap-3 shrink-0">
-              {finished && (
-                <Link
-                  href={track.unlocks}
-                  className="flex items-center gap-2 bg-secondary text-white rounded-xl px-4 py-2 text-label-lg font-medium hover:opacity-90 transition-opacity"
-                >
-                  <Unlock size={14} /> Open {track.title}
-                </Link>
-              )}
-            </div>
-          </div>
+          {view.kind === 'action' && track.action && (
+            <ActionStage
+              track={track}
+              done={progress.actionDone}
+              onGo={() => { startGuided(track.id); router.push(track.unlocks) }}
+              onContinue={advance}
+            />
+          )}
 
-          <StepRail
-            items={railItems}
-            currentIndex={viewIndex}
-            furthestIndex={furthest}
-            browsable={canBrowseSteps}
-            onSelect={setView}
-          />
+          {view.kind === 'final' && (
+            <FinalStage
+              track={track}
+              onSubmit={(correct, total, missed) => recordFinal(track.id, correct, total, missed)}
+              onDone={advance}
+            />
+          )}
+
+          {view.kind === 'done' && (
+            <Congratulations track={track} result={progress.final} didAction={progress.actionDone} />
+          )}
+
         </div>
 
-        {track.id === 'investing' && (
-          <div className="bg-surface-container rounded-2xl px-5 py-4">
-            <p className="text-body-sm text-on-surface-variant leading-relaxed">
-              {DISCLAIMER_INVESTING}
-            </p>
-          </div>
-        )}
-
-        {view.kind === 'lesson' && (
-          <LessonStage
-            key={view.id}
-            track={track}
-            lesson={track.lessons.find(l => l.id === view.id)!}
-            index={view.index}
-            alreadyAnswered={!!progress.lessons[view.id]?.answered}
-            onComplete={missed => { recordLesson(track.id, view.id, missed); advance() }}
-          />
-        )}
-
-        {view.kind === 'action' && track.action && (
-          <ActionStage
-            track={track}
-            done={progress.actionDone}
-            onGo={() => { startGuided(track.id); router.push(track.unlocks) }}
-            onContinue={advance}
-          />
-        )}
-
-        {view.kind === 'final' && (
-          <FinalStage
-            track={track}
-            onSubmit={(correct, total, missed) => recordFinal(track.id, correct, total, missed)}
-            onDone={advance}
-          />
-        )}
-
-        {view.kind === 'done' && (
-          <Congratulations track={track} result={progress.final} didAction={progress.actionDone} />
-        )}
-
-        <DisclaimerBar />
+        <DisclaimerFooter inner="max-w-6xl" />
       </div>
     </AcknowledgmentGate>
   )
@@ -195,11 +198,9 @@ function sameStage(a: Stage, b: Stage): boolean {
 // ─── Lesson: read on the left, timer then questions on the right ─────────────
 
 function LessonStage({
-  track, lesson, index, alreadyAnswered, onComplete,
+  lesson, alreadyAnswered, onComplete,
 }: {
-  track: Track
   lesson: Lesson
-  index: number
   alreadyAnswered: boolean
   onComplete: (missed: string[]) => void
 }) {
@@ -214,16 +215,15 @@ function LessonStage({
       {/* Content on the left, reference imagery on the right */}
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         <div className="flex-1 min-w-0 bg-surface-container-lowest rounded-3xl px-7 py-7 flex flex-col gap-5">
-          <span className="text-label-sm text-on-surface-variant uppercase tracking-widest">
-            Step {index + 1} of {track.lessons.length}
-          </span>
+          {/* No step counter. The rail above already shows where you are, and
+              a second count only made the lesson feel like a queue. */}
           <h2 className="text-headline-sm text-on-surface font-bold leading-snug">
             {lesson.title}
           </h2>
           <LessonContent lesson={lesson} />
         </div>
 
-        <LessonImages images={lesson.images} />
+        <LessonAside lesson={lesson} />
       </div>
 
       {/* Below both: the timer runs, and the questions take its place */}
@@ -245,7 +245,7 @@ function LessonStage({
             <button
               onClick={() => onComplete(state.missed)}
               disabled={!state.allAnswered}
-              className="flex items-center gap-2 bg-secondary text-white rounded-2xl px-6 py-3 text-label-lg font-medium disabled:opacity-30 transition-opacity"
+              className="btn-action items-center justify-center gap-1.5 disabled:opacity-30"
             >
               {alreadyAnswered ? 'Continue' : 'Next step'} <ArrowRight size={16} />
             </button>
@@ -307,7 +307,7 @@ function ActionStage({
           </span>
           <button
             onClick={onContinue}
-            className="flex items-center gap-2 bg-secondary text-white rounded-2xl px-6 py-3 text-label-lg font-medium hover:opacity-90 transition-opacity"
+            className="btn-action items-center justify-center gap-1.5"
           >
             Take the final quiz <ArrowRight size={16} />
           </button>
@@ -315,7 +315,7 @@ function ActionStage({
       ) : (
         <button
           onClick={onGo}
-          className="self-start flex items-center gap-2 bg-secondary text-white rounded-2xl px-6 py-3.5 text-label-lg font-medium hover:opacity-90 transition-opacity"
+          className="btn-action items-center justify-center gap-1.5 self-start"
         >
           Open {track.title} and do it <ArrowRight size={16} />
         </button>
@@ -363,7 +363,7 @@ function FinalStage({
         </p>
         <button
           onClick={retake}
-          className="mt-1 flex items-center gap-2 bg-secondary text-white rounded-2xl px-6 py-3.5 text-label-lg font-medium hover:opacity-90 transition-opacity"
+          className="btn-action items-center justify-center gap-1.5 mt-1"
         >
           Take it again <ArrowRight size={16} />
         </button>
@@ -376,7 +376,7 @@ function FinalStage({
       <div className="flex justify-center">
         <button
           onClick={onDone}
-          className="flex items-center gap-2 bg-secondary text-white rounded-2xl px-6 py-3.5 text-label-lg font-medium hover:opacity-90 transition-opacity"
+          className="btn-action items-center justify-center gap-1.5"
         >
           See your result <ArrowRight size={16} />
         </button>
@@ -412,7 +412,7 @@ function FinalStage({
       <button
         onClick={submit}
         disabled={!state.allAnswered}
-        className="self-end flex items-center gap-2 bg-secondary text-white rounded-2xl px-7 py-3.5 text-label-lg font-medium disabled:opacity-30 transition-opacity"
+        className="btn-action items-center justify-center gap-1.5 self-end disabled:opacity-30"
       >
         Submit answers <ArrowRight size={16} />
       </button>
@@ -431,46 +431,48 @@ function Congratulations({
   didAction: boolean
 }) {
   return (
-    <div className="bg-tertiary-fixed/30 rounded-3xl px-8 py-12 flex flex-col gap-5 items-center text-center max-w-2xl mx-auto">
-      <div className="w-16 h-16 rounded-2xl bg-surface-container-lowest flex items-center justify-center">
-        <Trophy size={28} style={{ color: '#1a6b3a' }} />
-      </div>
+    <div className="flex items-center justify-center px-8 py-20">
+      <div className="flex flex-col gap-6 items-center text-center max-w-xl">
+        <div className="w-20 h-20 rounded-3xl bg-tertiary-fixed/40 flex items-center justify-center">
+          <Trophy size={34} style={{ color: '#1a6b3a' }} />
+        </div>
 
-      <div className="flex flex-col gap-2.5">
-        <h2 className="text-display-sm text-on-surface font-bold leading-tight">
-          {track.title} complete
-        </h2>
-        {result && (
-          <p className="text-body-lg text-on-surface-variant">
-            {result.best} of {result.total} on the final
-            {result.attempts > 1 ? ` — ${result.attempts} attempts` : ''}.
-          </p>
-        )}
-      </div>
+        <div className="flex flex-col gap-3">
+          <h2 className="text-display-md text-on-surface font-bold leading-tight">
+            {track.title} complete
+          </h2>
+          {result && (
+            <p className="text-body-lg text-on-surface-variant">
+              {result.best} of {result.total} on the final
+              {result.attempts > 1 ? ` — ${result.attempts} attempts` : ''}.
+            </p>
+          )}
+        </div>
 
-      <p className="text-body-lg text-on-surface leading-relaxed max-w-md">
-        {track.outcome}
-      </p>
+        <p className="text-body-lg text-on-surface leading-relaxed max-w-md">
+          {track.outcome}
+        </p>
 
-      <p className="text-body-md text-on-surface-variant leading-relaxed max-w-md">
-        {didAction
-          ? `${track.title} is unlocked for good, and it already holds the data you entered. Everything you covered will come back in review over the next week.`
-          : `${track.title} is unlocked for good. The lessons are still here whenever you want them, and anything you missed comes back in review over the next week.`}
-      </p>
+        <p className="text-body-md text-on-surface-variant leading-relaxed max-w-md">
+          {didAction
+            ? `${track.title} is unlocked for good, and it already holds the data you entered. Everything you covered will come back in review over the next week.`
+            : `${track.title} is unlocked for good. The lessons are still here whenever you want them, and anything you missed comes back in review over the next week.`}
+        </p>
 
-      <div className="flex items-center gap-3 flex-wrap justify-center mt-1">
-        <Link
-          href={track.unlocks}
-          className="flex items-center gap-2 bg-secondary text-white rounded-2xl px-6 py-3.5 text-label-lg font-medium hover:opacity-90 transition-opacity"
-        >
-          <Unlock size={16} /> Open {track.title}
-        </Link>
-        <Link
-          href="/learning"
-          className="flex items-center gap-2 text-label-lg font-medium text-on-surface-variant hover:text-on-surface px-5 py-3.5 transition-colors"
-        >
-          Next track <ArrowRight size={16} />
-        </Link>
+        <div className="flex items-center gap-3 flex-wrap justify-center mt-2">
+          <Link
+            href={track.unlocks}
+            className="btn-action items-center justify-center gap-1.5"
+          >
+            <Unlock size={16} /> Open {track.title}
+          </Link>
+          <Link
+            href="/learning"
+            className="flex items-center gap-2 text-label-lg font-medium text-on-surface-variant hover:text-on-surface px-5 py-3.5 transition-colors"
+          >
+            Next track <ArrowRight size={16} />
+          </Link>
+        </div>
       </div>
     </div>
   )
@@ -492,7 +494,7 @@ function ComingSoon({ track }: { track: Track }) {
         </p>
         <Link
           href="/learning"
-          className="flex items-center gap-2 bg-secondary text-white rounded-2xl px-6 py-3.5 text-label-lg font-medium hover:opacity-90 transition-opacity"
+          className="btn-action items-center justify-center gap-1.5"
         >
           <ArrowLeft size={16} /> Back to Learning
         </Link>
@@ -508,7 +510,7 @@ function Missing({ message }: { message: string }) {
         <p className="text-body-lg text-on-surface-variant leading-relaxed">{message}</p>
         <Link
           href="/learning"
-          className="flex items-center gap-2 bg-secondary text-white rounded-2xl px-6 py-3.5 text-label-lg font-medium hover:opacity-90 transition-opacity"
+          className="btn-action items-center justify-center gap-1.5"
         >
           <ArrowLeft size={16} /> Back to Learning
         </Link>
