@@ -1436,7 +1436,7 @@ const INVESTING: Track = {
     },
     {
       id: 'inv-8',
-      title: 'Buying and selling investments',
+      title: 'Buying/selling investments',
       readSeconds: 60,
       intro: 'The investors who do well are usually the ones still there decades later. Not losing everything is the precondition for everything else.',
       sections: [
