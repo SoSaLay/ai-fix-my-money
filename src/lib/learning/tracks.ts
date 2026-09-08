@@ -1184,7 +1184,7 @@ const INVESTING: Track = {
     },
     {
       id: 'inv-2',
-      title: 'Grow money or lose money',
+      title: 'Money grows or money loss',
       readSeconds: 30,
       sections: [
         {
