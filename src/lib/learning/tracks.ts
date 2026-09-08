@@ -1272,7 +1272,7 @@ const INVESTING: Track = {
           body: 'Investing doesn’t have to be complicated. There are a few simple steps you can take to start investing wisely and have a solid foundation for growing your money.',
         },
         {
-          body: 'The accounts mentioned here are specific to the United States.',
+          body: 'The accounts mentioned here are specific to the United States employers/employees.',
         },
         {
           heading: 'Where your money goes, in order',
