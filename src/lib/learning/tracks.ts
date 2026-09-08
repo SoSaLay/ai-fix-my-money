@@ -1265,7 +1265,7 @@ const INVESTING: Track = {
     },
     {
       id: 'inv-3',
-      title: 'Financial basics support growth',
+      title: 'Financial basics help growth',
       readSeconds: 60,
       sections: [
         {
