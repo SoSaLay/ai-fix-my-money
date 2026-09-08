@@ -1336,15 +1336,9 @@ const INVESTING: Track = {
     },
     {
       id: 'inv-6',
-      title: 'What can I buy?',
+      title: 'Investment choices',
       readSeconds: 60,
       sections: [
-        {
-          body: 'All of this is bought through a brokerage account — an account that holds investments rather than cash and places your buy and sell orders. We are not naming or recommending any particular one; which broker to use is research you do yourself.',
-        },
-        {
-          body: 'Brokers and funds differ mostly in what they charge: a fund’s expense ratio is an annual percentage of your balance taken whether it gains or loses, and 1% instead of 0.05% quietly removes a large share of a lifetime of growth.',
-        },
         {
           body: 'What you can buy is not all equivalent. The differences are mostly about risk and how much skill each one demands.',
         },
@@ -1383,30 +1377,12 @@ const INVESTING: Track = {
       ],
       images: [
         {
-          src: '/learning/investing-fees.svg',
-          alt: 'Two ending balances from the same contributions and the same return, one charged a 0.05% annual expense ratio and one charged 1%, with the gap between them shaded and labelled as fees.',
-          caption: 'The same contributions and the same return. The only difference is the annual fee.',
-        },
-        {
           src: '/learning/investing-menu.svg',
           alt: 'A ladder of investment types ordered by risk, from broad index funds and bond funds at the low end through individual stocks and crypto to options, futures and day trading at the high end, each annotated with its main risk.',
           caption: 'Ordered by how much can go wrong and how much skill it demands.',
         },
       ],
       questions: [
-        {
-          id: 'inv-6-q0',
-          question: 'What is an expense ratio?',
-          options: [
-            'A one-off charge when you buy',
-            'An annual percentage of your balance taken by the fund',
-            'The tax on your gains',
-            'The fund’s return',
-          ],
-          answer: 1,
-          imageSrc: '/learning/investing-fees.svg',
-          why: 'It is charged every year on whatever the balance is, in good years and bad. That is why a small difference compounds into a large one.',
-        },
         {
           id: 'inv-6-q1',
           question: 'What is the main risk of a broad index ETF?',
@@ -1460,11 +1436,20 @@ const INVESTING: Track = {
     },
     {
       id: 'inv-8',
-      title: 'Investment allocation',
+      title: 'Buying and selling investments',
       readSeconds: 60,
       intro: 'The investors who do well are usually the ones still there decades later. Not losing everything is the precondition for everything else.',
       sections: [
         {
+          heading: 'Where the buying happens',
+          body: 'All of this is bought through a brokerage account — an account that holds investments rather than cash and places your buy and sell orders. We are not naming or recommending any particular one; which broker to use is research you do yourself.',
+        },
+        {
+          heading: 'What it costs to hold',
+          body: 'Brokers and funds differ mostly in what they charge: a fund’s expense ratio is an annual percentage of your balance taken whether it gains or loses, and 1% instead of 0.05% quietly removes a large share of a lifetime of growth.',
+        },
+        {
+          divider: true,
           body: 'Allocation is the act of taking money you have earned or saved and actually putting it into assets. There are a number of ways to do it, depending on what you decided to buy off the back of your own thinking and research.',
         },
         {
@@ -1521,12 +1506,30 @@ const INVESTING: Track = {
       ],
       images: [
         {
+          src: '/learning/investing-fees.svg',
+          alt: 'Two ending balances from the same contributions and the same return, one charged a 0.05% annual expense ratio and one charged 1%, with the gap between them shaded and labelled as fees.',
+          caption: 'The same contributions and the same return. The only difference is the annual fee.',
+        },
+        {
           src: '/learning/investing-allocation.svg',
           alt: 'One portfolio shown split across fixed income, large cap, mid and small cap and foreign holdings, beside a drifted version of the same portfolio and an arrow labelled rebalancing returning it to the intended split.',
           caption: 'Allocation is the split. Rebalancing is returning to it after the market moves it.',
         },
       ],
       questions: [
+        {
+          id: 'inv-8-q0',
+          question: 'What is an expense ratio?',
+          options: [
+            'A one-off charge when you buy',
+            'An annual percentage of your balance taken by the fund',
+            'The tax on your gains',
+            'The fund’s return',
+          ],
+          answer: 1,
+          imageSrc: '/learning/investing-fees.svg',
+          why: 'It is charged every year on whatever the balance is, in good years and bad. That is why a small difference compounds into a large one.',
+        },
         {
           id: 'inv-8-q7',
           question: 'What does rebalancing do?',
