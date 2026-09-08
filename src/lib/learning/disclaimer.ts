@@ -15,7 +15,7 @@ export const DISCLAIMER_MEDIUM =
 
 /** Heavier language for the Investing track specifically. */
 export const DISCLAIMER_INVESTING =
-  'Investing carries risk, including the possible loss of the money you put in. Past performance does not indicate future results. Nothing in this track recommends any security, strategy, or product. Consider speaking with a licensed professional about your own situation.'
+  'Investing carries risk, including the possible loss of the money you put in. Past performance does not indicate future results.'
 
 /** Shown once, before the first track starts. Acknowledged explicitly. */
 export const ACKNOWLEDGMENT_POINTS = [

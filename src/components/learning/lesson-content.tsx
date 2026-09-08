@@ -72,19 +72,36 @@ export function LessonContent({ lesson }: { lesson: Lesson }) {
           {section.gridTable && <GridTable table={section.gridTable} />}
 
           {section.bullets && (
-            <ul className="flex flex-col gap-2.5">
+            <ul className="flex flex-col gap-5">
               {section.bullets.map((bullet, j) => (
                 <li key={j} className="flex gap-2.5">
                   <span
                     className="mt-[9px] w-1.5 h-1.5 rounded-full bg-secondary/60 shrink-0"
                     aria-hidden
                   />
-                  <p className="text-body-md text-on-surface-variant leading-relaxed">
-                    {bullet.term && (
-                      <span className="text-on-surface font-semibold">{bullet.term} — </span>
+                  <div className="flex flex-col gap-2">
+                    <p className="text-body-md text-on-surface-variant leading-relaxed">
+                      {bullet.term && (
+                        <span className="text-on-surface font-semibold">{bullet.term} — </span>
+                      )}
+                      {bullet.text}
+                    </p>
+
+                    {/* Nested points sit under their parent, marked by a rule
+                        rather than a second dot — one bullet shape per list. */}
+                    {bullet.sub && (
+                      <ul className="flex flex-col gap-2 border-l border-outline-variant/50 pl-3.5">
+                        {bullet.sub.map((point, k) => (
+                          <li
+                            key={k}
+                            className="text-body-md text-on-surface-variant leading-relaxed"
+                          >
+                            {point}
+                          </li>
+                        ))}
+                      </ul>
                     )}
-                    {bullet.text}
-                  </p>
+                  </div>
                 </li>
               ))}
             </ul>

@@ -13,6 +13,8 @@
 // tradeoffs are. Nothing here tells a learner what to choose. See DISCLAIMER.
 // ============================================================================
 
+import { DISCLAIMER_INVESTING } from '@/lib/learning/disclaimer'
+
 export type TrackId = 'accounts' | 'spending' | 'savings' | 'investing'
 
 /** Portion of the final quiz that must be correct to pass. */
@@ -40,6 +42,8 @@ export interface Bullet {
   /** Optional lead-in shown in bold, e.g. a term being defined. */
   term?: string
   text: string
+  /** Nested points, indented under this one. For a caveat or a how-to. */
+  sub?: string[]
 }
 
 /**
@@ -957,12 +961,21 @@ const SAVINGS: Track = {
       readSeconds: 60,
       sections: [
         {
-          body: 'This course has only mentioned interest once so far — with credit cards, and that was the bad kind: what borrowing costs you. Savings is where the same mechanism works in your favor instead. We are not recommending a specific bank or rate here — that takes your own research — but plenty of banks compete for your money by offering a higher rate to keep it parked with them.',
+          body: 'So far, this course has only mentioned interest with credit cards—the cost of borrowing money when you don’t pay it back on time. With savings, the same mechanism works in your favor: banks pay you interest for keeping your money with them.',
+        },
+        {
+          body: 'We’re not recommending a specific bank or rate. That’s something you’ll need to research, but many banks compete for your money by offering higher interest rates.',
         },
         {
           heading: 'The good versus the bad',
           bullets: [
-            { term: 'Bad interest', text: 'What a credit card or loan charges you to borrow. The longer you carry a balance, the more it costs you.' },
+            {
+              term: 'Bad interest',
+              text: 'What a credit card or loan charges you to borrow. The longer you carry a balance, the more it costs you.',
+              sub: [
+                'Having a credit card does not mean you pay interest. Pay your full statement balance by the due date every month and you are charged none at all.',
+              ],
+            },
             { term: 'Good interest', text: 'What a savings account pays you to keep your money there. The longer it sits, the more you earn.' },
           ],
         },
@@ -970,8 +983,8 @@ const SAVINGS: Track = {
           divider: true,
           heading: 'Compounding',
           bullets: [
-            { term: 'What it is', text: 'Interest calculated on a balance that already includes past interest — the same mechanism grows a savings balance and a carried credit card balance alike.' },
-            { term: 'APY vs. APR', text: 'APY includes the effect of compounding, so it reflects what a year actually produces. APR is the rate before that effect is counted.' },
+            { term: 'What it is', text: 'You earn interest on your interest. It grows your savings. But this can also be detrimental, because if you owe money and that interest is compounding, the amount you owe keeps growing too.' },
+            { term: 'APY', text: 'Interest rates are given per year. APY is the yearly rate with compounding counted, what you actually earn or actually owe.' },
           ],
         },
       ],
@@ -1062,47 +1075,28 @@ const INVESTING: Track = {
   lessons: [
     {
       id: 'inv-1',
-      title: 'What you are actually buying',
+      title: 'Investing',
       readSeconds: 60,
-      intro: 'Investing is buying a piece of something someone else already started. Every other idea in this track follows from that one sentence.',
       sections: [
         {
-          heading: 'The definition',
-          body: 'A share is a unit of ownership in a business that someone else founded, staffed and runs. Buying one makes you a part-owner of that business and entitled to a slice of whatever it is worth and whatever it earns.',
+          body: 'Investing is buying a piece of something someone else already started. Specifically, you are buying a solution. Every business you can think of solves a problem at scale and gets paid for solving it. When you invest, you are investing in that solution, and in most cases many solutions at once.',
         },
         {
-          heading: 'What that means for you',
+          heading: 'Risk',
+          body: 'You cannot talk about investing without talking about risk. Nothing you buy is guaranteed.',
           bullets: [
-            { term: 'You are backing an operator', text: 'You are betting that the people running the business grow it. You are not being paid for handing over the money.' },
-            { term: 'Your return is their result', text: 'If the business becomes worth more, your slice becomes worth more. If it does not, your slice does not.' },
+            { text: 'Risk is the chance that an investment’s value or income turns out differently than you expected—including losing money.' },
+            { text: 'It happens because the future is uncertain, and factors outside your control. The economy, interest rates, company performance, politics, supply and demand to name a few.' },
           ],
         },
         {
-          divider: true,
-          heading: 'You own it, and you still do not run it',
-          body: 'Buying a share buys you no say in how the business is run. Someone else decides what it sells, who it hires, what it charges and when it changes direction, and you find out at the same time everyone else does.',
+          heading: 'The link',
+          body: 'You invest to grow your money, and every investment carries risk because growth requires putting money into something whose future value is not guaranteed. The possibility of loss is the trade-off for the possibility of earning a return.',
         },
         {
-          heading: 'That is true all the way up',
-          bullets: [
-            { text: 'An ordinary shareholder gets a vote on a short list of formal matters and nothing at all on day-to-day decisions.' },
-            { text: 'Even the largest holders do not run the company. They can push, vote and take board seats — the operating decisions still belong to management.' },
-            { term: 'So where does the risk come from', text: 'You are putting your money on other people’s judgement, in a market you do not control, over a stretch of years you cannot skip. That is the risk. Not a fee, not a bad week — the fact that the outcome is in someone else’s hands.' },
-          ],
-        },
-        {
-          divider: true,
-          heading: 'The two places a return can come from',
-          bullets: [
-            { term: 'Growth', text: 'The business is worth more later than what you paid, so your slice sells for more.' },
-            { term: 'Income', text: 'The business hands part of its earnings to owners as a dividend, or a borrower pays you interest.' },
-            { text: 'Neither is promised. A business can shrink, and a dividend can be cut.' },
-          ],
-        },
-        {
-          divider: true,
-          heading: 'Why this cannot be fast',
-          body: 'Businesses grow by winning customers, raising revenue and holding margins — work measured in years. A price that jumps in a day is people changing their minds about the same business, not the business changing.',
+          // The standing risk language, pulled from one place so the lesson and
+          // the disclosures page can never drift apart.
+          body: DISCLAIMER_INVESTING,
         },
       ],
       images: [
@@ -1178,159 +1172,82 @@ const INVESTING: Track = {
     },
     {
       id: 'inv-2',
-      title: 'Time is the ingredient, not the obstacle',
-      readSeconds: 60,
-      intro: 'Nobody gets rich in a day. Returns accumulate because businesses grow slowly, and because gains start earning on top of gains.',
+      title: 'Grow money or lose money',
+      readSeconds: 30,
       sections: [
         {
-          heading: 'Compounding, stated plainly',
-          body: 'A return earned this year becomes part of the base that earns next year. The effect is small early and large late, which is why the number of years matters more than the size of any single year.',
+          body: 'Once your money is invested it only moves in two directions. Here is what pushes it each way.',
         },
         {
-          heading: 'Why the early years look disappointing',
+          heading: 'How you can grow your money investing',
           bullets: [
-            { text: 'Most of the balance in year three is money you deposited, not growth.' },
-            { text: 'Most of the balance in year thirty is growth, not deposits.' },
-            { term: 'The consequence', text: 'Judging investing by its first two years measures your saving rate, not your investing.' },
+            { term: 'Growth', text: 'It is worth more later than what you paid, so your slice sells for more.' },
+            { term: 'Income', text: 'The business hands part of its earnings to owners as a dividend, or a borrower pays you interest.' },
           ],
         },
         {
           divider: true,
-          heading: 'Losses cost more than they look',
+          heading: 'How you can lose your money investing',
           bullets: [
-            { term: 'A 20% fall', text: 'needs a 25% gain to get back to where it was.' },
-            { term: 'A 50% fall', text: 'needs a 100% gain to get back to where it was.' },
-            { text: 'This asymmetry is why avoiding large losses matters more than chasing large wins.' },
+            { term: 'It loses value', text: 'It is worth less than what you paid. Selling at that point is what turns it into a real loss.' },
+            { term: 'It fails', text: 'A business can go under, and a stake in it can end up worth nothing.' },
+            { term: 'The income stops', text: 'A dividend is not promised. It can be cut or stopped at any time.' },
           ],
         },
         {
           divider: true,
-          heading: 'What you see online',
-          body: 'The results shown publicly are the ones that worked. The same strategy loses money for people who never post about it, so the visible sample is not the real one.',
-        },
-      ],
-      images: [
-        {
-          src: '/learning/investing-time.svg',
-          alt: 'A stacked bar chart across years five, fifteen and thirty showing contributions as the large share early on and growth overtaking them by year thirty, beside a note that a 50% fall needs a 100% gain to recover.',
-          caption: 'Contributions dominate early. Growth only takes over with time.',
+          heading: 'The link',
+          body: 'Both sides come from the same place. The business you bought into either does well or it does not, and your money follows it either way. You do not get access to one side without accepting the other.',
         },
       ],
       questions: [
         {
           id: 'inv-2-q1',
-          question: 'Why does compounding produce so little in the first few years?',
+          question: 'What are the two ways an investment can return money to you?',
           options: [
-            'Fees are highest at the start',
-            'The base earning a return is still mostly money you deposited',
-            'Returns are lower for new investors',
-            'Markets ignore small accounts',
+            'Interest and fees',
+            'Growth in what it is worth, and income paid out of earnings',
+            'Deposits and withdrawals',
+            'Taxes and rebates',
           ],
           answer: 1,
-          imageSrc: '/learning/investing-time.svg',
-          why: 'Growth compounds on top of growth. Early on there is barely any growth to compound, so the balance is mostly your own deposits.',
+          why: 'Either it becomes worth more than you paid, or it pays part of its earnings out to you. Nothing else is a return.',
         },
         {
           id: 'inv-2-q2',
-          question: 'An investment falls 50%. What gain is needed just to get back to even?',
-          options: ['50%', '75%', '100%', '150%'],
-          answer: 2,
-          why: '$100 falling to $50 has to double to return to $100. Losses need a bigger percentage to undo them than the percentage that caused them.',
+          question: 'Your investment is worth less than you paid. When does that become a real loss?',
+          options: [
+            'Immediately',
+            'When you sell it at that price',
+            'At the end of the tax year',
+            'It never does',
+          ],
+          answer: 1,
+          why: 'Until you sell, the fall is on paper. Selling is what turns the lower price into money you no longer have.',
         },
         {
           id: 'inv-2-q3',
-          question: 'Why is a wall of successful results online a misleading sample?',
+          question: 'Which is true of a dividend?',
           options: [
-            'The results are always fabricated',
-            'Only the outcomes that worked get posted, so the failures are invisible',
-            'Returns are illegal to share',
-            'Everyone uses different brokers',
+            'It is guaranteed once it starts',
+            'It can be cut or stopped at any time',
+            'It rises every year by law',
+            'It is paid even if the business fails',
           ],
           answer: 1,
-          why: 'People post wins and stay quiet about losses. You are seeing the survivors of a strategy, not its average result.',
-        },
-      ],
-    },
-    {
-      id: 'inv-3',
-      title: 'What usually comes before investing',
-      readSeconds: 60,
-      intro: 'There is a widely taught order for where a spare dollar goes. Understanding why each rung sits where it does matters more than the list itself.',
-      sections: [
-        {
-          heading: 'The ordering, and the reason for it',
-          body: 'Each rung is placed by the return it produces or the risk it removes. Nothing here is a recommendation for your situation.',
+          why: 'A dividend is a decision the business makes each time. Nothing obliges it to keep paying one.',
         },
         {
-          heading: 'The rungs',
-          bullets: [
-            { term: '1. High-interest debt', text: 'Clearing a 24% balance is a guaranteed 24% saved. No investment offers a guaranteed return to compete with that.' },
-            { term: '2. Three to six months of essentials', text: 'Without it, one bad month forces you to sell investments at the worst possible time, or borrow.' },
-            { term: '3. Employer 401(k) match', text: 'Money your employer adds when you contribute. Not taking it leaves part of your agreed pay unclaimed.' },
-            { term: '4. Roth IRA', text: 'You pay tax now; qualifying withdrawals later come out untaxed, including the growth.' },
-            { term: '5. Rest of the 401(k)', text: 'Contributions reduce taxable income now, and the balance grows untaxed until you withdraw.' },
-            { term: '6. HSA, if eligible', text: 'Tied to a high-deductible health plan. Untaxed going in, growing, and coming out for qualifying medical costs.' },
-            { term: '7. Taxable brokerage', text: 'No limits and no lock-up, but gains and dividends are taxable. This is where anything beyond the accounts above goes.' },
-          ],
-        },
-        {
-          divider: true,
-          heading: 'On the contribution limits',
-          body: 'Recent annual caps have been roughly $7,000 for an IRA, $23,000 for employee 401(k) contributions, and $4,300 for an individual HSA. These are reset every year, so check the current figures rather than trusting a number in a lesson.',
-        },
-        {
-          divider: true,
-          heading: 'The point of the order',
-          bullets: [
-            { text: 'The rungs above investing are not delays. They are the conditions that let an investment stay invested.' },
-            { text: 'An investor without an emergency fund is forced to sell during exactly the months when selling hurts most.' },
-          ],
-        },
-      ],
-      images: [
-        {
-          src: '/learning/investing-order.svg',
-          alt: 'Seven numbered rungs from high-interest debt at the bottom up to a taxable brokerage at the top, each labelled with the reason it sits at that height.',
-          caption: 'Ordered by guaranteed return and by risk removed, not by excitement.',
-        },
-      ],
-      questions: [
-        {
-          id: 'inv-3-q1',
-          question: 'Why does high-interest debt usually sit ahead of investing in this ordering?',
+          id: 'inv-2-q4',
+          question: 'Why can you not have the upside without the downside?',
           options: [
-            'Lenders require it',
-            'Clearing it is a guaranteed saving that no investment can guarantee to beat',
-            'Debt blocks you from opening a brokerage account',
-            'Interest is not tax deductible',
+            'Brokers require it',
+            'Both come from the same business doing well or badly',
+            'It is a tax rule',
+            'You can, with the right account',
           ],
           answer: 1,
-          imageSrc: '/learning/investing-order.svg',
-          why: 'A 24% interest rate you stop paying is a certain 24%. An investment return is never certain, so the guaranteed one is placed first.',
-        },
-        {
-          id: 'inv-3-q2',
-          question: 'What is the employer 401(k) match?',
-          options: [
-            'A loan from your employer',
-            'Money your employer adds when you contribute',
-            'A tax refund',
-            'A bonus paid at retirement',
-          ],
-          answer: 1,
-          why: 'It is part of your compensation that only arrives if you contribute. Leaving it unclaimed leaves agreed pay on the table.',
-        },
-        {
-          id: 'inv-3-q3',
-          question: 'Why is an emergency fund placed before investing rather than after?',
-          options: [
-            'It earns a higher return',
-            'It stops a bad month from forcing you to sell investments at a loss',
-            'Brokers require proof of savings',
-            'It is taxed more favourably',
-          ],
-          answer: 1,
-          why: 'The fund is what lets the investment be left alone. Without it, an ordinary emergency turns into a forced sale at whatever price the market offers that week.',
+          why: 'One business, one outcome. The thing that can grow your money is the same thing that can lose it.',
         },
       ],
     },
@@ -1344,7 +1261,7 @@ const INVESTING: Track = {
           heading: 'The six inputs',
           bullets: [
             { term: 'The goal', text: 'What the money is for, and roughly how much it needs to be.' },
-            { term: 'The time horizon', text: 'How many years until you need it. This single number changes everything downstream.' },
+            { term: 'The time horizon', text: 'How many years until you need it. Each year’s return joins the base that earns the next year, so the number of years matters more than any single year’s result.' },
             { term: 'The savings rate', text: 'What you can add regularly. Saving more lowers the return you need; saving less raises it.' },
             { term: 'Risk tolerance', text: 'How large a fall you can watch without selling. A plan you abandon in a bad year was the wrong plan.' },
             { term: 'The required return', text: 'What annual return the goal, the horizon and the savings rate actually imply.' },
@@ -1401,102 +1318,90 @@ const INVESTING: Track = {
       ],
     },
     {
-      id: 'inv-5',
-      title: 'Asset classes, allocation and diversification',
+      id: 'inv-3',
+      title: 'Financial basics, support growth',
       readSeconds: 60,
-      intro: 'Allocation is how you split money across kinds of investments. It explains more of a result than any single pick does.',
       sections: [
         {
-          heading: 'The three broad classes',
-          bullets: [
-            { term: 'Stocks', text: 'Ownership. The highest long-run growth historically, and the largest falls along the way.' },
-            { term: 'Bonds', text: 'Lending. You are paid interest and repaid the principal, so they move less — and grow less.' },
-            { term: 'Cash', text: 'Stable and immediately available. Steadily loses buying power to inflation.' },
-          ],
+          body: 'Investing doesn’t have to be complicated. There are a few simple steps you can take to invest wisely and have a solid foundation for growing your money.',
         },
         {
-          heading: 'How stock holdings get grouped',
-          table: {
-            columns: ['Group', 'What it is', 'Typical behaviour'],
-            rows: [
-              ['Large cap', 'The biggest, most established companies', 'Steadier, slower'],
-              ['Mid and small cap', 'Smaller companies with more room to grow', 'More volatile in both directions'],
-              ['Foreign', 'Companies outside your own country', 'Adds currency and country exposure'],
-              ['Fixed income', 'Bonds and similar lending', 'Least movement, lowest expected growth'],
-            ],
-          },
+          body: 'The accounts mentioned here are specific to the United States.',
         },
         {
-          divider: true,
-          heading: 'Allocation versus diversification',
+          heading: 'Where your money goes, in order',
           bullets: [
-            { term: 'Allocation', text: 'The split between classes — how much in stocks, how much in bonds, how much in cash.' },
-            { term: 'Diversification', text: 'Not concentrating within a class. Twenty companies in one industry is one bet wearing a disguise.' },
-            { term: 'Rebalancing', text: 'Periodically returning to your intended split. It mechanically trims what has run up and adds to what has not.' },
-          ],
-        },
-        {
-          divider: true,
-          heading: 'Pooled funds versus individual companies',
-          bullets: [
-            { term: 'A pooled vehicle', text: 'One purchase holding hundreds of companies. Diversification is built in and no single failure sinks you.' },
-            { term: 'Individual companies', text: 'Full control over what you own, and the entire outcome resting on those specific businesses.' },
+            { term: '1. Pay off high-interest debt', text: 'Clear what you owe at a high rate first. Wiping out a 24% balance is a guaranteed 24% saved, and that money is then free for other things, including investing.' },
+            { term: '2. Three to six months of savings', text: 'Cash set aside so that one bad month does not force you to sell investments at the worst possible time, or borrow.' },
+            { term: '3. Employer 401(k) match', text: 'A 401(k) is a retirement account through your job, and the money inside it is invested for you. Your employer adds their own money on top when you contribute, so skipping it leaves part of your pay unclaimed.' },
+            { term: '4. Roth IRA', text: 'A retirement account you open yourself, no employer needed. You pay tax on the money going in, and qualifying withdrawals later come out untaxed, including everything it grew.' },
+            { term: '5. Rest of the 401(k)', text: 'Keep contributing past the match. This money goes in before tax, so it lowers what you are taxed on this year and grows untaxed until you withdraw it.' },
+            { term: '6. HSA (Health Savings Account)', text: 'A savings account for medical costs, available if you have a high-deductible health plan. Money goes in untaxed, grows untaxed, and comes out untaxed for qualifying medical bills.' },
+            { term: '7. Taxable brokerage', text: 'This is the investing you already picture. You buy and sell here with no limits and no lock-up, and you pay tax on the gains and dividends you make.' },
           ],
         },
       ],
       images: [
         {
-          src: '/learning/investing-allocation.svg',
-          alt: 'One portfolio shown split across fixed income, large cap, mid and small cap and foreign holdings, beside a drifted version of the same portfolio and an arrow labelled rebalancing returning it to the intended split.',
-          caption: 'Allocation is the split. Rebalancing is returning to it after the market moves it.',
+          src: '/learning/investing-order.svg',
+          alt: 'Seven numbered rungs from high-interest debt at the bottom up to a taxable brokerage at the top, each labelled with the reason it sits at that height.',
+          caption: 'Ordered by guaranteed return and by risk removed, not by excitement.',
         },
       ],
       questions: [
         {
-          id: 'inv-5-q1',
-          question: 'What does rebalancing do?',
+          id: 'inv-3-q1',
+          question: 'Why does high-interest debt usually sit ahead of investing in this ordering?',
           options: [
-            'Adds money to the account',
-            'Returns a portfolio to its intended split after the market has moved it',
-            'Removes all risk',
-            'Locks in a guaranteed return',
+            'Lenders require it',
+            'Clearing it is a guaranteed saving that no investment can guarantee to beat',
+            'Debt blocks you from opening a brokerage account',
+            'Interest is not tax deductible',
           ],
           answer: 1,
-          imageSrc: '/learning/investing-allocation.svg',
-          why: 'Whatever grew fastest becomes an oversized share of the total. Rebalancing trims it back and tops up what lagged.',
+          imageSrc: '/learning/investing-order.svg',
+          why: 'A 24% interest rate you stop paying is a certain 24%. An investment return is never certain, so the guaranteed one is placed first.',
         },
         {
-          id: 'inv-5-q2',
-          question: 'Someone owns twenty companies, all in one industry. What is the problem?',
+          id: 'inv-3-q2',
+          question: 'What is the employer 401(k) match?',
           options: [
-            'Too many holdings to track',
-            'They are concentrated — one industry shock hits all twenty at once',
-            'Fees are higher',
-            'Nothing, twenty is diversified',
+            'A loan from your employer',
+            'Money your employer adds when you contribute',
+            'A tax refund',
+            'A bonus paid at retirement',
           ],
           answer: 1,
-          why: 'Diversification is about exposure, not the number of tickers. Twenty holdings that move together behave like one holding.',
+          why: 'It is part of your compensation that only arrives if you contribute. Leaving it unclaimed leaves agreed pay on the table.',
         },
         {
-          id: 'inv-5-q3',
-          question: 'What is the main structural difference between a pooled fund and buying individual companies?',
+          id: 'inv-3-q3',
+          question: 'Why is an emergency fund placed before investing rather than after?',
           options: [
-            'Pooled funds are guaranteed',
-            'A pooled fund spreads across many holdings by default; individual picks do not',
-            'Individual stocks cost less',
-            'Pooled funds cannot lose value',
+            'It earns a higher return',
+            'It stops a bad month from forcing you to sell investments at a loss',
+            'Brokers require proof of savings',
+            'It is taxed more favourably',
           ],
           answer: 1,
-          why: 'One fund purchase can hold hundreds of businesses. Picking individually gives you control and gives you the full consequence of each choice.',
+          why: 'The fund is what lets the investment be left alone. Without it, an ordinary emergency turns into a forced sale at whatever price the market offers that week.',
         },
       ],
     },
     {
       id: 'inv-6',
-      title: 'The menu: what you can actually buy',
+      title: 'What can I buy?',
       readSeconds: 60,
-      intro: 'A brokerage account will sell you all of these. They are not equivalent, and the differences are mostly about risk and how much skill each demands.',
       sections: [
+        {
+          body: 'All of this is bought through a brokerage account — an account that holds investments rather than cash and places your buy and sell orders. We are not naming or recommending any particular one; which broker to use is research you do yourself.',
+        },
+        {
+          body: 'Brokers and funds differ mostly in what they charge: a fund’s expense ratio is an annual percentage of your balance taken whether it gains or loses, and 1% instead of 0.05% quietly removes a large share of a lifetime of growth.',
+        },
+        {
+          body: 'What you can buy is not all equivalent. The differences are mostly about risk and how much skill each one demands.',
+        },
         {
           heading: 'Built to be held',
           bullets: [
@@ -1532,12 +1437,30 @@ const INVESTING: Track = {
       ],
       images: [
         {
+          src: '/learning/investing-fees.svg',
+          alt: 'Two ending balances from the same contributions and the same return, one charged a 0.05% annual expense ratio and one charged 1%, with the gap between them shaded and labelled as fees.',
+          caption: 'The same contributions and the same return. The only difference is the annual fee.',
+        },
+        {
           src: '/learning/investing-menu.svg',
           alt: 'A ladder of investment types ordered by risk, from broad index funds and bond funds at the low end through individual stocks and crypto to options, futures and day trading at the high end, each annotated with its main risk.',
           caption: 'Ordered by how much can go wrong and how much skill it demands.',
         },
       ],
       questions: [
+        {
+          id: 'inv-6-q0',
+          question: 'What is an expense ratio?',
+          options: [
+            'A one-off charge when you buy',
+            'An annual percentage of your balance taken by the fund',
+            'The tax on your gains',
+            'The fund’s return',
+          ],
+          answer: 1,
+          imageSrc: '/learning/investing-fees.svg',
+          why: 'It is charged every year on whatever the balance is, in good years and bad. That is why a small difference compounds into a large one.',
+        },
         {
           id: 'inv-6-q1',
           question: 'What is the main risk of a broad index ETF?',
@@ -1590,27 +1513,20 @@ const INVESTING: Track = {
       ],
     },
     {
-      id: 'inv-7',
-      title: 'Buying it: platforms, fees and consistency',
+      id: 'inv-8',
+      title: 'Investment allocation',
       readSeconds: 60,
-      intro: 'Where you buy and what it costs you every year matter more than most people expect, because both compound too.',
+      intro: 'The investors who do well are usually the ones still there decades later. Not losing everything is the precondition for everything else.',
       sections: [
         {
-          heading: 'Kinds of provider',
-          bullets: [
-            { term: 'Discount brokers', text: 'Low or no commission, you make your own decisions. What most self-directed investors use.' },
-            { term: 'Full-service brokers', text: 'Personal help and higher fees. More hand-holding, less of your return kept.' },
-            { term: 'Advisers and planners', text: 'Paid to design a strategy around your circumstances, usually as a flat fee or a percentage of assets.' },
-            { term: 'Money managers', text: 'Run a portfolio for you, generally aimed at large balances.' },
-          ],
+          body: 'Allocation is the act of taking money you have earned or saved and actually putting it into assets. There are a number of ways to do it, depending on what you decided to buy off the back of your own thinking and research.',
         },
         {
-          divider: true,
-          heading: 'Fees are a certainty in a place where returns are not',
+          heading: 'Allocation versus diversification',
           bullets: [
-            { term: 'The expense ratio', text: 'An annual percentage of your balance taken by a fund. Charged whether the fund gains or loses.' },
-            { text: 'A 1% annual fee instead of 0.05% removes a meaningful share of a lifetime of growth, because it is charged on the compounded balance every year.' },
-            { text: 'Commissions, spreads and account fees all come out of the same place your return does.' },
+            { term: 'Allocation', text: 'The split between classes — how much in stocks, how much in bonds, how much in cash.' },
+            { term: 'Diversification', text: 'Not concentrating within a class. Twenty companies in one industry is one bet wearing a disguise.' },
+            { term: 'Rebalancing', text: 'Periodically returning to your intended split. It mechanically trims what has run up and adds to what has not.' },
           ],
         },
         {
@@ -1622,61 +1538,8 @@ const INVESTING: Track = {
             { term: 'Timing the market', text: 'Getting out and back in requires being right twice. Missing a small number of the strongest days does most of the damage to a long-run result.' },
           ],
         },
-      ],
-      images: [
         {
-          src: '/learning/investing-fees.svg',
-          alt: 'Two ending balances from the same contributions and the same return, one charged a 0.05% annual expense ratio and one charged 1%, with the gap between them shaded and labelled as fees.',
-          caption: 'The same contributions and the same return. The only difference is the annual fee.',
-        },
-      ],
-      questions: [
-        {
-          id: 'inv-7-q1',
-          question: 'What is an expense ratio?',
-          options: [
-            'A one-off charge when you buy',
-            'An annual percentage of your balance taken by the fund',
-            'The tax on your gains',
-            'The fund’s return',
-          ],
-          answer: 1,
-          imageSrc: '/learning/investing-fees.svg',
-          why: 'It is charged every year on whatever the balance is, in good years and bad. That is why a small difference compounds into a large one.',
-        },
-        {
-          id: 'inv-7-q2',
-          question: 'What does dollar-cost averaging mean?',
-          options: [
-            'Buying only when prices fall',
-            'Investing a fixed amount at a fixed interval regardless of price',
-            'Averaging your account fees',
-            'Selling half your holdings each year',
-          ],
-          answer: 1,
-          why: 'The amount is fixed, so the number of units bought varies with price — more when prices are low, fewer when they are high.',
-        },
-        {
-          id: 'inv-7-q3',
-          question: 'Why is trying to time the market difficult in practice?',
-          options: [
-            'Brokers block it',
-            'It requires being right about when to leave and when to return',
-            'It is taxed at 100%',
-            'Markets are closed most of the year',
-          ],
-          answer: 1,
-          why: 'Two correct calls are needed, not one. Being out during a handful of the strongest days is enough to undo years of otherwise ordinary results.',
-        },
-      ],
-    },
-    {
-      id: 'inv-8',
-      title: 'Staying in: protecting capital, reviewing, and tax',
-      readSeconds: 60,
-      intro: 'The investors who do well are usually the ones still there decades later. Not losing everything is the precondition for everything else.',
-      sections: [
-        {
+          divider: true,
           heading: 'Protecting the capital you have',
           bullets: [
             { term: 'Risk what you can lose', text: 'Size a position against your whole portfolio, not against how confident you feel.' },
@@ -1710,7 +1573,63 @@ const INVESTING: Track = {
           body: 'You bought a piece of something someone else already started, and still runs. Businesses take years to grow, so your plan has to be built on your own goal, horizon and tolerance — and then left alone long enough to work.',
         },
       ],
+      images: [
+        {
+          src: '/learning/investing-allocation.svg',
+          alt: 'One portfolio shown split across fixed income, large cap, mid and small cap and foreign holdings, beside a drifted version of the same portfolio and an arrow labelled rebalancing returning it to the intended split.',
+          caption: 'Allocation is the split. Rebalancing is returning to it after the market moves it.',
+        },
+      ],
       questions: [
+        {
+          id: 'inv-8-q7',
+          question: 'What does rebalancing do?',
+          options: [
+            'Adds money to the account',
+            'Returns a portfolio to its intended split after the market has moved it',
+            'Removes all risk',
+            'Locks in a guaranteed return',
+          ],
+          answer: 1,
+          imageSrc: '/learning/investing-allocation.svg',
+          why: 'Whatever grew fastest becomes an oversized share of the total. Rebalancing trims it back and tops up what lagged.',
+        },
+        {
+          id: 'inv-8-q8',
+          question: 'Someone owns twenty companies, all in one industry. What is the problem?',
+          options: [
+            'Too many holdings to track',
+            'They are concentrated — one industry shock hits all twenty at once',
+            'Fees are higher',
+            'Nothing, twenty is diversified',
+          ],
+          answer: 1,
+          why: 'Diversification is about exposure, not the number of tickers. Twenty holdings that move together behave like one holding.',
+        },
+        {
+          id: 'inv-8-q5',
+          question: 'What does dollar-cost averaging mean?',
+          options: [
+            'Buying only when prices fall',
+            'Investing a fixed amount at a fixed interval regardless of price',
+            'Averaging your account fees',
+            'Selling half your holdings each year',
+          ],
+          answer: 1,
+          why: 'The amount is fixed, so the number of units bought varies with price — more when prices are low, fewer when they are high.',
+        },
+        {
+          id: 'inv-8-q6',
+          question: 'Why is trying to time the market difficult in practice?',
+          options: [
+            'Brokers block it',
+            'It requires being right about when to leave and when to return',
+            'It is taxed at 100%',
+            'Markets are closed most of the year',
+          ],
+          answer: 1,
+          why: 'Two correct calls are needed, not one. Being out during a handful of the strongest days is enough to undo years of otherwise ordinary results.',
+        },
         {
           id: 'inv-8-q1',
           question: 'Why does avoiding large losses matter more than finding large wins?',

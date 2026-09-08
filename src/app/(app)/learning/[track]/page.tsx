@@ -144,14 +144,6 @@ export default function TrackPage({ params }: { params: Promise<{ track: string 
             />
           </div>
 
-          {track.id === 'investing' && (
-            <div className="bg-surface-container rounded-2xl px-5 py-4">
-              <p className="text-body-sm text-on-surface-variant leading-relaxed">
-                {DISCLAIMER_INVESTING}
-              </p>
-            </div>
-          )}
-
           {view.kind === 'lesson' && (
             <LessonStage
               key={view.id}
