@@ -1,0 +1,48 @@
+# Weekly pool health check.
+#
+# `check-videos` asks TikTok's public oEmbed endpoint whether each approved
+# video still exists, and flips the dead ones to `unavailable`. It writes files
+# in the repo, which is deliberate: the pool's source of truth is the git
+# history, and the approval record is the commit.
+#
+# That is also why this is not a Lambda. A production instance cannot write the
+# pool — `assertWritable()` refuses — so the job belongs where the files live.
+# The commit it makes triggers an Amplify deploy carrying the corrected pool.
+
+name: Check video pool
+
+on:
+  schedule:
+    - cron: '0 9 * * 1' # Mondays, 09:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # No API key and no cost — this endpoint is public and unauthenticated.
+      - run: npm run check-videos
+
+      - name: Commit any retirements
+        run: |
+          if [[ -z "$(git status --porcelain src/lib/learning/video-pool)" ]]; then
+            echo "Pool unchanged."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/lib/learning/video-pool
+          git commit -m "Retire video questions whose embeds have gone"
+          git push

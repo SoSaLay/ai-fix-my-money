@@ -1,0 +1,27 @@
+# AWS Amplify Hosting build spec.
+#
+# Amplify detects Next.js and provisions WEB_COMPUTE — the route handlers and
+# server components run on Lambda. Confirm that on the first deploy: a static
+# build would drop every /api route without failing loudly.
+#
+# type-check runs before build so a type error fails in seconds rather than
+# after a full compile.
+
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - npm run type-check
+        - npm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+      - .next/cache/**/*

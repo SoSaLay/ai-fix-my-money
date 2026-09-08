@@ -6,6 +6,7 @@ import {
   useState,
   useEffect,
   useCallback,
+  useRef,
   type ReactNode,
 } from 'react'
 import {
@@ -26,6 +27,17 @@ import type {
   InvestingGoal,
 } from '@/hooks/use-data'
 import type { ArchetypeId } from '@/lib/investing/archetypes'
+import { useAuth } from '@/contexts/auth-context'
+import {
+  legacyAdopted,
+  markLegacyAdopted,
+  readLocal,
+  removeLocal,
+  scopedKey,
+  writeLocal,
+} from '@/lib/sync/local'
+import { loadRemoteState, queueRemoteWrite, reconcile } from '@/lib/sync/user-state'
+import type { UserStateKey } from '@/types/supabase'
 
 // ============================================================================
 // Storage Keys
@@ -39,8 +51,16 @@ const STORAGE_KEY_GENERAL_SAVINGS = 'llg_general_savings'
 const STORAGE_KEY_MANUAL_ACCOUNTS = 'llg_manual_accounts'
 const STORAGE_KEY_LEDGER = 'llg_ledger'
 
-// Storage key helper — no user scoping in local-only mode
-const sk = (base: string) => base
+/** Every key this provider owns. Hydration walks it; nothing else should. */
+const OWNED_KEYS = [
+  STORAGE_KEY_FINANCIAL,
+  STORAGE_KEY_SPENDING_LIMIT,
+  STORAGE_KEY_SAVINGS_GOALS,
+  STORAGE_KEY_INVESTING_GOAL,
+  STORAGE_KEY_GENERAL_SAVINGS,
+  STORAGE_KEY_MANUAL_ACCOUNTS,
+  STORAGE_KEY_LEDGER,
+] as const
 
 // ============================================================================
 // Manual Account type
@@ -58,25 +78,13 @@ export interface ManualAccount {
 }
 
 // ============================================================================
-// Local persistence helpers
+// Persistence
+//
+// Local storage is the cache and the database is the record. Every setter
+// writes the cache synchronously — the UI must never wait on a network — and
+// queues the same value for the server, where a debounce collapses a dragged
+// slider into one request.
 // ============================================================================
-
-function readStorage<T>(key: string): T | null {
-  try {
-    const raw = localStorage.getItem(key)
-    return raw ? (JSON.parse(raw) as T) : null
-  } catch {
-    return null
-  }
-}
-
-function writeStorage<T>(key: string, value: T): void {
-  try {
-    localStorage.setItem(key, JSON.stringify(value))
-  } catch {
-    // ignore quota errors
-  }
-}
 
 // ============================================================================
 // Transaction generation
@@ -382,6 +390,8 @@ function ledgerTxToTransaction(tx: LedgerTransaction): Transaction {
 }
 
 export function FinancialDataProvider({ children }: { children: ReactNode }) {
+  const { userId, ready: authReady } = useAuth()
+
   const [financialData, setFinancialData] = useState<FinancialProfile | null>(null)
   const [spendingLimit, setSpendingLimitState] = useState<StoredSpendingLimit | null>(null)
   const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([])
@@ -390,23 +400,116 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
   const [ledger, setLedger] = useState<LedgerTransaction[]>([])
   const [manualAccounts, setManualAccounts] = useState<ManualAccount[]>([])
 
-  // Load all state from localStorage once on mount
-  useEffect(() => {
-    setFinancialData(normalizeProfile(readStorage<unknown>(STORAGE_KEY_FINANCIAL)))
-    setSpendingLimitState(readStorage<StoredSpendingLimit>(STORAGE_KEY_SPENDING_LIMIT))
-    setSavingsGoals(readStorage<SavingsGoal[]>(STORAGE_KEY_SAVINGS_GOALS) ?? [])
-    setInvestingGoalState(readStorage<InvestingGoal>(STORAGE_KEY_INVESTING_GOAL))
-    setGeneralSavingsPctState(readStorage<number>(STORAGE_KEY_GENERAL_SAVINGS) ?? 0)
-    setLedger(readStorage<LedgerTransaction[]>(STORAGE_KEY_LEDGER) ?? [])
-    setManualAccounts(readStorage<ManualAccount[]>(STORAGE_KEY_MANUAL_ACCOUNTS) ?? [])
+  // ── Persistence ───────────────────────────────────────────────────────────
+  // Cache first, server second. Both take the unscoped key: the cache scopes it
+  // by user, and the server row already belongs to one.
+  //
+  // The id is read through a ref so these two stay referentially stable. Every
+  // setter below closes over them with an empty dependency list; if they were
+  // rebuilt on sign-in, those setters would keep writing to the signed-out key.
+
+  const userIdRef = useRef<string | null>(userId)
+  userIdRef.current = userId
+
+  const persist = useCallback((base: string, value: unknown) => {
+    writeLocal(scopedKey(base, userIdRef.current), value)
+    queueRemoteWrite(base, value)
   }, [])
+
+  /**
+   * A cleared key is stored as JSON null rather than deleted, so the clearing
+   * itself syncs. A missing row would be indistinguishable from a row that had
+   * never been written, and the other device would helpfully restore it.
+   */
+  const forget = useCallback((base: string) => {
+    removeLocal(scopedKey(base, userIdRef.current))
+    queueRemoteWrite(base, null)
+  }, [])
+
+  // ── Hydration ─────────────────────────────────────────────────────────────
+  // Paint from the cache immediately, then reconcile with the server. Runs
+  // again whenever the account changes, because that is a different dataset.
+
+  const applyValues = useCallback((values: Partial<Record<string, unknown>>) => {
+    const has = (key: string) => Object.prototype.hasOwnProperty.call(values, key)
+    if (has(STORAGE_KEY_FINANCIAL)) {
+      setFinancialData(normalizeProfile(values[STORAGE_KEY_FINANCIAL]))
+    }
+    if (has(STORAGE_KEY_SPENDING_LIMIT)) {
+      setSpendingLimitState((values[STORAGE_KEY_SPENDING_LIMIT] as StoredSpendingLimit) ?? null)
+    }
+    if (has(STORAGE_KEY_SAVINGS_GOALS)) {
+      setSavingsGoals((values[STORAGE_KEY_SAVINGS_GOALS] as SavingsGoal[]) ?? [])
+    }
+    if (has(STORAGE_KEY_INVESTING_GOAL)) {
+      setInvestingGoalState((values[STORAGE_KEY_INVESTING_GOAL] as InvestingGoal) ?? null)
+    }
+    if (has(STORAGE_KEY_GENERAL_SAVINGS)) {
+      setGeneralSavingsPctState((values[STORAGE_KEY_GENERAL_SAVINGS] as number) ?? 0)
+    }
+    if (has(STORAGE_KEY_LEDGER)) {
+      setLedger((values[STORAGE_KEY_LEDGER] as LedgerTransaction[]) ?? [])
+    }
+    if (has(STORAGE_KEY_MANUAL_ACCOUNTS)) {
+      setManualAccounts((values[STORAGE_KEY_MANUAL_ACCOUNTS] as ManualAccount[]) ?? [])
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!authReady) return
+    let active = true
+
+    // 1. The cache. This is the frame the user actually sees.
+    const local: Partial<Record<string, unknown>> = {}
+    for (const key of OWNED_KEYS) {
+      const value = readLocal<unknown>(scopedKey(key, userId))
+      if (value !== null) local[key] = value
+    }
+
+    // 2. Work entered before signing up belongs to the account that just
+    //    appeared, so it is adopted once and then left alone.
+    if (userId && !legacyAdopted(userId)) {
+      for (const key of OWNED_KEYS) {
+        if (local[key] !== undefined) continue
+        const legacy = readLocal<unknown>(key)
+        if (legacy !== null) {
+          local[key] = legacy
+          writeLocal(scopedKey(key, userId), legacy)
+        }
+      }
+      markLegacyAdopted(userId)
+    }
+
+    applyValues(local)
+
+    if (!userId) return
+
+    // 3. The server. Whichever side wrote last wins, key by key.
+    void loadRemoteState().then(remote => {
+      if (!active || !remote) return
+
+      const { fromRemote, toRemote } = reconcile(userId, remote, local as Partial<Record<UserStateKey, unknown>>)
+
+      for (const [key, value] of Object.entries(fromRemote)) {
+        writeLocal(scopedKey(key, userId), value)
+      }
+      applyValues(fromRemote)
+
+      for (const key of toRemote) {
+        if (!(OWNED_KEYS as readonly string[]).includes(key)) continue
+        queueRemoteWrite(key, local[key] ?? null)
+      }
+    })
+
+    return () => { active = false }
+  }, [authReady, userId, applyValues])
 
   // ── Profile ───────────────────────────────────────────────────────────────
   // The profile is built up by hand as the user works through a learning track.
   const saveProfile = useCallback((update: (current: FinancialProfile) => FinancialProfile) => {
     setFinancialData(prev => {
       const next = recomputeSummary(update(prev ?? emptyProfile()))
-      writeStorage(sk(STORAGE_KEY_FINANCIAL), next)
+      persist(STORAGE_KEY_FINANCIAL, next)
       return next
     })
   }, [])
@@ -419,13 +522,13 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
     setGeneralSavingsPctState(0)
     setLedger([])
     setManualAccounts([])
-    localStorage.removeItem(sk(STORAGE_KEY_FINANCIAL))
-    localStorage.removeItem(sk(STORAGE_KEY_SPENDING_LIMIT))
-    localStorage.removeItem(sk(STORAGE_KEY_SAVINGS_GOALS))
-    localStorage.removeItem(sk(STORAGE_KEY_INVESTING_GOAL))
-    localStorage.removeItem(sk(STORAGE_KEY_GENERAL_SAVINGS))
-    localStorage.removeItem(sk(STORAGE_KEY_LEDGER))
-    localStorage.removeItem(sk(STORAGE_KEY_MANUAL_ACCOUNTS))
+    forget(STORAGE_KEY_FINANCIAL)
+    forget(STORAGE_KEY_SPENDING_LIMIT)
+    forget(STORAGE_KEY_SAVINGS_GOALS)
+    forget(STORAGE_KEY_INVESTING_GOAL)
+    forget(STORAGE_KEY_GENERAL_SAVINGS)
+    forget(STORAGE_KEY_LEDGER)
+    forget(STORAGE_KEY_MANUAL_ACCOUNTS)
   }, [])
 
   // ── Spending limit ────────────────────────────────────────────────────────
@@ -440,14 +543,14 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
         updated_at: now,
       }
       setSpendingLimitState(record)
-      writeStorage(sk(STORAGE_KEY_SPENDING_LIMIT), record)
+      persist(STORAGE_KEY_SPENDING_LIMIT, record)
     },
     [spendingLimit],
   )
 
   const removeSpendingLimit = useCallback(() => {
     setSpendingLimitState(null)
-    localStorage.removeItem(sk(STORAGE_KEY_SPENDING_LIMIT))
+    forget(STORAGE_KEY_SPENDING_LIMIT)
   }, [])
 
   // ── Savings goals ─────────────────────────────────────────────────────────
@@ -463,7 +566,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       }
       setSavingsGoals(prev => {
         const next = [...prev, newGoal]
-        writeStorage(sk(STORAGE_KEY_SAVINGS_GOALS), next)
+        persist(STORAGE_KEY_SAVINGS_GOALS, next)
         return next
       })
       return newGoal.id
@@ -476,7 +579,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       const next = prev.map(g =>
         g.id === id ? { ...g, ...updates, updated_at: new Date().toISOString() } : g,
       )
-      writeStorage(sk(STORAGE_KEY_SAVINGS_GOALS), next)
+      persist(STORAGE_KEY_SAVINGS_GOALS, next)
       return next
     })
   }, [])
@@ -484,7 +587,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
   const deleteSavingsGoal = useCallback((id: string) => {
     setSavingsGoals(prev => {
       const next = prev.filter(g => g.id !== id)
-      writeStorage(sk(STORAGE_KEY_SAVINGS_GOALS), next)
+      persist(STORAGE_KEY_SAVINGS_GOALS, next)
       return next
     })
   }, [])
@@ -503,38 +606,38 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
         updated_at: now,
       }
       setInvestingGoalState(record)
-      writeStorage(sk(STORAGE_KEY_INVESTING_GOAL), record)
+      persist(STORAGE_KEY_INVESTING_GOAL, record)
     },
     [investingGoal],
   )
 
   const removeInvestingGoal = useCallback(() => {
     setInvestingGoalState(null)
-    localStorage.removeItem(sk(STORAGE_KEY_INVESTING_GOAL))
+    forget(STORAGE_KEY_INVESTING_GOAL)
   }, [])
 
   // ── General savings ───────────────────────────────────────────────────────
   const setGeneralSavings = useCallback((pct: number) => {
     setGeneralSavingsPctState(pct)
-    writeStorage(sk(STORAGE_KEY_GENERAL_SAVINGS), pct)
+    persist(STORAGE_KEY_GENERAL_SAVINGS, pct)
   }, [])
 
   // ── Reset all allocations ─────────────────────────────────────────────────
   const resetAllocations = useCallback(() => {
     setSpendingLimitState(null)
-    localStorage.removeItem(sk(STORAGE_KEY_SPENDING_LIMIT))
+    forget(STORAGE_KEY_SPENDING_LIMIT)
 
     setSavingsGoals(prev => {
       const next = prev.map(g => ({ ...g, allocation_pct: 0, updated_at: new Date().toISOString() }))
-      writeStorage(sk(STORAGE_KEY_SAVINGS_GOALS), next)
+      persist(STORAGE_KEY_SAVINGS_GOALS, next)
       return next
     })
 
     setGeneralSavingsPctState(0)
-    writeStorage(sk(STORAGE_KEY_GENERAL_SAVINGS), 0)
+    persist(STORAGE_KEY_GENERAL_SAVINGS, 0)
 
     setInvestingGoalState(null)
-    localStorage.removeItem(sk(STORAGE_KEY_INVESTING_GOAL))
+    forget(STORAGE_KEY_INVESTING_GOAL)
   }, [])
 
   // ── Ledger CRUD ───────────────────────────────────────────────────────────
@@ -545,7 +648,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
     }
     setLedger(prev => {
       const next = [...prev, entry]
-      writeStorage(sk(STORAGE_KEY_LEDGER), next)
+      persist(STORAGE_KEY_LEDGER, next)
       return next
     })
     return entry
@@ -554,7 +657,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
   const removeLedgerTransaction = useCallback((id: string) => {
     setLedger(prev => {
       const next = prev.filter(t => t.id !== id)
-      writeStorage(sk(STORAGE_KEY_LEDGER), next)
+      persist(STORAGE_KEY_LEDGER, next)
       return next
     })
   }, [])
@@ -568,7 +671,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
     }
     setManualAccounts(prev => {
       const next = [...prev, newAccount]
-      writeStorage(sk(STORAGE_KEY_MANUAL_ACCOUNTS), next)
+      persist(STORAGE_KEY_MANUAL_ACCOUNTS, next)
       return next
     })
     return newAccount
@@ -577,7 +680,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
   const updateManualAccount = useCallback((id: string, updates: Partial<Pick<ManualAccount, 'name' | 'type' | 'balance' | 'limit'>>) => {
     setManualAccounts(prev => {
       const next = prev.map(a => a.id === id ? { ...a, ...updates } : a)
-      writeStorage(sk(STORAGE_KEY_MANUAL_ACCOUNTS), next)
+      persist(STORAGE_KEY_MANUAL_ACCOUNTS, next)
       return next
     })
   }, [])
@@ -585,7 +688,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
   const removeManualAccount = useCallback((id: string) => {
     setManualAccounts(prev => {
       const next = prev.filter(a => a.id !== id)
-      writeStorage(sk(STORAGE_KEY_MANUAL_ACCOUNTS), next)
+      persist(STORAGE_KEY_MANUAL_ACCOUNTS, next)
       return next
     })
   }, [])
@@ -600,7 +703,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
         i === idx ? { ...a, ...(updates.name !== undefined ? { name: updates.name } : {}), ...(updates.balance !== undefined ? { balance: updates.balance } : {}) } : a
       )
       const next = { ...prev, accounts }
-      writeStorage(sk(STORAGE_KEY_FINANCIAL), next)
+      persist(STORAGE_KEY_FINANCIAL, next)
       return next
     })
   }, [])
@@ -612,7 +715,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       if (isNaN(idx) || idx < 0 || idx >= prev.accounts.length) return prev
       const accounts = prev.accounts.filter((_, i) => i !== idx)
       const next = { ...prev, accounts }
-      writeStorage(sk(STORAGE_KEY_FINANCIAL), next)
+      persist(STORAGE_KEY_FINANCIAL, next)
       return next
     })
   }, [])

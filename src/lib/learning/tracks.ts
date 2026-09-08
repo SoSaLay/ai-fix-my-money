@@ -97,7 +97,19 @@ export interface Lesson {
 /** The single step where the learner works in the real tool. */
 export interface ActionStep {
   title: string
+  /**
+   * What the step is called in the rail and above the heading. Defaults to
+   * "Your turn". Set it where the step also carries teaching material, so the
+   * label says what the learner is walking into.
+   */
+  label?: string
   prompt: string
+  /**
+   * Material the learner needs while they work, shown above the task list.
+   * This is for content that only earns its place next to the doing — a lesson
+   * they read ten minutes ago and then have to apply belongs here instead.
+   */
+  brief?: LessonSection[]
   /** Concrete things to do while in the tool. */
   tasks: string[]
   doneWhen: string
@@ -1252,74 +1264,8 @@ const INVESTING: Track = {
       ],
     },
     {
-      id: 'inv-4',
-      title: 'Your goal, your horizon, your risk',
-      readSeconds: 60,
-      intro: 'A plan built from someone else’s numbers is not a plan. Six inputs decide what any of this should look like for you.',
-      sections: [
-        {
-          heading: 'The six inputs',
-          bullets: [
-            { term: 'The goal', text: 'What the money is for, and roughly how much it needs to be.' },
-            { term: 'The time horizon', text: 'How many years until you need it. Each year’s return joins the base that earns the next year, so the number of years matters more than any single year’s result.' },
-            { term: 'The savings rate', text: 'What you can add regularly. Saving more lowers the return you need; saving less raises it.' },
-            { term: 'Risk tolerance', text: 'How large a fall you can watch without selling. A plan you abandon in a bad year was the wrong plan.' },
-            { term: 'The required return', text: 'What annual return the goal, the horizon and the savings rate actually imply.' },
-            { term: 'Inflation', text: 'Prices rise, so a return that does not beat inflation is a loss in what the money buys.' },
-          ],
-        },
-        {
-          divider: true,
-          heading: 'Why the horizon does the heavy lifting',
-          bullets: [
-            { text: 'A long horizon leaves time to recover from a bad stretch, so a wider range of outcomes is survivable.' },
-            { text: 'A short horizon does not. Money needed in two years cannot wait out a three-year drawdown.' },
-            { term: 'The usual consequence', text: 'The closer a goal gets, the more people move that money toward things that move less.' },
-          ],
-        },
-        {
-          divider: true,
-          heading: 'Risk tolerance is behavioural, not theoretical',
-          body: 'The real test is not what you would accept on paper. It is what you actually do in the month your balance is down a third.',
-        },
-      ],
-      questions: [
-        {
-          id: 'inv-4-q1',
-          question: 'Which input most changes how much short-term movement a plan can absorb?',
-          options: ['The account provider', 'The time horizon', 'The number of holdings', 'The deposit day'],
-          answer: 1,
-          why: 'Years are what let a bad stretch be recovered from. With enough of them, a fall is temporary; without them, it is the outcome.',
-        },
-        {
-          id: 'inv-4-q2',
-          question: 'Why does inflation belong in the calculation?',
-          options: [
-            'It is a fee brokers charge',
-            'A return below inflation still loses buying power',
-            'It sets the tax rate',
-            'It determines the match',
-          ],
-          answer: 1,
-          why: 'The point of the money is what it can buy. If prices rise faster than the balance does, the balance is worth less in real terms.',
-        },
-        {
-          id: 'inv-4-q3',
-          question: 'What is the practical test of someone’s risk tolerance?',
-          options: [
-            'The score on a questionnaire',
-            'What they actually do when the balance is well down',
-            'How much they earn',
-            'How many accounts they hold',
-          ],
-          answer: 1,
-          why: 'Tolerance is revealed by behaviour under loss. A plan is only as good as what the person holding it does in the worst month.',
-        },
-      ],
-    },
-    {
       id: 'inv-3',
-      title: 'Financial basics, support growth',
+      title: 'Financial basics support growth',
       readSeconds: 60,
       sections: [
         {
@@ -1683,8 +1629,39 @@ const INVESTING: Track = {
   ],
   action: {
     title: 'Write down your own investing plan',
+    label: 'Your turn + goals',
     prompt:
       'Pick the archetype that sounds like you, set the share of your income that goes to investing, and record the plan behind it — the goal, the horizon and what you would do in a bad year — using the figures you already recorded in the earlier tracks.',
+    // The six inputs used to be a lesson of their own, read and then set aside.
+    // They are reference material for exactly this step, so they sit next to
+    // the work rather than ten minutes behind it.
+    brief: [
+      {
+        heading: 'The six inputs',
+        bullets: [
+          { term: 'The goal', text: 'What the money is for, and roughly how much it needs to be.' },
+          { term: 'The time horizon', text: 'How many years until you need it. Each year’s return joins the base that earns the next year, so the number of years matters more than any single year’s result.' },
+          { term: 'The savings rate', text: 'What you can add regularly. Saving more lowers the return you need; saving less raises it.' },
+          { term: 'Risk tolerance', text: 'How large a fall you can watch without selling. A plan you abandon in a bad year was the wrong plan.' },
+          { term: 'The required return', text: 'What annual return the goal, the horizon and the savings rate actually imply.' },
+          { term: 'Inflation', text: 'Prices rise, so a return that does not beat inflation is a loss in what the money buys.' },
+        ],
+      },
+      {
+        divider: true,
+        heading: 'Why the horizon does the heavy lifting',
+        bullets: [
+          { text: 'A long horizon leaves time to recover from a bad stretch, so a wider range of outcomes is survivable.' },
+          { text: 'A short horizon does not. Money needed in two years cannot wait out a three-year drawdown.' },
+          { term: 'The usual consequence', text: 'The closer a goal gets, the more people move that money toward things that move less.' },
+        ],
+      },
+      {
+        divider: true,
+        heading: 'Risk tolerance is behavioural, not theoretical',
+        body: 'The real test is not what you would accept on paper. It is what you actually do in the month your balance is down a third.',
+      },
+    ],
     tasks: [
       'Name the goal this money is for, and roughly what it needs to be worth.',
       'Write down the time horizon in years, and note whether that leaves room to recover from a bad stretch.',

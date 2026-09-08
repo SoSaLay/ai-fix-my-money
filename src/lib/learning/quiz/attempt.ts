@@ -26,6 +26,13 @@ export interface AttemptPayload {
   videoIds: string[]
   /** `QuizQuestion.id`s of the sampled multiple choice. */
   choiceIds: string[]
+  /**
+   * The `quiz_attempts` row this paper was written down as. Signed into the
+   * token so a learner cannot attach their answers to somebody else's attempt —
+   * or to an attempt they have already been graded on. Absent when the database
+   * is not configured, which is the local-development case.
+   */
+  recordId?: string
   issuedAt: number
 }
 

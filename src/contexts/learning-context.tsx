@@ -6,6 +6,7 @@ import {
   useState,
   useEffect,
   useCallback,
+  useRef,
   type ReactNode,
 } from 'react'
 import {
@@ -15,6 +16,17 @@ import {
   passMark,
   type TrackId,
 } from '@/lib/learning/tracks'
+import { useAuth } from '@/contexts/auth-context'
+import {
+  legacyAdopted,
+  markLegacyAdopted,
+  readLocal,
+  removeLocal,
+  scopedKey,
+  writeLocal,
+} from '@/lib/sync/local'
+import { loadRemoteState, queueRemoteWrite, reconcile } from '@/lib/sync/user-state'
+import type { UserStateKey } from '@/types/supabase'
 
 // ============================================================================
 // Storage
@@ -25,15 +37,10 @@ const STORAGE_KEY_REVIEW = 'llg_learning_review'
 const STORAGE_KEY_ACK = 'llg_learning_ack'
 const STORAGE_KEY_GUIDED = 'llg_learning_guided'
 
-function read<T>(key: string): T | null {
-  try {
-    const raw = localStorage.getItem(key)
-    return raw ? (JSON.parse(raw) as T) : null
-  } catch {
-    return null
-  }
-}
-
+/**
+ * Raw storage, used only by the development seeder below. Everything the
+ * provider writes goes through `persist`, which also syncs.
+ */
 function write<T>(key: string, value: T): void {
   try {
     localStorage.setItem(key, JSON.stringify(value))
@@ -155,17 +162,19 @@ interface LearningContextValue {
  * Guarded by NODE_ENV at both the call site and here, so a production build
  * cannot reach it.
  */
-function devUnlockAll() {
+function devUnlockAll(userId: string | null) {
   if (process.env.NODE_ENV !== 'development' || typeof window === 'undefined') return
+
+  const key = (base: string) => scopedKey(base, userId)
 
   const mode = new URLSearchParams(window.location.search).get('unlock')
   if (mode !== 'all' && mode !== 'reset') return
 
   if (mode === 'reset') {
-    localStorage.removeItem(STORAGE_KEY_PROGRESS)
-    localStorage.removeItem(STORAGE_KEY_REVIEW)
-    localStorage.removeItem(STORAGE_KEY_ACK)
-    localStorage.removeItem(STORAGE_KEY_GUIDED)
+    localStorage.removeItem(key(STORAGE_KEY_PROGRESS))
+    localStorage.removeItem(key(STORAGE_KEY_REVIEW))
+    localStorage.removeItem(key(STORAGE_KEY_ACK))
+    localStorage.removeItem(key(STORAGE_KEY_GUIDED))
   } else {
     const now = new Date().toISOString()
     const seeded: ProgressMap = {}
@@ -201,10 +210,10 @@ function devUnlockAll() {
       ),
     )
 
-    write(STORAGE_KEY_PROGRESS, seeded)
-    write(STORAGE_KEY_REVIEW, queue)
-    write(STORAGE_KEY_ACK, true)
-    localStorage.removeItem(STORAGE_KEY_GUIDED)
+    write(key(STORAGE_KEY_PROGRESS), seeded)
+    write(key(STORAGE_KEY_REVIEW), queue)
+    write(key(STORAGE_KEY_ACK), true)
+    localStorage.removeItem(key(STORAGE_KEY_GUIDED))
   }
 
   const url = new URL(window.location.href)
@@ -224,25 +233,102 @@ function questionExists(item: ReviewItem): boolean {
 
 const LearningContext = createContext<LearningContextValue | null>(null)
 
+/** Every key this provider owns. */
+const OWNED_KEYS = [
+  STORAGE_KEY_PROGRESS,
+  STORAGE_KEY_REVIEW,
+  STORAGE_KEY_ACK,
+  STORAGE_KEY_GUIDED,
+] as const
+
 export function LearningProvider({ children }: { children: ReactNode }) {
+  const { userId, ready: authReady } = useAuth()
+
   const [ready, setReady] = useState(false)
   const [progress, setProgress] = useState<ProgressMap>({})
   const [reviewQueue, setReviewQueue] = useState<ReviewItem[]>([])
   const [acknowledged, setAcknowledged] = useState(false)
   const [guided, setGuided] = useState<GuidedSession | null>(null)
 
+  // Stable across renders, so the setters below can close over them with an
+  // empty dependency list and still write to the right account's key.
+  const userIdRef = useRef<string | null>(userId)
+  userIdRef.current = userId
+
+  const persist = useCallback((base: string, value: unknown) => {
+    writeLocal(scopedKey(base, userIdRef.current), value)
+    queueRemoteWrite(base, value)
+  }, [])
+
+  const forget = useCallback((base: string) => {
+    removeLocal(scopedKey(base, userIdRef.current))
+    queueRemoteWrite(base, null)
+  }, [])
+
+  const applyValues = useCallback((values: Partial<Record<string, unknown>>) => {
+    const has = (key: string) => Object.prototype.hasOwnProperty.call(values, key)
+    if (has(STORAGE_KEY_PROGRESS)) setProgress((values[STORAGE_KEY_PROGRESS] as ProgressMap) ?? {})
+    if (has(STORAGE_KEY_REVIEW)) setReviewQueue((values[STORAGE_KEY_REVIEW] as ReviewItem[]) ?? [])
+    if (has(STORAGE_KEY_ACK)) setAcknowledged((values[STORAGE_KEY_ACK] as boolean) ?? false)
+    if (has(STORAGE_KEY_GUIDED)) setGuided((values[STORAGE_KEY_GUIDED] as GuidedSession) ?? null)
+  }, [])
+
   useEffect(() => {
+    if (!authReady) return
+    let active = true
+
     // Authoring escape hatch: `?unlock=all` in development marks every track
     // finished so the whole curriculum can be read through without sitting the
     // quizzes. Stripped from production builds — see devUnlockAll.
-    if (process.env.NODE_ENV === 'development') devUnlockAll()
+    if (process.env.NODE_ENV === 'development') devUnlockAll(userId)
 
-    setProgress(read<ProgressMap>(STORAGE_KEY_PROGRESS) ?? {})
-    setReviewQueue(read<ReviewItem[]>(STORAGE_KEY_REVIEW) ?? [])
-    setAcknowledged(read<boolean>(STORAGE_KEY_ACK) ?? false)
-    setGuided(read<GuidedSession>(STORAGE_KEY_GUIDED))
+    const local: Partial<Record<string, unknown>> = {}
+    for (const key of OWNED_KEYS) {
+      const value = readLocal<unknown>(scopedKey(key, userId))
+      if (value !== null) local[key] = value
+    }
+
+    // Progress earned before signing up belongs to the account that just
+    // appeared. Adopted once, then never again for this user.
+    if (userId && !legacyAdopted(userId)) {
+      for (const key of OWNED_KEYS) {
+        if (local[key] !== undefined) continue
+        const legacy = readLocal<unknown>(key)
+        if (legacy !== null) {
+          local[key] = legacy
+          writeLocal(scopedKey(key, userId), legacy)
+        }
+      }
+      markLegacyAdopted(userId)
+    }
+
+    applyValues(local)
     setReady(true)
-  }, [])
+
+    if (!userId) return
+
+    void loadRemoteState().then(remote => {
+      if (!active || !remote) return
+
+      const { fromRemote, toRemote } = reconcile(
+        userId,
+        remote,
+        local as Partial<Record<UserStateKey, unknown>>,
+      )
+
+      for (const [key, value] of Object.entries(fromRemote)) {
+        writeLocal(scopedKey(key, userId), value)
+      }
+      applyValues(fromRemote)
+
+      for (const key of toRemote) {
+        if (!(OWNED_KEYS as readonly string[]).includes(key)) continue
+        queueRemoteWrite(key, local[key] ?? null)
+      }
+    })
+
+    return () => { active = false }
+  }, [authReady, userId, applyValues])
 
   const trackProgress = useCallback(
     (trackId: TrackId): TrackProgress => progress[trackId] ?? emptyTrack(),
@@ -259,7 +345,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
     (trackId: TrackId, patch: (current: TrackProgress) => TrackProgress) => {
       setProgress(prev => {
         const next = { ...prev, [trackId]: patch(prev[trackId] ?? emptyTrack()) }
-        write(STORAGE_KEY_PROGRESS, next)
+        persist(STORAGE_KEY_PROGRESS, next)
         return next
       })
     },
@@ -290,7 +376,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
           return { trackId, lessonId, questionId: q.id, stage, dueAt: due.toISOString() }
         })
         const next = [...rest, ...additions]
-        write(STORAGE_KEY_REVIEW, next)
+        persist(STORAGE_KEY_REVIEW, next)
         return next
       })
     },
@@ -332,7 +418,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
             trackId, lessonId: 'final', questionId, stage: 0, dueAt: due.toISOString(),
           }))
           const next = [...rest, ...additions]
-          write(STORAGE_KEY_REVIEW, next)
+          persist(STORAGE_KEY_REVIEW, next)
           return next
         })
       }
@@ -468,13 +554,13 @@ export function LearningProvider({ children }: { children: ReactNode }) {
       // and retire off the queue at the end.
       const stage = correct ? item.stage + 1 : 0
       if (stage >= REVIEW_INTERVALS_DAYS.length) {
-        write(STORAGE_KEY_REVIEW, rest)
+        persist(STORAGE_KEY_REVIEW, rest)
         return rest
       }
       const due = new Date()
       due.setDate(due.getDate() + REVIEW_INTERVALS_DAYS[stage])
       const next = [...rest, { ...item, stage, dueAt: due.toISOString() }]
-      write(STORAGE_KEY_REVIEW, next)
+      persist(STORAGE_KEY_REVIEW, next)
       return next
     })
   }, [])
@@ -482,26 +568,26 @@ export function LearningProvider({ children }: { children: ReactNode }) {
   const startGuided = useCallback((trackId: TrackId) => {
     const session = { trackId }
     setGuided(session)
-    write(STORAGE_KEY_GUIDED, session)
+    persist(STORAGE_KEY_GUIDED, session)
   }, [])
 
   const endGuided = useCallback(() => {
     setGuided(null)
-    localStorage.removeItem(STORAGE_KEY_GUIDED)
+    forget(STORAGE_KEY_GUIDED)
   }, [])
 
   const acknowledge = useCallback(() => {
     setAcknowledged(true)
-    write(STORAGE_KEY_ACK, true)
+    persist(STORAGE_KEY_ACK, true)
   }, [])
 
   const resetProgress = useCallback(() => {
     setProgress({})
     setReviewQueue([])
     setGuided(null)
-    localStorage.removeItem(STORAGE_KEY_GUIDED)
-    localStorage.removeItem(STORAGE_KEY_PROGRESS)
-    localStorage.removeItem(STORAGE_KEY_REVIEW)
+    forget(STORAGE_KEY_GUIDED)
+    forget(STORAGE_KEY_PROGRESS)
+    forget(STORAGE_KEY_REVIEW)
   }, [])
 
   return (

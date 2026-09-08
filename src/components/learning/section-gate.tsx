@@ -39,7 +39,7 @@ export function SectionGate({
         <div className="px-8 pt-6">
           <div className="bg-secondary-fixed/25 rounded-3xl px-6 py-5 flex flex-col gap-3">
             <span className="text-label-sm uppercase tracking-widest text-secondary font-semibold">
-              Your turn · {track.title}
+              {track.action.label ?? 'Your turn'} · {track.title}
             </span>
 
             <div>
@@ -146,7 +146,9 @@ function LearningPath({ trackId }: { trackId: TrackId }) {
     })),
     ...(track.action ? [{
       key: 'action',
-      label: 'Your turn — enter your own numbers',
+      label: track.action.label
+        ? `${track.action.label} — enter your own numbers`
+        : 'Your turn — enter your own numbers',
       done: p.actionDone,
     }] : []),
     ...(track.finalQuiz.length > 0 ? [{

@@ -10,9 +10,12 @@ import {
   GraduationCap,
   Lock,
   Check,
+  LogOut,
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useLearning } from '@/contexts/learning-context'
+import { useAuth } from '@/contexts/auth-context'
+import { flushRemoteWrites } from '@/lib/sync/user-state'
 import type { TrackId } from '@/lib/learning/tracks'
 
 interface NavItem {
@@ -37,6 +40,7 @@ interface SidebarProps {
 
 export function Sidebar({ pathname }: SidebarProps) {
   const { ready, isToolUnlocked, isTrackComplete, dueReviews } = useLearning()
+  const { user, enabled: authEnabled } = useAuth()
   const due = ready ? dueReviews().length : 0
 
   return (
@@ -110,6 +114,33 @@ export function Sidebar({ pathname }: SidebarProps) {
           )
         })}
       </nav>
+
+      {authEnabled && user && (
+        <div className="pt-3 mt-3 border-t border-outline-variant/40">
+          <p className="px-3 text-label-sm text-on-surface-variant/70 truncate" title={user.email}>
+            {user.email}
+          </p>
+          {/*
+            A form POST rather than a click handler: the route clears the
+            session cookie server-side, which is the only place it can actually
+            be cleared. Anything queued is sent first, so the last edit before
+            signing out is not the one that gets lost.
+          */}
+          <form
+            action="/auth/signout"
+            method="post"
+            onSubmit={() => { void flushRemoteWrites() }}
+          >
+            <button
+              type="submit"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-label-lg font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all duration-150"
+            >
+              <LogOut size={18} />
+              Sign out
+            </button>
+          </form>
+        </div>
+      )}
     </aside>
   )
 }

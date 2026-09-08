@@ -7,7 +7,7 @@ import {
   ArrowLeft, ArrowRight, Check, PenLine, Sparkles, Trophy, RotateCcw, Unlock,
 } from 'lucide-react'
 import { useLearning, type Stage } from '@/contexts/learning-context'
-import { getTrack, passMark, shortTitle, type Track, type Lesson } from '@/lib/learning/tracks'
+import { getTrack, passMark, shortTitle, type Track, type Lesson, type LessonSection } from '@/lib/learning/tracks'
 import { DISCLAIMER_INVESTING } from '@/lib/learning/disclaimer'
 import { DisclaimerFooter } from '@/components/learning/disclaimer-footer'
 import { AcknowledgmentGate } from '@/components/learning/acknowledgment-gate'
@@ -70,7 +70,7 @@ export default function TrackPage({ params }: { params: Promise<{ track: string 
     ...(track.action ? [{
       key: 'action',
       label: track.action.title,
-      shortLabel: 'Your turn',
+      shortLabel: track.action.label ?? 'Your turn',
       done: progress.actionDone,
       stage: { kind: 'action' as const },
     }] : []),
@@ -250,6 +250,47 @@ function LessonStage({
 
 // ─── Action: go and use the real tool ────────────────────────────────────────
 
+/**
+ * Reference material carried into the action step. Deliberately quieter than a
+ * lesson — this is something to look across while working, not something to
+ * read through, so it sits in a recessed block rather than in the page's own
+ * type scale.
+ */
+function ActionBrief({ sections }: { sections: LessonSection[] }) {
+  return (
+    <div className="bg-surface-container-low rounded-2xl px-5 py-5 flex flex-col gap-4">
+      {sections.map((section, i) => (
+        <div
+          key={section.heading ?? i}
+          className={section.divider && i > 0 ? 'border-t border-outline-variant/40 pt-4' : undefined}
+        >
+          {section.heading && (
+            <p className="text-title-sm text-on-surface font-semibold mb-2">{section.heading}</p>
+          )}
+          {section.body && (
+            <p className="text-body-md text-on-surface-variant leading-relaxed">{section.body}</p>
+          )}
+          {section.bullets && (
+            <ul className="flex flex-col gap-2">
+              {section.bullets.map(bullet => (
+                <li key={bullet.term ?? bullet.text} className="flex gap-2.5">
+                  <span className="mt-[9px] w-1.5 h-1.5 rounded-full bg-secondary/40 shrink-0" aria-hidden />
+                  <p className="text-body-md text-on-surface-variant leading-relaxed">
+                    {bullet.term && (
+                      <span className="text-on-surface font-semibold">{bullet.term}. </span>
+                    )}
+                    {bullet.text}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function ActionStage({
   track, done, onGo, onContinue,
 }: {
@@ -264,7 +305,7 @@ function ActionStage({
       <div className="flex items-center gap-2.5">
         <PenLine size={15} className="text-secondary" />
         <span className="text-label-sm text-on-surface-variant uppercase tracking-widest">
-          Your turn
+          {action.label ?? 'Your turn'}
         </span>
       </div>
 
@@ -272,6 +313,8 @@ function ActionStage({
         <h2 className="text-headline-sm text-on-surface font-bold">{action.title}</h2>
         <p className="text-body-lg text-on-surface-variant leading-relaxed">{action.prompt}</p>
       </div>
+
+      {action.brief && <ActionBrief sections={action.brief} />}
 
       <div className="flex flex-col gap-2.5">
         <p className="text-title-md text-on-surface font-semibold">What to do</p>
