@@ -359,8 +359,31 @@ create policy "report a video" on public.video_reports
 The service-role key bypasses RLS. It is used **only** in route handlers, never
 in a client component, and never in a `NEXT_PUBLIC_` variable.
 
-**Verify:** with the anon key and user A's session, `select * from user_state`
-returns only A's rows. Attempting `insert into graded_answers` as A fails.
+**Verify — do this before anyone else has an account.** Three checks:
+
+1. **Every table has it on.** Run the query at the bottom of the migration.
+   Each of the five tables must come back `rls_enabled = true` with at least one
+   policy. A table with RLS off is a public table, regardless of what its
+   policies say.
+2. **Supabase's own linter.** Database → Advisors flags any table left without
+   RLS, and any `SECURITY DEFINER` function without a pinned `search_path`.
+   Both should be clean.
+3. **The behavioural check, which is the one that counts.** Sign in as user A,
+   run `select * from user_state` — only A's rows come back. Sign in as B, same
+   query, only B's. Then try `insert into graded_answers` as A: it fails,
+   because grades are the server's to write.
+
+**What an anonymous request sees: nothing.** `auth.uid()` is NULL without a
+session, `NULL = user_id` is NULL rather than true, so no row matches on any
+table. The `revoke ... from anon` lines refuse those requests one step earlier
+still, at the grant level.
+
+**The one key that sees everything** is `SUPABASE_SERVICE_ROLE_KEY`. It bypasses
+every policy above, and it is used in exactly three places — opening a quiz
+attempt, writing a grade, recording a dead video. Keep it out of anything named
+`NEXT_PUBLIC_`, and out of client components; `src/lib/supabase/admin.ts` is
+marked `server-only`, so a client import fails the build instead of shipping the
+key to a browser.
 
 ---
 
@@ -663,7 +686,8 @@ and confirm zero `unavailable` in the approved set before the final deploy.
 on a different device, and see it all. This is the entire promise of the release.
 
 **G3 — Isolation.** Two accounts, same browser. Neither sees the other's
-financial data. Confirmed at the RLS layer, not just visually.
+financial data. Confirm it at the RLS layer, not just visually — §3.3 has the
+three checks, and Supabase's Advisors page must be clean.
 
 **G4 — Grading.** Ten written answers spanning strong, partial and wrong. Scores
 are sane, `reasoning` is written to the learner, and the guardrails hold — no

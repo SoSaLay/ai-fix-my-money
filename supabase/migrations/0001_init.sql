@@ -153,6 +153,23 @@ create index if not exists video_reports_video_idx
   on public.video_reports (video_id, created_at desc);
 
 -- ─── Row-level security ─────────────────────────────────────────────────────
+--
+-- This is the whole security model, so it is worth being explicit about how it
+-- works. PostgREST connects as `authenticator` and switches to `anon` for a
+-- request with no session, or `authenticated` for one carrying a valid JWT. In
+-- both cases the role is not the table owner and has no BYPASSRLS, so every
+-- query it runs is filtered by the policies below.
+--
+-- `auth.uid()` is NULL for an anonymous request. `NULL = user_id` evaluates to
+-- NULL, which is not true, so an anonymous caller matches no row on any table
+-- here. There is no policy anywhere in this file that grants a read the caller
+-- does not own.
+--
+-- Only `service_role` sees past this, and it is used in exactly three places:
+-- opening a quiz attempt, writing a grade, and recording a dead video. Its key
+-- is server-side only and `src/lib/supabase/admin.ts` is marked `server-only`,
+-- so importing it into a client component fails the build rather than shipping
+-- the key to a browser.
 
 alter table public.profiles       enable row level security;
 alter table public.user_state     enable row level security;
@@ -160,32 +177,88 @@ alter table public.quiz_attempts  enable row level security;
 alter table public.graded_answers enable row level security;
 alter table public.video_reports  enable row level security;
 
+-- Defence in depth. The policies already deny anonymous access; this means an
+-- anonymous request is refused at the grant level, before a policy is even
+-- evaluated. A future table added without a policy is then closed by default
+-- rather than open by default.
+revoke all on public.profiles       from anon;
+revoke all on public.user_state     from anon;
+revoke all on public.quiz_attempts  from anon;
+revoke all on public.graded_answers from anon;
+revoke all on public.video_reports  from anon;
+
+-- Every policy below names `authenticated`. Without that clause a policy
+-- applies to PUBLIC, which includes `anon` — the outcome is the same because
+-- of the NULL comparison, but relying on that is relying on a coincidence.
+
+-- Read and update your own profile. There is no INSERT policy because the
+-- trigger above creates the row, and no DELETE policy because deleting the
+-- profile without deleting the account would leave a signed-in user with no
+-- row and no way to make one. Account deletion removes the auth.users row and
+-- cascades from there.
 drop policy if exists "own profile" on public.profiles;
 create policy "own profile" on public.profiles
-  for all
+  for select
+  to authenticated
+  using (auth.uid() = id);
+
+drop policy if exists "update own profile" on public.profiles;
+create policy "update own profile" on public.profiles
+  for update
+  to authenticated
   using (auth.uid() = id)
   with check (auth.uid() = id);
 
+-- The learner owns their own state outright: it is their figures and their
+-- progress, and they are the only one who writes it.
 drop policy if exists "own state" on public.user_state;
 create policy "own state" on public.user_state
   for all
+  to authenticated
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
+-- Read-only. Attempts and grades are written by the server with the
+-- service-role key: a client that could insert its own grade could pass every
+-- quiz, and a client that could edit an attempt could hand itself a paper it
+-- had already seen the answers to.
 drop policy if exists "own attempts" on public.quiz_attempts;
 create policy "own attempts" on public.quiz_attempts
   for select
+  to authenticated
   using (auth.uid() = user_id);
 
--- Attempts and grades are written by the server with the service-role key.
--- A client that could insert its own grade could pass every quiz, and a client
--- that could edit an attempt could hand itself a paper it had already seen.
 drop policy if exists "read own grades" on public.graded_answers;
 create policy "read own grades" on public.graded_answers
   for select
+  to authenticated
   using (auth.uid() = user_id);
 
+-- Insert only, and only as yourself. Nobody reads these through the API; a
+-- review pass reads them in the dashboard.
 drop policy if exists "report a video" on public.video_reports;
 create policy "report a video" on public.video_reports
   for insert
+  to authenticated
   with check (auth.uid() = user_id);
+
+-- ─── Proving it ─────────────────────────────────────────────────────────────
+--
+-- Run this after applying the migration. Every table must come back with
+-- rls_enabled = true and a policy count above zero. A table listed here with
+-- rls_enabled = false is a public table, whatever else is true of it.
+--
+--   select
+--     c.relname                                as table_name,
+--     c.relrowsecurity                         as rls_enabled,
+--     (select count(*) from pg_policies p
+--       where p.schemaname = 'public'
+--         and p.tablename = c.relname)         as policies
+--   from pg_class c
+--   join pg_namespace n on n.oid = c.relnamespace
+--   where n.nspname = 'public' and c.relkind = 'r'
+--   order by c.relname;
+--
+-- Then the behavioural check, which is the one that actually matters — sign in
+-- as two different accounts and confirm each sees only its own rows. Supabase's
+-- own linter (Database → Advisors) also flags any table left without RLS.
