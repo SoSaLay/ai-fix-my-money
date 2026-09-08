@@ -57,6 +57,57 @@ a matter of calling them.
 
 ---
 
+## Your work
+
+Everything below needs your accounts, your judgment, or your content. The code
+side is done.
+
+### Accounts to open
+- [ ] Supabase — two projects: `aifmm-staging`, `aifmm-prod`
+- [ ] PostHog — one project per environment
+- [ ] AWS — Amplify, Route 53, ACM (one account, existing is fine)
+- [ ] Anthropic — API key, **and set a monthly spend cap**
+
+### Supabase (§3, §4)
+- [ ] Apply `supabase/migrations/0001_init.sql` to staging, then prod
+- [ ] Copy URL, anon key, service-role key into `.env.local` for local testing
+- [ ] Turn on email confirmation in prod
+- [ ] Set Site URL and the redirect allowlist to the real domain — **not
+      localhost**, or every confirmation email points at your laptop
+- [ ] Enable Pro / point-in-time recovery before the first real tester
+- [ ] Decide: Google sign-in, or email and password only
+
+### Amplify + domain (§8)
+- [ ] Connect the GitHub repo, branch `main` → production
+- [ ] Confirm it provisioned **WEB_COMPUTE**, not a static build — a static
+      build drops every `/api` route without failing loudly
+- [ ] Set all seven environment variables; mark the three secrets as secret
+- [ ] Register or delegate the domain in Route 53, map apex + `www`
+- [ ] Go back and update the Supabase URLs to the live domain
+
+### Content and product
+- [ ] **Approve the video pools** — 8 per track minimum to serve a quiz, 25 for
+      a healthy one. Currently 0 across all four. This is gate G1
+- [ ] Build the learner-facing final quiz screen (ROADMAP §1.6). Endpoints and
+      client helpers are already there
+- [ ] Decide whether the three questions lost with the old "Your goal, your
+      horizon, your risk" lesson get rewritten into a neighbouring lesson
+
+### Legal (gate G6)
+- [ ] Rewrite Terms and Privacy at `/learning/disclosures/{terms,privacy}` —
+      they were written for a local-only app. They now need: data is stored on
+      our servers, what analytics are collected, and how someone deletes their
+      account. `docs/SETUP.md` is already updated
+
+### Before you hand out the URL
+- [ ] Sign up, finish a lesson, sign out, sign in on another device — see it all
+- [ ] Two accounts in one browser — neither sees the other's figures
+- [ ] Ten written answers across strong / partial / wrong — grades are sane
+- [ ] Grade 41 answers in an hour — the 41st returns 429
+- [ ] Walk the whole learning flow on a real phone
+
+---
+
 ## 0. Where the app actually is today
 
 Read this before planning dates. The gap between the current app and a
