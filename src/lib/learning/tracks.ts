@@ -1438,7 +1438,7 @@ const INVESTING: Track = {
         {
           divider: true,
           heading: 'Read the pattern',
-          body: 'Risk rises as the thing being bought moves further from part-ownership of an operating business and closer to a bet on a price. The long-term case gets weaker in the same direction.',
+          body: 'Generally, risk rises with uncertainty and shorter time horizons: the less certain and shorter-term an investment is, the more risk you take on; the more certain and longer-term it is, the less risk you take on.',
         },
       ],
       images: [
