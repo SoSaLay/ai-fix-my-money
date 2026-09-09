@@ -1278,7 +1278,7 @@ const INVESTING: Track = {
           heading: 'Where your money goes, in order',
           bullets: [
             { term: '1. Pay off high-interest debt', text: 'Clear what you owe at a high rate first. Wiping out a 24% balance is a guaranteed 24% saved, and that money is then free for other things, including investing.' },
-            { term: '2. Three to six months of savings', text: 'Cash set aside so that one bad month does not force you to sell investments at the worst possible time, or borrow.' },
+            { term: '2. Three to six months of savings', text: 'Cash you can reach quickly, enough to cover three to six months of your own costs. It is what a lost job or a large bill comes out of, so a bad month does not put you back on high-interest debt — or, once you are investing, force you to sell while prices are down.' },
             { term: '3. Employer 401(k) match', text: 'A 401(k) is a retirement account through your job, and the money inside it is invested for you. Your employer adds their own money on top when you contribute, so skipping it leaves part of your pay unclaimed.' },
             { term: '4. Roth IRA', text: 'A retirement account you open yourself, no employer needed. You pay tax on the money going in, and qualifying withdrawals later come out untaxed, including everything it grew.' },
             { term: '5. Rest of the 401(k)', text: 'Keep contributing past the match. This money goes in before tax, so it lowers what you are taxed on this year and grows untaxed until you withdraw it.' },
