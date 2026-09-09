@@ -51,10 +51,24 @@ export interface Bullet {
  * comparison — three options against the same two or three criteria. Prose is
  * better at everything else.
  */
+/**
+ * How much can go wrong, 1 (least) to 5 (most). Drives a colour ramp on the
+ * risk cell — pale yellow up to deep red.
+ *
+ * The colour is a second reading of something the cell already says in words.
+ * It has to stay that way: a learner who cannot distinguish the shades, or is
+ * reading a printed page, must lose nothing but the speed of the scan.
+ */
+export type RiskLevel = 1 | 2 | 3 | 4 | 5
+
 export interface LessonTable {
   columns: string[]
   /** Each row has one cell per column. The first cell is the row's label. */
   rows: string[][]
+  /** One tier per row, in row order. Omit for a table that is not about risk. */
+  risk?: RiskLevel[]
+  /** Which column carries the tint. Defaults to the last. */
+  riskColumn?: number
 }
 
 export interface LessonSection {
@@ -1343,31 +1357,64 @@ const INVESTING: Track = {
           body: 'What you can buy is not all equivalent. The differences are mostly about risk and how much skill each one demands.',
         },
         {
-          heading: 'Built to be held',
-          bullets: [
-            { term: 'Index ETFs', text: 'One purchase tracking a whole market. Broad by default, cheap to hold, trades like a share. Falls when the market falls — that is the risk, and it is the honest one.' },
-            { term: 'Mutual funds', text: 'The same pooling idea, priced once a day. Actively managed ones cost more and most do not beat the plain index over long periods.' },
-            { term: 'Bonds and bond funds', text: 'Lending for interest. Lower expected return, and they lose value when interest rates rise.' },
-            { term: 'REITs', text: 'Pooled property. Income-oriented, and exposed to property markets and rates.' },
-          ],
-        },
-        {
-          divider: true,
-          heading: 'Higher risk, more depends on you',
-          bullets: [
-            { term: 'Individual stocks', text: 'A single company can lose most of its value and not come back. Requires real work to research and a tolerance for being wrong.' },
-            { term: 'Crypto', text: 'Extremely volatile, weakly regulated, and with no earnings underneath it. Falls of 70% or more have happened repeatedly. Held in a taxable brokerage, and treated as property for tax.' },
-          ],
-        },
-        {
-          divider: true,
-          heading: 'Technical instruments where losing money is the common outcome',
-          bullets: [
-            { term: 'Options', text: 'Contracts on the price of something else, with expiry dates. Most expire worthless. Some strategies can lose more than you put in.' },
-            { term: 'Futures', text: 'Leveraged contracts to buy or sell later. Leverage magnifies losses as readily as gains, and can be called in.' },
-            { term: 'Day trading', text: 'Buying and selling within the day. Study after study finds the large majority of day traders lose money over time, and the ones who persist mostly lose more.' },
-            { text: 'These are not forbidden and they are not secrets. They are specialist tools that require skill, time and a tolerance for total loss.' },
-          ],
+          gridTable: {
+            columns: ['Type', 'Definition', 'Risk'],
+            // Ordered by risk, lowest first — the ordering is the lesson, and
+            // the colour makes it visible before a word is read.
+            risk: [1, 1, 1, 1, 2, 3, 4, 5, 5, 5],
+            rows: [
+              [
+                'ETFs',
+                'Funds you can buy and sell like a stock. They can hold many investments at once, making diversification easy.',
+                'Depends on what the ETF owns.',
+              ],
+              [
+                'Index funds',
+                'Funds designed to track a market index instead of trying to pick individual winners.',
+                'Usually less risky than picking individual stocks, because your money is spread across many companies.',
+              ],
+              [
+                'Mutual funds',
+                'Pools of investments managed together.',
+                'Depends on what the fund owns, but diversified funds generally carry less risk than individual stocks.',
+              ],
+              [
+                'Bonds and bond funds',
+                'Lending money in exchange for interest.',
+                'Generally lower risk and lower expected returns than stocks, but they can lose value when interest rates rise.',
+              ],
+              [
+                'REITs',
+                'A way to invest in real estate without buying property yourself. You can earn income and growth.',
+                'Property values, rents and interest rates can all affect what you make or lose.',
+              ],
+              [
+                'Individual stocks',
+                'Buying a piece of one company.',
+                'Higher risk: your money is concentrated in one company, so your results depend heavily on how that single company performs. It can grow and make you money, but it can also lose much or nearly all of its value.',
+              ],
+              [
+                'Crypto',
+                'Digital assets that can rise or fall dramatically in price.',
+                'Very high risk: large gains are possible, but major losses can happen just as quickly.',
+              ],
+              [
+                'Options',
+                'Contracts based on the future price of another investment.',
+                'Very high risk: you need to understand the technical systems behind how options work, and you can lose your entire investment. Some strategies can lose more than you put in.',
+              ],
+              [
+                'Futures',
+                'Contracts to buy or sell something at a future date, usually using leverage.',
+                'Very high risk: leverage magnifies losses as well as gains, and you can lose more than you initially put in.',
+              ],
+              [
+                'Day trading',
+                'Buying and selling investments within the same day to profit from short-term price movements.',
+                'Extremely high risk: most people who consistently day trade lose money over time, while competing against financial institutions with far greater resources and technology.',
+              ],
+            ],
+          },
         },
         {
           divider: true,

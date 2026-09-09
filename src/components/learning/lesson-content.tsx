@@ -1,4 +1,4 @@
-import type { Lesson, LessonTable } from '@/lib/learning/tracks'
+import type { Lesson, LessonTable, RiskLevel } from '@/lib/learning/tracks'
 
 /**
  * The left column: the material itself. Headings carry the structure, bullets
@@ -113,11 +113,30 @@ export function LessonContent({ lesson }: { lesson: Lesson }) {
 }
 
 /**
+ * The risk ramp: pale yellow at tier 1 up to deep red at tier 5.
+ *
+ * Each tier is a very light tint carrying a saturated stripe down its left
+ * edge. The tint alone, dark enough to read as a warning, would take the text
+ * contrast with it; the stripe puts the full colour where nothing has to be
+ * legible through it. Text stays on a near-white ground at every tier.
+ */
+const RISK_RAMP: Record<RiskLevel, { tint: string; stripe: string }> = {
+  1: { tint: '#fdf8e6', stripe: '#d9a520' },
+  2: { tint: '#fdf1dd', stripe: '#dd8b28' },
+  3: { tint: '#fbe9dc', stripe: '#d1662a' },
+  4: { tint: '#f9e1dc', stripe: '#bf4527' },
+  5: { tint: '#f7d9d7', stripe: '#9c241c' },
+}
+
+/**
  * A reference table with every cell ruled, the way a spreadsheet draws one.
  * The full grid is the point: these are rows you scan across and compare, and
  * the underline-only style used for an inline `table` reads as prose instead.
  */
 function GridTable({ table }: { table: LessonTable }) {
+  // Defaults to the last column, which is where a risk note naturally lands.
+  const riskColumn = table.riskColumn ?? table.columns.length - 1
+
   return (
     // Narrow screens scroll the table rather than the page.
     <div className="overflow-x-auto rounded-xl">
@@ -138,20 +157,38 @@ function GridTable({ table }: { table: LessonTable }) {
           </tr>
         </thead>
         <tbody>
-          {table.rows.map((row, j) => (
-            <tr key={j} className="align-top">
-              {row.map((cell, k) => (
-                <td
-                  key={k}
-                  className={`border border-outline-variant/70 px-3 py-2.5 text-body-md leading-relaxed ${
-                    k === 0 ? 'font-semibold text-on-surface' : 'text-on-surface-variant'
-                  }`}
-                >
-                  {cell}
-                </td>
-              ))}
-            </tr>
-          ))}
+          {table.rows.map((row, j) => {
+            const tier = table.risk?.[j]
+            const ramp = tier ? RISK_RAMP[tier] : null
+
+            return (
+              <tr key={j} className="align-top">
+                {row.map((cell, k) => {
+                  const tinted = ramp && k === riskColumn
+
+                  return (
+                    <td
+                      key={k}
+                      className={`border border-outline-variant/70 px-3 py-2.5 text-body-md leading-relaxed ${
+                        k === 0 ? 'font-semibold text-on-surface' : 'text-on-surface-variant'
+                      }`}
+                      style={
+                        tinted
+                          ? {
+                              backgroundColor: ramp.tint,
+                              borderLeft: `3px solid ${ramp.stripe}`,
+                              color: '#2d2f33',
+                            }
+                          : undefined
+                      }
+                    >
+                      {cell}
+                    </td>
+                  )
+                })}
+              </tr>
+            )
+          })}
         </tbody>
       </table>
     </div>
