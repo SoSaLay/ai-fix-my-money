@@ -1354,9 +1354,6 @@ const INVESTING: Track = {
       readSeconds: 60,
       sections: [
         {
-          body: 'What you can buy is not all equivalent. The differences are mostly about risk and how much skill each one demands.',
-        },
-        {
           heading: 'Lower Risk, Built for the Long Term',
           gridTable: {
             columns: ['Type', 'Definition', 'Risk'],
