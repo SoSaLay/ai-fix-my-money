@@ -1357,11 +1357,10 @@ const INVESTING: Track = {
           body: 'What you can buy is not all equivalent. The differences are mostly about risk and how much skill each one demands.',
         },
         {
+          heading: 'Lower Risk, Built for the Long Term',
           gridTable: {
             columns: ['Type', 'Definition', 'Risk'],
-            // Ordered by risk, lowest first — the ordering is the lesson, and
-            // the colour makes it visible before a word is read.
-            risk: [1, 1, 1, 1, 2, 3, 4, 5, 5, 5],
+            risk: [1, 1, 1, 1, 2],
             rows: [
               [
                 'ETFs',
@@ -1388,6 +1387,16 @@ const INVESTING: Track = {
                 'A way to invest in real estate without buying property yourself. You can earn income and growth.',
                 'Property values, rents and interest rates can all affect what you make or lose.',
               ],
+            ],
+          },
+        },
+        {
+          divider: true,
+          heading: 'Higher Risk, Bigger Swings',
+          gridTable: {
+            columns: ['Type', 'Definition', 'Risk'],
+            risk: [3, 4],
+            rows: [
               [
                 'Individual stocks',
                 'Buying a piece of one company.',
@@ -1398,6 +1407,16 @@ const INVESTING: Track = {
                 'Digital assets that can rise or fall dramatically in price.',
                 'Very high risk: large gains are possible, but major losses can happen just as quickly.',
               ],
+            ],
+          },
+        },
+        {
+          divider: true,
+          heading: 'Highest Risk, Easy to Lose Money',
+          gridTable: {
+            columns: ['Type', 'Definition', 'Risk'],
+            risk: [5, 5, 5],
+            rows: [
               [
                 'Options',
                 'Contracts based on the future price of another investment.',
