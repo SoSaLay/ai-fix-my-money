@@ -1,4 +1,6 @@
-import type { Lesson, LessonTable, RiskLevel } from '@/lib/learning/tracks'
+import type { Lesson, LessonTable } from '@/lib/learning/tracks'
+// Shared with the investing tool, so a tier looks the same wherever it appears.
+import { RISK_RAMP } from '@/lib/investing/risk-ramp'
 
 /**
  * The left column: the material itself. Headings carry the structure, bullets
@@ -110,22 +112,6 @@ export function LessonContent({ lesson }: { lesson: Lesson }) {
       ))}
     </article>
   )
-}
-
-/**
- * The risk ramp: pale yellow at tier 1 up to deep red at tier 5.
- *
- * Each tier is a very light tint carrying a saturated stripe down its left
- * edge. The tint alone, dark enough to read as a warning, would take the text
- * contrast with it; the stripe puts the full colour where nothing has to be
- * legible through it. Text stays on a near-white ground at every tier.
- */
-const RISK_RAMP: Record<RiskLevel, { tint: string; stripe: string }> = {
-  1: { tint: '#fdf8e6', stripe: '#d9a520' },
-  2: { tint: '#fdf1dd', stripe: '#dd8b28' },
-  3: { tint: '#fbe9dc', stripe: '#d1662a' },
-  4: { tint: '#f9e1dc', stripe: '#bf4527' },
-  5: { tint: '#f7d9d7', stripe: '#9c241c' },
 }
 
 /**

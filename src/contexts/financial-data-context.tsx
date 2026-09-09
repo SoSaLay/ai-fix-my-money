@@ -26,7 +26,7 @@ import type {
   SavingsGoal,
   InvestingGoal,
 } from '@/hooks/use-data'
-import type { ArchetypeId } from '@/lib/investing/archetypes'
+import type { CategoryAllocations } from '@/lib/investing/categories'
 import { useAuth } from '@/contexts/auth-context'
 import {
   legacyAdopted,
@@ -338,7 +338,7 @@ interface FinancialDataContextValue {
 
   // Investing goal (localStorage CRUD)
   investingGoal: InvestingGoal | null
-  setInvestingGoal: (data: { allocation_pct: number; risk_profile: 'conservative' | 'moderate' | 'aggressive'; archetype?: ArchetypeId }) => void
+  setInvestingGoal: (data: { allocation_pct: number; risk_profile: 'conservative' | 'moderate' | 'aggressive'; categories?: CategoryAllocations; general_pct?: number }) => void
   removeInvestingGoal: () => void
 
   // General savings (locked % of net cash flow, separate from goal allocations)
@@ -594,14 +594,15 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
 
   // ── Investing goal ────────────────────────────────────────────────────────
   const setInvestingGoal = useCallback(
-    (data: { allocation_pct: number; risk_profile: 'conservative' | 'moderate' | 'aggressive'; archetype?: ArchetypeId }) => {
+    (data: { allocation_pct: number; risk_profile: 'conservative' | 'moderate' | 'aggressive'; categories?: CategoryAllocations; general_pct?: number }) => {
       const now = new Date().toISOString()
       const record: InvestingGoal = {
         id: `ig_${Date.now()}`,
         user_id: 'local',
         allocation_pct: data.allocation_pct,
         risk_profile: data.risk_profile,
-        archetype: data.archetype,
+        categories: data.categories,
+        general_pct: data.general_pct,
         created_at: investingGoal?.created_at ?? now,
         updated_at: now,
       }

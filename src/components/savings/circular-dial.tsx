@@ -14,6 +14,8 @@ interface CircularDialProps {
   maxFreePct?: number
   /** Override the draggable-arc color (default: dark green) */
   freeColor?: string
+  /** Override the fixed-arc color (default: teal) */
+  lockedColor?: string
   size?: number
 }
 
@@ -28,6 +30,7 @@ export function CircularDial({
   onChange,
   maxFreePct: maxFreePctProp,
   freeColor = FREE_COLOR,
+  lockedColor = LOCKED_COLOR,
   size = 240,
 }: CircularDialProps) {
   const svgRef     = useRef<SVGSVGElement>(null)
@@ -132,7 +135,7 @@ export function CircularDial({
           <circle
             cx={cx} cy={cy} r={radius}
             fill="none"
-            stroke={LOCKED_COLOR}
+            stroke={lockedColor}
             strokeWidth={strokeWidth}
             strokeLinecap="butt"
             strokeDasharray={`${lockedLength} ${circumference - lockedLength}`}
@@ -159,7 +162,7 @@ export function CircularDial({
             cx={thumbX}
             cy={thumbY}
             r={strokeWidth / 2 + 2}
-            fill={freePct > 0 ? freeColor : LOCKED_COLOR}
+            fill={freePct > 0 ? freeColor : lockedColor}
             stroke="white"
             strokeWidth={3}
           />

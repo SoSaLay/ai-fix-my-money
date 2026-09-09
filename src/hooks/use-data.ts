@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { useFinancialData } from '@/contexts/financial-data-context'
-import type { ArchetypeId } from '@/lib/investing/archetypes'
+import type { CategoryAllocations } from '@/lib/investing/categories'
 
 // ============================================================================
 // Types (kept identical so existing pages need zero changes)
@@ -77,10 +77,18 @@ export interface SavingsGoal {
 export interface InvestingGoal {
   id: string
   user_id: string
+  /**
+   * Everything going to investing, as a percent of monthly income. Derived
+   * from the two fields below, and stored because the dashboard and the
+   * savings cap both read this one number.
+   */
   allocation_pct: number
+  /** Derived from the mix. Kept because the stored goal has always had one. */
   risk_profile: 'conservative' | 'moderate' | 'aggressive'
-  /** The archetype the learner picked. Absent on goals saved before archetypes. */
-  archetype?: ArchetypeId
+  /** Percent of income committed to each named instrument. */
+  categories?: CategoryAllocations
+  /** Percent going to investing without a category named against it. */
+  general_pct?: number
   created_at: string
   updated_at: string
 }
@@ -362,7 +370,8 @@ export function useInvestingGoal() {
     async (data: {
       allocation_pct: number
       risk_profile: 'conservative' | 'moderate' | 'aggressive'
-      archetype?: ArchetypeId
+      categories?: CategoryAllocations
+      general_pct?: number
     }) => {
       setUpdating(true)
       setInvestingGoal(data)

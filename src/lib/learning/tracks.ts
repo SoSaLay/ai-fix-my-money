@@ -87,6 +87,19 @@ export interface LessonSection {
   divider?: boolean
 }
 
+/**
+ * A short note pinned in the right column, beside the material rather than
+ * inside it. Use it for the one idea that stays true down the whole lesson —
+ * a rule the reader should still have in view at the bottom of a long table.
+ * It sticks to the viewport as they scroll, so it does not scroll away from
+ * the rows it explains.
+ */
+export interface LessonNote {
+  heading: string
+  /** One entry per paragraph. */
+  body: string[]
+}
+
 /** Reference imagery shown beside a lesson, and reusable by its questions. */
 export interface LessonImage {
   /** Path under /public, or a data URI. */
@@ -103,6 +116,8 @@ export interface Lesson {
   /** One-line framing shown above the content. Omit where it would repeat. */
   intro?: string
   sections: LessonSection[]
+  /** Pinned at the top of the right column, above any imagery. */
+  aside?: LessonNote
   /** Shown in the right column. Absent until reference art exists. */
   images?: LessonImage[]
   questions: QuizQuestion[]
@@ -1116,6 +1131,13 @@ const INVESTING: Track = {
           ],
         },
         {
+          heading: 'Growth or loss',
+          bullets: [
+            { term: 'Grow your money', text: 'Your investment can increase in value, and you may earn income through dividends or interest.' },
+            { term: 'Lose your money', text: 'Your investment can fall in value, fail completely, or lose its income.' },
+          ],
+        },
+        {
           heading: 'The link',
           body: 'You invest to grow your money, and every investment carries risk because growth requires putting money into something whose future value is not guaranteed. The possibility of loss is the trade-off for the possibility of earning a return.',
         },
@@ -1193,87 +1215,6 @@ const INVESTING: Track = {
           ],
           answer: 1,
           why: 'Price is what people will pay today. The underlying business almost never changes at the speed the price does.',
-        },
-      ],
-    },
-    {
-      id: 'inv-2',
-      title: 'Money growth or loss',
-      readSeconds: 30,
-      sections: [
-        {
-          body: 'Once your money is invested it only moves in two directions. Here is what pushes it each way.',
-        },
-        {
-          heading: 'How you can grow your money investing',
-          bullets: [
-            { term: 'Growth', text: 'It is worth more later than what you paid, so your slice sells for more.' },
-            { term: 'Income', text: 'The business hands part of its earnings to owners as a dividend, or a borrower pays you interest.' },
-          ],
-        },
-        {
-          divider: true,
-          heading: 'How you can lose your money investing',
-          bullets: [
-            { term: 'It loses value', text: 'It is worth less than what you paid. Selling at that point is what turns it into a real loss.' },
-            { term: 'It fails', text: 'A business can go under, and a stake in it can end up worth nothing.' },
-            { term: 'The income stops', text: 'A dividend is not promised. It can be cut or stopped at any time.' },
-          ],
-        },
-        {
-          divider: true,
-          heading: 'The link',
-          body: 'Both sides come from the same place. The business you bought into either does well or it does not, and your money follows it either way. You do not get access to one side without accepting the other.',
-        },
-      ],
-      questions: [
-        {
-          id: 'inv-2-q1',
-          question: 'What are the two ways an investment can return money to you?',
-          options: [
-            'Interest and fees',
-            'Growth in what it is worth, and income paid out of earnings',
-            'Deposits and withdrawals',
-            'Taxes and rebates',
-          ],
-          answer: 1,
-          why: 'Either it becomes worth more than you paid, or it pays part of its earnings out to you. Nothing else is a return.',
-        },
-        {
-          id: 'inv-2-q2',
-          question: 'Your investment is worth less than you paid. When does that become a real loss?',
-          options: [
-            'Immediately',
-            'When you sell it at that price',
-            'At the end of the tax year',
-            'It never does',
-          ],
-          answer: 1,
-          why: 'Until you sell, the fall is on paper. Selling is what turns the lower price into money you no longer have.',
-        },
-        {
-          id: 'inv-2-q3',
-          question: 'Which is true of a dividend?',
-          options: [
-            'It is guaranteed once it starts',
-            'It can be cut or stopped at any time',
-            'It rises every year by law',
-            'It is paid even if the business fails',
-          ],
-          answer: 1,
-          why: 'A dividend is a decision the business makes each time. Nothing obliges it to keep paying one.',
-        },
-        {
-          id: 'inv-2-q4',
-          question: 'Why can you not have the upside without the downside?',
-          options: [
-            'Brokers require it',
-            'Both come from the same business doing well or badly',
-            'It is a tax rule',
-            'You can, with the right account',
-          ],
-          answer: 1,
-          why: 'One business, one outcome. The thing that can grow your money is the same thing that can lose it.',
         },
       ],
     },
@@ -1362,27 +1303,27 @@ const INVESTING: Track = {
               [
                 'ETFs',
                 'Funds you can buy and sell like a stock. They can hold many investments at once, making diversification easy.',
-                'Depends on what the ETF owns.',
+                'Risk depends on what it holds; broad ETFs are generally more diversified than narrow ones.',
               ],
               [
                 'Index funds',
                 'Funds designed to track a market index instead of trying to pick individual winners.',
-                'Usually less risky than picking individual stocks, because your money is spread across many companies.',
+                'Diversification spreads your risk across many companies.',
               ],
               [
                 'Mutual funds',
                 'Pools of investments managed together.',
-                'Depends on what the fund owns, but diversified funds generally carry less risk than individual stocks.',
+                'Risk depends on what the fund owns; diversified funds are generally less risky.',
               ],
               [
-                'Bonds and bond funds',
+                'Bonds & bond funds',
                 'Lending money in exchange for interest.',
-                'Generally lower risk and lower expected returns than stocks, but they can lose value when interest rates rise.',
+                'Generally less risky than stocks, but you can still lose money.',
               ],
               [
                 'REITs',
                 'A way to invest in real estate without buying property yourself. You can earn income and growth.',
-                'Property values, rents and interest rates can all affect what you make or lose.',
+                'Your returns can fall when property values, rents, or interest rates move against you.',
               ],
             ],
           },
@@ -1397,12 +1338,12 @@ const INVESTING: Track = {
               [
                 'Individual stocks',
                 'Buying a piece of one company.',
-                'Higher risk: your money is concentrated in one company, so your results depend heavily on how that single company performs. It can grow and make you money, but it can also lose much or nearly all of its value.',
+                'Your money depends heavily on one company, so you can lose a large portion of it.',
               ],
               [
                 'Crypto',
                 'Digital assets that can rise or fall dramatically in price.',
-                'Very high risk: large gains are possible, but major losses can happen just as quickly.',
+                'Prices can swing dramatically, so large losses can happen quickly.',
               ],
             ],
           },
@@ -1417,34 +1358,35 @@ const INVESTING: Track = {
               [
                 'Options',
                 'Contracts based on the future price of another investment.',
-                'Very high risk: you need to understand the technical systems behind how options work, and you can lose your entire investment. Some strategies can lose more than you put in.',
+                'You can lose your entire investment, and some strategies can lose more than you put in.',
               ],
               [
                 'Futures',
                 'Contracts to buy or sell something at a future date, usually using leverage.',
-                'Very high risk: leverage magnifies losses as well as gains, and you can lose more than you initially put in.',
+                'Leverage can magnify losses, potentially costing you more than you invested.',
               ],
               [
                 'Day trading',
                 'Buying and selling investments within the same day to profit from short-term price movements.',
-                'Extremely high risk: most people who consistently day trade lose money over time, while competing against financial institutions with far greater resources and technology.',
+                'Extremely high risk; frequent traders can lose money quickly and consistently.',
               ],
             ],
           },
         },
         {
           divider: true,
-          heading: 'Read the pattern',
-          body: 'Generally, risk rises with uncertainty and shorter time horizons: the less certain and shorter-term an investment is, the more risk you take on; the more certain and longer-term it is, the less risk you take on.',
+          heading: 'Bonus',
+          body: 'This isn’t every investment that exists. For further research: private markets, commodities, collectibles, royalties.',
         },
       ],
-      images: [
-        {
-          src: '/learning/investing-menu.svg',
-          alt: 'A ladder of investment types ordered by risk, from broad index funds and bond funds at the low end through individual stocks and crypto to options, futures and day trading at the high end, each annotated with its main risk.',
-          caption: 'Ordered by how much can go wrong and how much skill it demands.',
-        },
-      ],
+      aside: {
+        heading: 'Read the pattern',
+        body: [
+          'Generally, risk rises with uncertainty:',
+          'The less certain and shorter-term an investment is, the more risk you take on.',
+          'The more certain and longer-term it is, the less risk you take on.',
+        ],
+      },
       questions: [
         {
           id: 'inv-6-q1',
@@ -1456,7 +1398,6 @@ const INVESTING: Track = {
             'It has no risk',
           ],
           answer: 1,
-          imageSrc: '/learning/investing-menu.svg',
           why: 'It holds the market, so it takes the market’s falls. That is a real risk — it is simply not the risk of a single company failing.',
         },
         {
@@ -1498,73 +1439,114 @@ const INVESTING: Track = {
       ],
     },
     {
-      id: 'inv-8',
-      title: 'Buying/selling investments',
+      id: 'inv-4',
+      title: 'Your goals',
       readSeconds: 60,
-      intro: 'The investors who do well are usually the ones still there decades later. Not losing everything is the precondition for everything else.',
+      intro: 'Your investment plan should fit five things:',
       sections: [
         {
-          heading: 'Where the buying happens',
-          body: 'All of this is bought through a brokerage account — an account that holds investments rather than cash and places your buy and sell orders. We are not naming or recommending any particular one; which broker to use is research you do yourself.',
-        },
-        {
-          heading: 'What it costs to hold',
-          body: 'Brokers and funds differ mostly in what they charge: a fund’s expense ratio is an annual percentage of your balance taken whether it gains or loses, and 1% instead of 0.05% quietly removes a large share of a lifetime of growth.',
-        },
-        {
-          divider: true,
-          body: 'Allocation is the act of taking money you have earned or saved and actually putting it into assets. There are a number of ways to do it, depending on what you decided to buy off the back of your own thinking and research.',
-        },
-        {
-          heading: 'Allocation versus diversification',
           bullets: [
-            { term: 'Allocation', text: 'The split between classes — how much in stocks, how much in bonds, how much in cash.' },
-            { term: 'Diversification', text: 'Not concentrating within a class. Twenty companies in one industry is one bet wearing a disguise.' },
-            { term: 'Rebalancing', text: 'Periodically returning to your intended split. It mechanically trims what has run up and adds to what has not.' },
+            { term: 'Goal', text: 'What the money is for and how much you need.' },
+            { term: 'Time', text: 'When you’ll need it; more time gives investments longer to recover and compound.' },
+            { term: 'Savings', text: 'How much you can regularly contribute.' },
+            { term: 'Risk tolerance', text: 'How much of a drop you can handle without selling.' },
+            { term: 'Required return', text: 'The return you need to reach your goal based on your time and savings.' },
           ],
         },
         {
           divider: true,
-          heading: 'Contributing on a schedule',
+          heading: 'Fictional stories',
           bullets: [
-            { term: 'Dollar-cost averaging', text: 'Investing a fixed amount at a fixed interval regardless of price. You buy more units when prices are low and fewer when they are high.' },
-            { term: 'Automation', text: 'A standing transfer removes the monthly decision, which is where most plans break down.' },
-            { term: 'Timing the market', text: 'Getting out and back in requires being right twice. Missing a small number of the strongest days does most of the damage to a long-run result.' },
+            {
+              term: '1. Maya — Keep It Simple',
+              text: 'Maya works a 9-to-5, gets her full 401(k) match, and automatically invests the rest into diversified funds. Over decades, her contributions and market growth build a retirement portfolio she can eventually draw from.',
+              sub: [
+                'End goal: Build enough wealth to retire comfortably around her target age.',
+                'Tradeoff: Simple and diversified, but her balance can still fall significantly during market downturns.',
+              ],
+            },
+            {
+              term: '2. Jordan — Build & Grow',
+              text: 'Jordan invests consistently in broad index funds and uses a mix of retirement and taxable accounts. When he reaches a major financial goal, he can sell some investments and turn that portfolio into money for the goal.',
+              sub: [
+                'End goal: Grow his investments until they can fund a major purchase, early retirement, or another long-term goal.',
+                'Tradeoff: If the market drops, his investments could be worth much less than expected, forcing a sell at a loss.',
+              ],
+            },
+            {
+              term: '3. Leo — Take Calculated Risks',
+              text: 'Leo keeps most of his money in diversified funds but uses a small portion for individual stocks and defined-risk options strategies. If one of his bets pays off, he can take the gains and move them back into his long-term portfolio.',
+              sub: [
+                'End goal: Use a small amount of higher-risk investing to potentially accelerate wealth while protecting his core portfolio.',
+                'Tradeoff: The higher upside comes with a real possibility of losing some or all of that speculative money.',
+              ],
+            },
+          ],
+        },
+        {
+          body: 'The point: Different investors can use different strategies — but the goal should determine what you’re investing for, how much risk you take, and when you eventually use the money.',
+        },
+      ],
+      questions: [
+        {
+          id: 'inv-4-q1',
+          question: 'Which input most changes how much short-term movement a plan can absorb?',
+          options: ['The account provider', 'The time horizon', 'The number of holdings', 'The deposit day'],
+          answer: 1,
+          why: 'Years are what let a bad stretch be recovered from. With enough of them, a fall is temporary; without them, it is the outcome.',
+        },
+        {
+          id: 'inv-4-q2',
+          question: 'Why does inflation belong in the calculation?',
+          options: [
+            'It is a fee brokers charge',
+            'A return below inflation still loses buying power',
+            'It sets the tax rate',
+            'It determines the match',
+          ],
+          answer: 1,
+          why: 'The point of the money is what it can buy. If prices rise faster than the balance does, the balance is worth less in real terms.',
+        },
+        {
+          id: 'inv-4-q3',
+          question: 'What is the practical test of someone’s risk tolerance?',
+          options: [
+            'The score on a questionnaire',
+            'What they actually do when the balance is well down',
+            'How much they earn',
+            'How many accounts they hold',
+          ],
+          answer: 1,
+          why: 'Tolerance is revealed by behaviour under loss. A plan is only as good as what the person holding it does in the worst month.',
+        },
+      ],
+    },
+    {
+      id: 'inv-8',
+      title: 'Buy and manage investments',
+      readSeconds: 60,
+      intro: 'The goal isn’t to win every investment. It’s to stay invested, avoid major losses, and give your money time to grow.',
+      sections: [
+        {
+          heading: '1. Buy Through a Brokerage',
+          body: 'A brokerage account is where you buy, sell, and hold investments like stocks, ETFs, and bonds. Choose one based on its fees, features, and investment options.',
+          bullets: [
+            { term: 'Start Investing Consistently', text: 'Invest regularly, stay invested through market ups and downs, and avoid reacting to short-term movements.' },
+            { term: 'Manage Your Risk', text: 'Build a diversified mix that fits your goals and risk tolerance, then periodically rebalance it without risking more than you can afford to lose.' },
           ],
         },
         {
           divider: true,
-          heading: 'Protecting the capital you have',
+          heading: '2. Taxes',
           bullets: [
-            { term: 'Risk what you can lose', text: 'Size a position against your whole portfolio, not against how confident you feel.' },
-            { term: 'Do not try to lose more than you are trying to make', text: 'The riskier the play, the larger both outcomes get. The downside is the one that ends the run.' },
-            { term: 'Know what you own', text: 'If you cannot explain what a holding is and how it makes money, you cannot judge what would go wrong.' },
+            { term: 'Pay taxes on profits', text: 'In a taxable account, selling an investment for a profit can create a tax bill; holding longer can qualify for more favorable capital-gains tax treatment.' },
+            { term: 'Account type matters', text: 'Your tax treatment also depends on where you invest, such as a taxable brokerage, 401(k), IRA, or HSA.' },
           ],
         },
         {
           divider: true,
-          heading: 'Reviewing, without fiddling',
-          bullets: [
-            { term: 'Review annually', text: 'Check that the split still matches your goal, horizon and tolerance. Life changes are the usual reason to adjust.' },
-            { term: 'Rebalance when it has drifted', text: 'Move back to the intended split rather than reacting to the last few months.' },
-            { term: 'Do not chase last year’s winner', text: 'Buying whatever performed best recently is a reliable way to buy high.' },
-            { term: 'Decide in advance', text: 'Rules set on a calm day are what carry you through a bad one. Decisions made mid-fall are made by fear.' },
-          ],
-        },
-        {
-          divider: true,
-          heading: 'What you keep is after tax',
-          bullets: [
-            { term: 'After-tax value is the real number', text: 'A balance you have not paid tax on yet is not entirely yours.' },
-            { term: 'Asset location', text: 'Which account holds which investment changes the tax bill, separately from what you hold.' },
-            { term: 'Rebalancing inside tax-advantaged accounts', text: 'Selling to rebalance in a taxable account can trigger a taxable gain; inside a 401(k) or IRA it generally does not.' },
-            { term: 'Roth versus traditional', text: 'A Roth is taxed going in and generally not on the way out. A traditional account is the reverse. Which is better depends on your tax rate now against later — a question about you, not about markets.' },
-          ],
-        },
-        {
-          divider: true,
-          heading: 'The whole track in one line',
-          body: 'You bought a piece of something someone else already started, and still runs. Businesses take years to grow, so your plan has to be built on your own goal, horizon and tolerance — and then left alone long enough to work.',
+          heading: 'The Big Picture',
+          body: 'Choose what fits, invest consistently, manage your risk, and give your money time to compound. The biggest advantage most investors have isn’t predicting the market — it’s staying invested long enough for their investments to compound.',
         },
       ],
       images: [
@@ -1695,49 +1677,18 @@ const INVESTING: Track = {
   ],
   action: {
     title: 'Write down your own investing plan',
-    label: 'Your turn + goals',
     prompt:
-      'Pick the archetype that sounds like you, set the share of your income that goes to investing, and record the plan behind it — the goal, the horizon and what you would do in a bad year — using the figures you already recorded in the earlier tracks.',
-    // The six inputs used to be a lesson of their own, read and then set aside.
-    // They are reference material for exactly this step, so they sit next to
-    // the work rather than ten minutes behind it.
-    brief: [
-      {
-        heading: 'The six inputs',
-        bullets: [
-          { term: 'The goal', text: 'What the money is for, and roughly how much it needs to be.' },
-          { term: 'The time horizon', text: 'How many years until you need it. Each year’s return joins the base that earns the next year, so the number of years matters more than any single year’s result.' },
-          { term: 'The savings rate', text: 'What you can add regularly. Saving more lowers the return you need; saving less raises it.' },
-          { term: 'Risk tolerance', text: 'How large a fall you can watch without selling. A plan you abandon in a bad year was the wrong plan.' },
-          { term: 'The required return', text: 'What annual return the goal, the horizon and the savings rate actually imply.' },
-          { term: 'Inflation', text: 'Prices rise, so a return that does not beat inflation is a loss in what the money buys.' },
-        ],
-      },
-      {
-        divider: true,
-        heading: 'Why the horizon does the heavy lifting',
-        bullets: [
-          { text: 'A long horizon leaves time to recover from a bad stretch, so a wider range of outcomes is survivable.' },
-          { text: 'A short horizon does not. Money needed in two years cannot wait out a three-year drawdown.' },
-          { term: 'The usual consequence', text: 'The closer a goal gets, the more people move that money toward things that move less.' },
-        ],
-      },
-      {
-        divider: true,
-        heading: 'Risk tolerance is behavioural, not theoretical',
-        body: 'The real test is not what you would accept on paper. It is what you actually do in the month your balance is down a third.',
-      },
-    ],
+      'Set the share of your income that goes to investing, decide how it splits across the investments you learned about, and record the plan behind it — the goal, the horizon and what you would do in a bad year — using the figures you already recorded in the earlier tracks.',
     tasks: [
       'Name the goal this money is for, and roughly what it needs to be worth.',
       'Write down the time horizon in years, and note whether that leaves room to recover from a bad stretch.',
-      'Check where you currently sit on the ordering from lesson three, and note the rung you are on.',
-      'Turn over the archetype cards and pick the one that honestly sounds like you, not the one that sounds impressive. Read what it says you are accepting.',
-      'Look at the asset classes that archetype points at, and read the risk noted against each one.',
+      'Check where you currently sit on the ordering from lesson two, and note the rung you are on.',
       'Set the share of your monthly income that goes to investing, alongside what is already committed to spending and savings.',
+      'Split that share across the investments you would actually hold, and read the risk noted against each one before you commit to it.',
+      'Leave anything you have not decided on yet as general investing, and come back to it.',
       'Write down, in advance, what you will do if the balance falls by a third — before it does.',
     ],
-    doneWhen: 'Your archetype is chosen, your investing allocation is set from your own numbers, and the goal, horizon and bad-year rule are written down.',
+    doneWhen: 'Your investing allocation is set from your own numbers, the split across investments reflects what you actually intend to hold, and the goal, horizon and bad-year rule are written down.',
   },
   finalQuiz: [],
 }
