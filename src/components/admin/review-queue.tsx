@@ -17,8 +17,6 @@ import { VideoEmbed } from '@/components/learning/video-embed'
 import type { TrackId } from '@/lib/learning/tracks'
 import { isReviewComplete, type QueuedVideo } from '@/lib/learning/video-pool/types'
 
-const REVIEWER_KEY = 'pool-review:reviewer'
-
 interface ReviewQueueProps {
   trackId: TrackId
   trackTitle: string
@@ -33,7 +31,6 @@ const textToRubric = (text: string) =>
 export function ReviewQueue({ trackId, trackTitle, initialQueue }: ReviewQueueProps) {
   const [queue, setQueue] = useState(initialQueue)
   const [index, setIndex] = useState(0)
-  const [reviewer, setReviewer] = useState('')
   const [dirty, setDirty] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -46,15 +43,6 @@ export function ReviewQueue({ trackId, trackTitle, initialQueue }: ReviewQueuePr
   const [rubricText, setRubricText] = useState('')
 
   const current = queue[index]
-
-  // The reviewer's name is the same every time; ask once per browser.
-  useEffect(() => {
-    setReviewer(window.localStorage.getItem(REVIEWER_KEY) ?? '')
-  }, [])
-
-  useEffect(() => {
-    if (reviewer) window.localStorage.setItem(REVIEWER_KEY, reviewer)
-  }, [reviewer])
 
   // Load the candidate's saved draft whenever the screen moves to a new one.
   useEffect(() => {
@@ -94,7 +82,6 @@ export function ReviewQueue({ trackId, trackTitle, initialQueue }: ReviewQueuePr
             action,
             id: current.id,
             review: draft,
-            reviewedBy: reviewer,
             ...extra,
           }),
         })
@@ -111,7 +98,7 @@ export function ReviewQueue({ trackId, trackTitle, initialQueue }: ReviewQueuePr
         setBusy(false)
       }
     },
-    [current, draft, reviewer, trackId],
+    [current, draft, trackId],
   )
 
   const save = useCallback(async () => {
@@ -183,16 +170,6 @@ export function ReviewQueue({ trackId, trackTitle, initialQueue }: ReviewQueuePr
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        <label className="flex items-center gap-2 text-label-md text-on-surface-variant">
-          Reviewed by
-          <input
-            value={reviewer}
-            onChange={event => setReviewer(event.target.value)}
-            placeholder="your name"
-            className="rounded-md bg-surface-container-low px-3 py-1.5 text-body-md text-on-surface focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-secondary/35"
-          />
-        </label>
-
         <div className="ml-auto flex items-center gap-2">
           <button
             type="button"
@@ -256,22 +233,6 @@ export function ReviewQueue({ trackId, trackTitle, initialQueue }: ReviewQueuePr
           </div>
 
           <div className="flex flex-col gap-4">
-            {current.concerns && current.concerns.length > 0 && (
-              <div className="rounded-xl bg-tertiary/10 px-4 py-3">
-                <p className="text-label-md font-medium text-on-surface">
-                  Flagged from the caption
-                </p>
-                <ul className="mt-1 list-disc pl-5 text-body-md text-on-surface-variant">
-                  {current.concerns.map(concern => (
-                    <li key={concern}>{concern}</li>
-                  ))}
-                </ul>
-                <p className="mt-2 text-label-sm text-on-surface-variant">
-                  A hint, not a verdict — the script only saw the caption. You have the video.
-                </p>
-              </div>
-            )}
-
             {current.rejected && (
               <div className="flex items-center justify-between gap-3 rounded-xl bg-error/10 px-4 py-3">
                 <span className="text-body-md text-error">
@@ -335,7 +296,7 @@ export function ReviewQueue({ trackId, trackTitle, initialQueue }: ReviewQueuePr
             {!error && note && <p className="text-body-md text-success">{note}</p>}
 
             <div className="flex flex-wrap items-center gap-3">
-              <Button onClick={approve} disabled={busy || !complete || !reviewer.trim()}>
+              <Button onClick={approve} disabled={busy || !complete}>
                 <span className="inline-flex items-center gap-2">
                   <Check className="h-4 w-4" aria-hidden />
                   Approve
@@ -356,9 +317,6 @@ export function ReviewQueue({ trackId, trackTitle, initialQueue }: ReviewQueuePr
                 <span className="text-label-md text-on-surface-variant">
                   A question, a reference answer, and one rubric point are required.
                 </span>
-              )}
-              {complete && !reviewer.trim() && (
-                <span className="text-label-md text-on-surface-variant">Add your name first.</span>
               )}
             </div>
           </div>

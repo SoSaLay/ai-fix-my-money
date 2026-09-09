@@ -39,7 +39,6 @@ interface Body {
     referenceAnswer?: string
     rubric?: string[]
   }
-  reviewedBy?: string
   reason?: string
 }
 
@@ -102,9 +101,6 @@ export async function POST(request: Request) {
         return bad('A question, a reference answer, and at least one rubric point are required.')
       }
 
-      const reviewedBy = body.reviewedBy?.trim()
-      if (!reviewedBy) return bad('Say who reviewed this.')
-
       const now = new Date().toISOString()
       const approved: PooledVideo = {
         id: merged.id,
@@ -121,7 +117,6 @@ export async function POST(request: Request) {
         claimUnderTest: merged.claimUnderTest?.trim() || undefined,
         referenceAnswer: merged.referenceAnswer!.trim(),
         rubric: (merged.rubric ?? []).map(point => point.trim()).filter(Boolean),
-        reviewedBy,
         reviewedAt: now,
         status: 'approved',
         lastCheckedAt: now,
@@ -154,6 +149,5 @@ function mergeReview(candidate: QueuedVideo, body: Body): QueuedVideo {
     claimUnderTest: review.claimUnderTest ?? candidate.claimUnderTest,
     referenceAnswer: review.referenceAnswer ?? candidate.referenceAnswer,
     rubric: review.rubric ?? candidate.rubric,
-    reviewedBy: body.reviewedBy?.trim() || candidate.reviewedBy,
   }
 }

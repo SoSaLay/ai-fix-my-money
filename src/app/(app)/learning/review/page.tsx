@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowLeft, Check, X, RotateCcw, ArrowRight } from 'lucide-react'
@@ -16,18 +16,26 @@ import { DisclaimerFooter } from '@/components/learning/disclaimer-footer'
 export default function ReviewPage() {
   const { ready, dueReviews, practiceReviews, completeReview } = useLearning()
 
-  // Snapshot the queue once so answering does not reshuffle mid-session.
-  const [queue] = useState<ReviewItem[]>(() => [])
+  // The session is fixed once, the first time the queue can be read. Deriving
+  // it on every render would drop each question out of the list as it was
+  // answered — answering re-dates it into the future, so it stops being due —
+  // sliding everything after it down a place and skipping the next question.
+  const [session, setSession] = useState<{ items: ReviewItem[]; practising: boolean } | null>(null)
 
-  const scheduled = useMemo(() => (ready ? dueReviews() : queue), [ready, dueReviews, queue])
+  useEffect(() => {
+    if (!ready || session) return
+    const scheduled = dueReviews()
+    // Nothing scheduled still gets a session — questions from finished lessons,
+    // so review is somewhere to test yourself rather than only a due list.
+    setSession(
+      scheduled.length > 0
+        ? { items: scheduled, practising: false }
+        : { items: practiceReviews(), practising: true },
+    )
+  }, [ready, session, dueReviews, practiceReviews])
 
-  // Nothing scheduled still gets a session — questions from finished lessons,
-  // so review is somewhere to test yourself rather than only a due list.
-  const due = useMemo(
-    () => (scheduled.length > 0 || !ready ? scheduled : practiceReviews()),
-    [scheduled, ready, practiceReviews],
-  )
-  const practising = scheduled.length === 0 && due.length > 0
+  const due = session?.items ?? []
+  const practising = session?.practising === true && due.length > 0
 
   const [index, setIndex] = useState(0)
   const [selected, setSelected] = useState<number | null>(null)
@@ -56,7 +64,7 @@ export default function ReviewPage() {
     setSelected(null)
   }, [])
 
-  if (!ready) return null
+  if (!ready || !session) return null
 
   const finished = index >= due.length
 

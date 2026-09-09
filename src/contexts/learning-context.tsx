@@ -513,14 +513,18 @@ export function LearningProvider({ children }: { children: ReactNode }) {
 
   /**
    * Review is also a place to test yourself on demand, not only a queue that
-   * comes due. When nothing is scheduled this draws from lessons already
-   * finished, so the review screen always has something to offer. Answering
-   * one schedules it normally — practising a question is the same signal as
-   * meeting it on its due date.
+   * comes due. When nothing is scheduled this draws from every lesson already
+   * finished, so the review screen always has something to offer.
+   *
+   * A question that is already scheduled is offered as its existing queue
+   * entry rather than a fresh one, so answering it advances the schedule it is
+   * actually on instead of knocking it back to the first interval. Everything a
+   * learner has finished is in that queue, so excluding queued questions here
+   * would leave the pool empty for exactly the people this exists for.
    */
   const practiceReviews = useCallback(
     (limit = 10) => {
-      const queued = new Set(reviewQueue.map(r => `${r.trackId}:${r.questionId}`))
+      const queued = new Map(reviewQueue.map(r => [`${r.trackId}:${r.questionId}`, r]))
       const now = new Date().toISOString()
       const pool: ReviewItem[] = []
 
@@ -528,16 +532,24 @@ export function LearningProvider({ children }: { children: ReactNode }) {
         for (const lesson of track.lessons) {
           if (!progress[track.id]?.lessons?.[lesson.id]?.answered) continue
           for (const q of lesson.questions) {
-            if (queued.has(`${track.id}:${q.id}`)) continue
-            pool.push({
-              trackId: track.id,
-              lessonId: lesson.id,
-              questionId: q.id,
-              stage: 0,
-              dueAt: now,
-            })
+            pool.push(
+              queued.get(`${track.id}:${q.id}`) ?? {
+                trackId: track.id,
+                lessonId: lesson.id,
+                questionId: q.id,
+                stage: 0,
+                dueAt: now,
+              },
+            )
           }
         }
+      }
+
+      // Drawn at random, so practising twice is not the same ten questions in
+      // the same order every time.
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[pool[i], pool[j]] = [pool[j], pool[i]]
       }
 
       return pool.slice(0, limit)

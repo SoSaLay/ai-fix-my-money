@@ -51,8 +51,7 @@ export interface VideoReview {
   referenceAnswer: string
   /** SERVER ONLY. The points an answer must hit, in order of weight. */
   rubric: string[]
-  reviewedBy: string
-  /** ISO. */
+  /** ISO. Who did it is on the approving commit, which is the real record. */
   reviewedAt: string
 }
 
