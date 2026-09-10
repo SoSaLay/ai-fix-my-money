@@ -3,7 +3,12 @@ import { notFound } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 
 import { getTrack } from '@/lib/learning/tracks'
-import { poolHealth, readQueue, TARGET_POOL_SIZE } from '@/lib/learning/video-pool/pool'
+import {
+  poolHealth,
+  readApprovedFile,
+  readQueue,
+  TARGET_POOL_SIZE,
+} from '@/lib/learning/video-pool/pool'
 import { ReviewQueue } from '@/components/admin/review-queue'
 
 export default async function TrackReviewPage({
@@ -15,7 +20,10 @@ export default async function TrackReviewPage({
   const track = getTrack(trackParam)
   if (!track) notFound()
 
-  const queue = await readQueue(track.id)
+  const [queue, approved] = await Promise.all([
+    readQueue(track.id),
+    readApprovedFile(track.id),
+  ])
   const health = poolHealth(track.id)
 
   return (
@@ -33,7 +41,12 @@ export default async function TrackReviewPage({
         </span>
       </div>
 
-      <ReviewQueue trackId={track.id} trackTitle={track.title} initialQueue={queue} />
+      <ReviewQueue
+        trackId={track.id}
+        trackTitle={track.title}
+        initialQueue={queue}
+        initialApproved={approved}
+      />
     </div>
   )
 }

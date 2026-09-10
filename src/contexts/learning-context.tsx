@@ -12,8 +12,8 @@ import {
 import {
   TRACKS,
   TRACK_ORDER,
+  PASS_THRESHOLD,
   getTrack,
-  passMark,
   type TrackId,
 } from '@/lib/learning/tracks'
 import { useAuth } from '@/contexts/auth-context'
@@ -390,8 +390,10 @@ export function LearningProvider({ children }: { children: ReactNode }) {
 
   const recordFinal = useCallback(
     (trackId: TrackId, correct: number, total: number, missed: string[]): boolean => {
-      const track = getTrack(trackId)
-      const needed = track ? passMark(track) : total
+      // Derived from this paper's own total, so a video paper scored out of 20
+      // points and a choice-only paper scored out of 10 questions use the same
+      // threshold. For a choice-only quiz this is exactly passMark(track).
+      const needed = Math.ceil(total * PASS_THRESHOLD)
       const passed = correct >= needed
 
       mutate(trackId, current => {

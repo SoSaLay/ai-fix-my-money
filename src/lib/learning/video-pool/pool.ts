@@ -125,8 +125,8 @@ export function poolHealth(trackId: TrackId): PoolHealth {
 
 /**
  * The only supported way to send a pool item to a browser. Anything absent from
- * the return type is deliberately absent — `referenceAnswer`, `rubric`, the
- * reviewer's name, and the creator's caption all stay on this side.
+ * the return type is deliberately absent — `referenceAnswer`, `rubric` and the
+ * creator's caption all stay on this side.
  */
 export function toPublicQuestion(video: PooledVideo): PublicVideoQuestion {
   return {

@@ -53,6 +53,23 @@ export function extractRows(data: unknown): Record<string, unknown>[] {
   return []
 }
 
+/**
+ * TikTok reports length in milliseconds on `video.duration`. A few rows carry
+ * it only on the thumbnail sheet, which is in seconds instead. 0 means the
+ * payload had neither, which shows on the review screen as unknown rather than
+ * as a plausible-looking zero-second video.
+ */
+function durationSeconds(aweme: Record<string, unknown>): number {
+  const video = asRecord(aweme.video) ?? {}
+
+  const ms = num(video.duration) || num(aweme.duration)
+  if (ms > 0) return Math.round(ms / 1000)
+
+  const thumbs = Array.isArray(video.big_thumbs) ? asRecord(video.big_thumbs[0]) : null
+  const seconds = num(thumbs?.duration)
+  return seconds > 0 ? Math.round(seconds) : 0
+}
+
 /** A row is either the aweme itself or a search hit wrapping one. */
 function unwrapAweme(row: Record<string, unknown>): Record<string, unknown> | null {
   const nested = asRecord(row.aweme_info) ?? asRecord(row.item) ?? asRecord(row.aweme)
@@ -94,6 +111,7 @@ export function toCandidate(
     embedUrl: `https://www.tiktok.com/embed/v2/${videoId}`,
     creatorHandle,
     postedAt: new Date(createdSeconds * 1000).toISOString(),
+    durationSeconds: durationSeconds(aweme),
     caption: str(aweme.desc) || str(aweme.title),
     engagement: {
       likes: num(stats.digg_count) || num(stats.diggCount),

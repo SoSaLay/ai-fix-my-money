@@ -26,7 +26,17 @@ function devOnly(): NextResponse | null {
   return null
 }
 
-type Action = 'save' | 'approve' | 'reject' | 'unreject'
+type Action =
+  | 'save'
+  | 'approve'
+  | 'reject'
+  | 'unreject'
+  | 'update-approved'
+  | 'retire'
+  | 'unretire'
+
+/** Actions that act on the approved file rather than the candidate queue. */
+const APPROVED_ACTIONS: Action[] = ['update-approved', 'retire', 'unretire']
 
 interface Body {
   trackId?: string
@@ -64,6 +74,50 @@ export async function POST(request: Request) {
   const { trackId, action, id } = body
   if (!isTrackId(trackId)) return bad('Unknown track.')
   if (!id) return bad('Missing candidate id.')
+
+  // Anything acting on an already-approved video reads the other file entirely
+  // — it is no longer a candidate and is not in the queue.
+  if (action && APPROVED_ACTIONS.includes(action)) {
+    const pool = await readApprovedFile(trackId)
+    const at = pool.findIndex(item => item.id === id)
+    if (at === -1) return bad(`No approved video ${id} in ${trackId}.`)
+    const existing = pool[at]
+
+    let updated: PooledVideo
+
+    if (action === 'retire') {
+      // Retired, never deleted. The row keeps the id spoken for and keeps
+      // ingestion from offering the same video back as a fresh candidate.
+      updated = {
+        ...existing,
+        status: 'retired',
+        retiredReason: body.reason?.trim() || undefined,
+      }
+    } else if (action === 'unretire') {
+      const { retiredReason: _reason, ...rest } = existing
+      updated = { ...rest, status: 'approved' }
+    } else {
+      const review = body.review ?? {}
+      updated = {
+        ...existing,
+        question: (review.question ?? existing.question).trim(),
+        claimUnderTest: (review.claimUnderTest ?? existing.claimUnderTest)?.trim() || undefined,
+        referenceAnswer: (review.referenceAnswer ?? existing.referenceAnswer).trim(),
+        rubric: (review.rubric ?? existing.rubric).map(point => point.trim()).filter(Boolean),
+        reviewedAt: new Date().toISOString(),
+      }
+
+      // This one is already in front of learners. Emptying a field here would
+      // break a live question, so the same completeness gate applies.
+      if (!isReviewComplete(updated)) {
+        return bad('A question, a reference answer, and at least one rubric point are required.')
+      }
+    }
+
+    pool[at] = updated
+    await writeApprovedFile(trackId, pool)
+    return NextResponse.json({ ok: true, item: updated })
+  }
 
   const queue = await readQueue(trackId)
   const index = queue.findIndex(item => item.id === id)
@@ -111,6 +165,7 @@ export async function POST(request: Request) {
         embedUrl: merged.embedUrl,
         creatorHandle: merged.creatorHandle,
         postedAt: merged.postedAt,
+        durationSeconds: merged.durationSeconds,
         caption: merged.caption,
         engagement: merged.engagement,
         question: merged.question!.trim(),
@@ -132,7 +187,7 @@ export async function POST(request: Request) {
       await writeApprovedFile(trackId, [...pool, approved])
       await writeQueue(trackId, queue.filter(item => item.id !== id))
 
-      return NextResponse.json({ ok: true, approvedId: approved.id })
+      return NextResponse.json({ ok: true, approvedId: approved.id, item: approved })
     }
 
     default:

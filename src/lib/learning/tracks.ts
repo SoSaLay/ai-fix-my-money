@@ -461,6 +461,32 @@ const ACCOUNTS: Track = {
   },
   finalQuiz: [
     {
+      id: 'acc-f11',
+      question:
+        'You have $3,200 in checking, $6,000 in savings, a $14,500 car loan and $2,300 on a credit card. What is your net worth, and what does it tell you?',
+      options: [
+        '$26,000 — the total of everything recorded',
+        '−$7,600 — what you own minus what you owe, and it says nothing about whether you can cover this month',
+        '$9,200 — only the money you can actually reach counts',
+        '−$16,800 — debts count double because they carry interest',
+      ],
+      answer: 1,
+      why: '(3,200 + 6,000) − (14,500 + 2,300) = −7,600. Net worth is one subtraction across every account, it is allowed to be negative, and it is a standing total rather than a statement about this month\u2019s cash.',
+    },
+    {
+      id: 'acc-f12',
+      question:
+        'You owe $900 on a card with a $3,000 limit. Which single action does the most for your credit score?',
+      options: [
+        'Closing the card once it is paid off',
+        'Paying the statement balance in full by the due date, every month',
+        'Applying for a second card to raise your total limit',
+        'Checking your score weekly',
+      ],
+      answer: 1,
+      why: 'Payment history is the largest factor, and paying the statement balance in full is also what stops interest being charged at all. Closing the card shortens your history and raises utilisation, a new application adds a hard inquiry, and checking your own score changes nothing.',
+    },
+    {
       id: 'acc-f1',
       question: 'Which pair correctly separates an asset account from a liability account?',
       options: [

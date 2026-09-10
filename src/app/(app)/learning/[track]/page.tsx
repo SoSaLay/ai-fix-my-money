@@ -7,7 +7,7 @@ import {
   ArrowLeft, ArrowRight, Check, PenLine, Sparkles, Trophy, RotateCcw, Unlock,
 } from 'lucide-react'
 import { useLearning, type Stage } from '@/contexts/learning-context'
-import { getTrack, passMark, shortTitle, type Track, type Lesson, type LessonSection } from '@/lib/learning/tracks'
+import { getTrack, shortTitle, type Track, type Lesson, type LessonSection } from '@/lib/learning/tracks'
 import { DISCLAIMER_INVESTING } from '@/lib/learning/disclaimer'
 import { DisclaimerFooter } from '@/components/learning/disclaimer-footer'
 import { AcknowledgmentGate } from '@/components/learning/acknowledgment-gate'
@@ -15,6 +15,7 @@ import { LessonContent } from '@/components/learning/lesson-content'
 import { LessonAside } from '@/components/learning/lesson-aside'
 import { ReadTimer } from '@/components/learning/read-timer'
 import { QuestionStack } from '@/components/learning/question-stack'
+import { VideoQuiz } from '@/components/learning/video-quiz'
 import { StepRail, type RailItem } from '@/components/learning/step-rail'
 
 export default function TrackPage({ params }: { params: Promise<{ track: string }> }) {
@@ -368,90 +369,25 @@ function FinalStage({
   onSubmit: (correct: number, total: number, missed: string[]) => boolean
   onDone: () => void
 }) {
-  const needed = useMemo(() => passMark(track), [track])
-  const [attempt, setAttempt] = useState(0)
-  const [state, setState] = useState({ allAnswered: false, missed: [] as string[], correct: 0 })
-  const [result, setResult] = useState<{ correct: number; passed: boolean } | null>(null)
+  // A retake draws a fresh paper rather than re-showing the one just sat.
+  const [attemptKey, setAttemptKey] = useState(0)
 
-  const submit = () => {
-    const passed = onSubmit(state.correct, track.finalQuiz.length, state.missed)
-    setResult({ correct: state.correct, passed })
-  }
-
-  const retake = () => {
-    setResult(null)
-    setState({ allAnswered: false, missed: [], correct: 0 })
-    setAttempt(a => a + 1)
-  }
-
-  if (result && !result.passed) {
-    return (
-      <div className="bg-surface-container-lowest rounded-3xl px-7 py-10 flex flex-col gap-5 items-center text-center max-w-2xl mx-auto">
-        <RotateCcw size={24} className="text-on-surface-variant" />
-        <h2 className="text-headline-sm text-on-surface font-bold">Not quite yet</h2>
-        <p className="text-body-lg text-on-surface-variant">
-          {result.correct} of {track.finalQuiz.length} correct. You need {needed} to pass.
-        </p>
-        <p className="text-body-md text-on-surface-variant max-w-md leading-relaxed">
-          The ones you missed are in your review queue. Go back over the steps you
-          want to revisit, then take it again — there is no limit on attempts.
-        </p>
-        <button
-          onClick={retake}
-          className="btn-action items-center justify-center gap-1.5 mt-1"
-        >
-          Take it again <ArrowRight size={16} />
-        </button>
-      </div>
-    )
-  }
-
-  if (result?.passed) {
-    return (
-      <div className="flex justify-center">
-        <button
-          onClick={onDone}
-          className="btn-action items-center justify-center gap-1.5"
-        >
-          See your result <ArrowRight size={16} />
-        </button>
-      </div>
-    )
-  }
+  const submit = useCallback(
+    (points: number, totalPoints: number, missed: string[]) => {
+      const passed = onSubmit(points, totalPoints, missed)
+      if (!passed) setAttemptKey(k => k + 1)
+      return passed
+    },
+    [onSubmit],
+  )
 
   return (
-    <div className="flex flex-col gap-6 max-w-3xl mx-auto w-full">
-      <div className="bg-surface-container-lowest rounded-3xl px-7 py-6 flex flex-col gap-2">
-        <div className="flex items-center gap-2.5">
-          <Trophy size={15} className="text-secondary" />
-          <span className="text-label-sm text-on-surface-variant uppercase tracking-widest">
-            Final quiz
-          </span>
-        </div>
-        <h2 className="text-headline-sm text-on-surface font-bold">
-          Everything from {track.title}
-        </h2>
-        <p className="text-body-md text-on-surface-variant leading-relaxed">
-          {track.finalQuiz.length} questions. {needed} correct to pass and unlock the
-          feature. Answers are not shown until you submit, and you can retake it.
-        </p>
-      </div>
-
-      <QuestionStack
-        key={attempt}
-        questions={track.finalQuiz}
-        revealImmediately={false}
-        onChange={setState}
-      />
-
-      <button
-        onClick={submit}
-        disabled={!state.allAnswered}
-        className="btn-action items-center justify-center gap-1.5 self-end disabled:opacity-30"
-      >
-        Submit answers <ArrowRight size={16} />
-      </button>
-    </div>
+    <VideoQuiz
+      track={track}
+      attemptKey={attemptKey}
+      onSubmit={submit}
+      onDone={onDone}
+    />
   )
 }
 

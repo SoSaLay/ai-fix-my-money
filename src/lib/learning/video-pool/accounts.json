@@ -1,1 +1,243 @@
-[]
+[
+  {
+    "id": "acc-v-002",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7351912418815003935",
+    "shareUrl": "https://www.tiktok.com/@creditspeak/video/7351912418815003935",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7351912418815003935",
+    "creatorHandle": "@creditspeak",
+    "postedAt": "2024-03-29T22:15:35.000Z",
+    "caption": "This is how you want to climb up the credit card ladder💳 these are only a couple credit cards in the entire credit card market. Make sure to pay off credit cards responsibly and on time.🙏🏻 make sure to CreditSpeak, as I speak credit every day 💳💰 ##credit##creditcard##credittips##amex##credittips101##creditscore##creditpoints##americanexpress",
+    "engagement": {
+      "likes": 1418771,
+      "comments": 5315,
+      "shares": 97800,
+      "plays": 22616680
+    },
+    "question": "Is building a relationship with a bank really the main thing driving your ability to get credit cards and their benefits?",
+    "claimUnderTest": "The video presents the bank relationship as the primary engine that takes you from no credit to better cards and rewards.",
+    "referenceAnswer": "It's a real factor but not the main one. What the bank is actually responding to is your track record — paying on time, keeping the account in good standing, building history over time. The relationship matters because it's how the bank gets to see that behavior firsthand: an issuer you've been with can look directly at how you've handled their card, which helps when you apply for their better products. But strip out the good behavior and the relationship is worth nothing; you can bank somewhere for years and still get denied. The right way to read the video's point is that the relationship is the channel, and your payment history is what travels through it. That's also what unlocks the benefits he describes — the rewards and free flights come from qualifying for the better cards, and you qualify by demonstrating you're reliable, not by being familiar.",
+    "rubric": [
+      "Says no — the relationship helps but payment history and good standing are what actually drive access",
+      "Explains the relationship's real role: the issuer can see your history with them directly, which aids approvals",
+      "Notes the relationship alone doesn't qualify you without the underlying behavior",
+      "Ties access to better cards to the rewards payoff (points, miles, free flights)"
+    ],
+    "reviewedAt": "2026-09-09T22:28:38.112Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-09T22:28:38.112Z",
+    "durationSeconds": 0
+  },
+  {
+    "id": "acc-v-003",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7452911357646654726",
+    "shareUrl": "https://www.tiktok.com/@angieonabudget/video/7452911357646654726",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7452911357646654726",
+    "creatorHandle": "@angieonabudget",
+    "postedAt": "2024-12-27T02:22:33.000Z",
+    "caption": "Did you know this about credit cards? 🤯 I learned this from my fav financetoker @alex on a budget 💰🤩 #financetok #PersonalFinance #financialliteracy #creditcards #interest #personalgrowth #debt",
+    "engagement": {
+      "likes": 717520,
+      "comments": 4659,
+      "shares": 85861,
+      "plays": 7769766
+    },
+    "question": "The video says paying your statement balance in full each month keeps you out of interest. Does paying in full always mean you owe no interest?",
+    "claimUnderTest": "Pay the statement balance in full by the due date and the grace period covers you — no interest is charged.",
+    "referenceAnswer": "It holds up, but only while you keep it up. The grace period is conditional: it applies to new purchases only if you paid the previous statement balance in full. Pay in full every month and you never touch interest, because each cycle's purchases are covered by the grace period the last full payment earned you.\n\nThe failure case is what makes the claim conditional. Carry a balance one month and you lose the grace period — from that point, new purchases start accruing interest from the day they post, not from the next statement date. Paying in full the following month doesn't retroactively erase that interest, and it usually takes a full cycle of paying in full to get the grace period back. So there's also a gap between the statement balance and the current balance: paying the statement balance is what protects you, even if you've spent more since the statement closed. And the grace period doesn't apply at all to cash advances, which accrue from day one regardless.",
+    "rubric": [
+      "Says paying the statement balance in full each month does avoid interest, via the grace period",
+      "Explains the grace period is conditional on having paid the previous statement in full",
+      "Notes that once you carry a balance, new purchases accrue interest immediately until you re-qualify",
+      "Distinguishes statement balance from current balance as the amount that matters"
+    ],
+    "reviewedAt": "2026-09-09T22:34:23.505Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-09T22:34:23.505Z",
+    "durationSeconds": 0
+  },
+  {
+    "id": "acc-v-013",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7641359248542272781",
+    "shareUrl": "https://www.tiktok.com/@jahbaritaylor/video/7641359248542272781",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7641359248542272781",
+    "creatorHandle": "@jahbaritaylor",
+    "postedAt": "2026-05-18T22:16:46.000Z",
+    "caption": "Ranking savings bank accounts #TikTokLearningCampaign #financialliteracy ",
+    "engagement": {
+      "likes": 143046,
+      "comments": 1003,
+      "shares": 12094,
+      "plays": 2658909
+    },
+    "question": "The video puts big banks in F tier and online banks like SoFi at the top for savings rates. Is the rate difference the whole story when choosing where to save?",
+    "claimUnderTest": "Big banks pay next to nothing on savings; online banks pay far more, so that's where your savings should go.",
+    "referenceAnswer": "The core claim is right and it's not a close call. Big banks with branch networks have high overhead and large deposit bases, so they don't need to compete on rate — their savings rates often sit near zero. Online banks have no branches and compete mainly on yield, so they pay multiples more on the same balance. On rate alone, the tier list is fair.\n\nWhere it's incomplete is that rate isn't a fixed feature of the bank. High-yield rates are variable and move with the Fed, so today's top payer may not be next year's, and some accounts advertise a promotional rate that drops after an intro window or requires conditions like a direct deposit or a minimum balance. A good answer also checks the things a tier list flattens: FDIC insurance (present at reputable online banks, and worth verifying, especially with fintech apps that aren't themselves banks), transfer speed to and from your checking account, and whether losing branch access or cash deposits actually matters for how you bank. The reasonable conclusion isn't that big banks are useless — it's that they're fine for checking and daily access, and savings should sit where it earns.",
+    "rubric": [
+      "Agrees the rate gap is real, and explains why: branch overhead vs. online banks competing on yield",
+      "Notes rates are variable and can change, and that intro rates or conditions may apply",
+      "Raises at least one factor beyond rate — FDIC insurance, transfer speed, or branch/cash access",
+      "Concludes sensibly: use each for what it's good at rather than treating big banks as worthless"
+    ],
+    "reviewedAt": "2026-09-09T22:45:26.095Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-09T22:45:26.095Z",
+    "durationSeconds": 0
+  },
+  {
+    "id": "acc-v-019",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7673260631247605005",
+    "shareUrl": "https://www.tiktok.com/@hs.queen96/video/7673260631247605005",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7673260631247605005",
+    "creatorHandle": "@hs.queen96",
+    "postedAt": "2026-08-12T21:30:37.000Z",
+    "caption": "What's the move ??!?!  lol This is not a joke.   . #fypシ゚viral #millon #chase #millionaire #chasebank ",
+    "engagement": {
+      "likes": 118711,
+      "comments": 2689,
+      "shares": 5511,
+      "plays": 2733449
+    },
+    "question": "A creator shows off a large balance in their bank account. What does that screenshot actually tell you?",
+    "claimUnderTest": "The balance is offered as evidence — that the creator is successful and therefore worth listening to.",
+    "referenceAnswer": "Close to nothing. A balance is a number on a screen with no context attached: you can't see where it came from, whether it's income or borrowed or transferred in for the shot, what's owed against it, or whether it was there the day before or the day after. Even taking it as fully real, it tells you the creator has money — not that they know how to make it, and not that anything they're about to teach you will work.\n\nThe useful move is to redirect the question from how much to how. A method can be examined: does it make sense, is it repeatable, does it depend on things they had and you don't, like an audience or timing or capital? A balance can't be examined at all, which is exactly why it gets shown. It's there to buy credibility without having to earn it.\n\nThere's also no reason to measure yourself against it. Someone else's number changes nothing about your situation, and comparing against figures you can't verify — from people selecting what to display — is a losing game by design.",
+    "rubric": [
+      "Says the balance tells you essentially nothing; it's unverifiable and stripped of context",
+      "Notes that having money doesn't demonstrate knowing how to make it, or that their method transfers",
+      "Redirects to the how — the method is what can be evaluated, the amount can't",
+      "Points out that comparison to others' displayed numbers isn't useful"
+    ],
+    "reviewedAt": "2026-09-09T22:55:42.151Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-09T22:55:42.151Z",
+    "durationSeconds": 0
+  },
+  {
+    "id": "acc-v-031",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7678434329311055135",
+    "shareUrl": "https://www.tiktok.com/@spam2r/video/7678434329311055135",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7678434329311055135",
+    "creatorHandle": "@spam2r",
+    "postedAt": "2026-08-26T20:07:05.000Z",
+    "durationSeconds": 19,
+    "caption": "My net worth EXPOSED 🫪 #fyp #cam2r ",
+    "engagement": {
+      "likes": 247005,
+      "comments": 1465,
+      "shares": 4341,
+      "plays": 1890114
+    },
+    "question": "The creator revealed they're carrying a large amount of debt. Does that mean their net worth is low?",
+    "claimUnderTest": "The debt figure was presented as correcting the assumption that the creator is wealthy.",
+    "referenceAnswer": "Not necessarily. Net worth is assets minus liabilities, so a debt number on its own is only half the equation. What matters is what the debt bought. If someone borrowed to acquire property, equipment, or a business that's worth more than the loan against it, the debt sits opposite an asset and net worth can still be strongly positive. Large borrowing is often a sign of access to credit, which itself requires income and a track record.\n\nThe debt only signals trouble when there's nothing on the other side of it — consumer spending, high-interest balances, obligations against assets that lose value or produce no income. So the honest read is that you can't score anyone from a liability figure alone, in either direction.\n\nThe same logic runs the other way, which is why the original estimate was wrong too. Guessing net worth from visible signals — revenue, a house, a car — measures assets while ignoring what's owed against them. Both the researcher's high estimate and the \"actually in debt\" correction make the same mistake from opposite ends: each takes one side of the balance sheet as the answer.",
+    "rubric": [
+      "Defines net worth as assets minus liabilities",
+      "Explains that debt held against valuable or income-producing assets doesn't mean low net worth",
+      "Distinguishes that from debt with nothing behind it, which does reduce net worth",
+      "Notes the original high estimate had the same flaw — judging from one side only"
+    ],
+    "reviewedAt": "2026-09-09T23:22:34.748Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-09T23:22:34.748Z"
+  },
+  {
+    "id": "acc-v-045",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7573024345333730573",
+    "shareUrl": "https://www.tiktok.com/@leilahormozi/video/7573024345333730573",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7573024345333730573",
+    "creatorHandle": "@leilahormozi",
+    "postedAt": "2025-11-15T18:42:40.000Z",
+    "durationSeconds": 45,
+    "caption": "The difference between assets and liabilities…",
+    "engagement": {
+      "likes": 74380,
+      "comments": 52,
+      "shares": 6000,
+      "plays": 512230
+    },
+    "question": "Before you buy something, how do you tell whether it's an asset or a liability?",
+    "claimUnderTest": "Assets put money in your pocket, liabilities take it out — and you should sort your purchases that way before buying.",
+    "referenceAnswer": "Ask what the thing does after you own it. An asset either produces income or holds its value, so it can be sold for something close to what you put in. A liability costs you on an ongoing basis — payments, upkeep, insurance, fuel, fees — and loses value while you own it. The test isn't the price or the category, it's the direction of the cash flow once the purchase is done.\n\nThe same object can land on either side depending on how it's used. A car driven to work is a liability: it depreciates and bills you every month. The same car used to earn money can be an asset. A house you live in costs you monthly and only pays off if it appreciates enough to clear what you spent; the same house rented out produces income. So it's the use, not the label, that decides it.\n\nThe point of sorting purchases this way isn't that liabilities are forbidden — most people need a car and a place to live. It's that you should know which one you're buying and how much it will keep costing you, so the decision is deliberate rather than something you notice later in your monthly outflow.",
+    "rubric": [
+      "States the test: does it put money in your pocket or take money out, after purchase",
+      "Notes that assets produce income or hold value, while liabilities depreciate and carry ongoing costs",
+      "Recognizes the same item can be either depending on how it's used",
+      "Concludes that the goal is deliberate buying, not avoiding all liabilities"
+    ],
+    "reviewedAt": "2026-09-09T23:40:44.700Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-09T23:40:44.700Z"
+  },
+  {
+    "id": "acc-v-051",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7425602633882275102",
+    "shareUrl": "https://www.tiktok.com/@brianferoldi/video/7425602633882275102",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7425602633882275102",
+    "creatorHandle": "@brianferoldi",
+    "postedAt": "2024-10-14T12:11:25.000Z",
+    "durationSeconds": 50,
+    "caption": "The Balance Sheet Explained In <1 Minute Grab a Free copy of my infographic ebook (link in bio) The master equation: Assets = Liabilities + Shareholder Equity ⏰ TIME: Point in Time 🔢 ACCOUNTING: Accrual 3 Main Sections: 💰 ASSETS: What the company Owns 🔴 LIABILITIES: What the company Owes to creditors 🔵 EQUITY: The net value of the owner's claim 💰 ASSETS Listed in order of liquidity (how quickly it can be turned into cash). CURRENT ASSETS: Expected to be used in <1 year →Cash →Marketable Securities →Accounts Receivable →Inventory →Other Current Assets LONG-TERM ASSETS: Expected to be last >1 year →Long-Term Investments →Fixed Assets →Goodwill →Other Long-Term Assets 🔴 LIABILITIES Listed in order of when they are expected to be paid off. CURRENT LIABILITIES: Expected to be paid in <1 year →Payables & Accrued Expenses →Short-Term Debt →Other Current Liabilities LONG-TERM LIABILITIES: Expected to be paid in >1 year →Long-Term Debt →Other Long-Term Liabilities 🔵 SHAREHOLDER'S EQUITY CAPITAL RAISED FROM INVESTORS →Preferred Stock →Common Stock & Additional Paid-In Capital PROFITS RETAINED BY THE COMPANY →Retained Earnings →Treasury Stock #accounting #accountingstudent #finance #finance101 #investing #investingforbeginners",
+    "engagement": {
+      "likes": 2774,
+      "comments": 24,
+      "shares": 864,
+      "plays": 148619
+    },
+    "question": "The video uses a company's balance sheet — assets, liabilities, shareholder equity. How does that structure apply to your own finances?",
+    "claimUnderTest": "A personal net worth statement is the same structure as a business balance sheet: what you own, what you owe, and the difference between them.",
+    "referenceAnswer": "It maps directly. A company's balance sheet lists assets, subtracts liabilities, and what's left is shareholder equity — the owners' actual stake. Do the same for yourself and the leftover is your net worth. You are the shareholder; your equity is what would remain if everything were sold and every debt settled.\n\nYour assets are cash, savings, retirement accounts, investments, a home, anything with resale value. Your liabilities are mortgage, car loan, student loans, credit card balances, anything owed. The difference is the only number that describes your position, and it's why neither side means much alone — a large asset column can sit on top of an equally large liability column and leave almost nothing, while someone with modest assets and no debt may hold more equity outright.\n\nThe reason to think in balance-sheet terms is that it changes what you watch. Income is a flow and tells you what came in this month; the balance sheet is a position and tells you what you've actually kept. It also makes the effect of a decision visible: borrowing to buy something raises assets and liabilities together, so equity only improves if the thing is worth more than the loan against it. Paying down debt shrinks liabilities and raises equity directly. Tracking the number over time shows whether you're building a stake or just moving money through.",
+    "rubric": [
+      "Maps the structure: personal assets minus liabilities equals net worth, the equivalent of shareholder equity",
+      "Gives examples of what falls on each side for an individual",
+      "Explains why the balance matters — either column alone is meaningless without the other",
+      "Notes the balance sheet shows position over time, unlike income, and tracking it reveals real progress"
+    ],
+    "reviewedAt": "2026-09-09T23:44:01.405Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-09T23:44:01.405Z"
+  },
+  {
+    "id": "acc-v-024",
+    "trackId": "accounts",
+    "platform": "tiktok",
+    "videoId": "7670588824619142414",
+    "shareUrl": "https://www.tiktok.com/@financebronextdoor/video/7670588824619142414",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7670588824619142414",
+    "creatorHandle": "@financebronextdoor",
+    "postedAt": "2026-08-05T16:42:25.000Z",
+    "durationSeconds": 46,
+    "caption": "These percentages are based on your monthly net income (after taxes), not your gross paycheck. Everyone’s financial situation is different, so use this as a starting point and adjust it based on your goals and circumstances. 📌 Save this for your next paycheck and follow for more practical personal finance tips. For educational purposes only. This is not financial advice.",
+    "engagement": {
+      "likes": 213796,
+      "comments": 3151,
+      "shares": 50343,
+      "plays": 3628576
+    },
+    "question": "Using the creator's approach, how would you split your monthly income, and which accounts would each piece go into?",
+    "claimUnderTest": "Your monthly income should be divided by percentage across a few specific destinations rather than left in one account.",
+    "referenceAnswer": "The shape of the answer matters more than the exact percentages. Income lands in checking, which is the hub — fixed costs and spending run through it, and everything else gets moved out from there rather than left sitting.\n\nFrom there the money splits by job:\n\nSavings (ideally high-yield) holds the emergency fund — the cushion for job loss or a surprise expense, kept liquid and separate so it isn't spent by accident. This usually gets funded early, at least to a starter amount.\n401(k), at minimum up to the employer match. This is the \"free money\" — the employer contributes on top of what you put in, so not capturing it is leaving compensation behind. It's the highest-return move available and generally comes before extra debt payments on anything low-interest.\nDebt payoff, made from checking to the card or loan. High-interest balances, credit cards especially, are prioritized because the interest rate you avoid is a guaranteed return.\nBrokerage, for investing beyond retirement accounts — money that doesn't have a near-term job and can stay invested, with the tradeoff that it isn't tax-advantaged but also isn't locked until retirement.\n\nThe rough ordering most of these breakdowns land on: cover fixed expenses, grab the employer match, build a small emergency cushion, kill high-interest debt, then split what's left between longer-term savings and investing. A percentage rule is a starting frame, not a prescription — the split shifts with income, cost of living, and how much debt is in the picture.",
+    "rubric": [
+      "Names checking as where income lands and spending runs through",
+      "Names savings (emergency fund) as a separate destination from spending money",
+      "Mentions 401(k), ideally identifying the employer match as the \"free money\"",
+      "Mentions paying down debt, and/or a brokerage for longer-term investing",
+      "Grade this one loosely — any reasonable split across those accounts should earn credit, and a learner shouldn't be penalized for naming different percentages than the video used."
+    ],
+    "reviewedAt": "2026-09-09T23:52:23.193Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-09T23:52:23.193Z"
+  }
+]

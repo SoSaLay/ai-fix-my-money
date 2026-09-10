@@ -40,9 +40,14 @@ const ID_PREFIX: Record<TrackId, string> = {
  */
 const DEFAULT_KEYWORDS: Record<TrackId, string[]> = {
   accounts: [
+    'net worth explained',
+    'how to calculate net worth',
+    'high yield savings account explained',
+    'money market account vs savings',
+    'types of bank accounts explained',
+    'types of loans explained',
     'checking vs savings account',
     'credit score explained',
-    'bank fees explained',
     'what is a credit utilization',
   ],
   spending: [
@@ -68,6 +73,15 @@ const DEFAULT_KEYWORDS: Record<TrackId, string[]> = {
 /** Older than this and the reviewer gets told, so stale framing is not missed. */
 const DEFAULT_STALE_AFTER_YEARS = 3
 
+/**
+ * This is short-form content and the questions are about one point. A minute is
+ * already long for that; past it the video is usually a lecture with the point
+ * buried somewhere inside. Videos over this are dropped before ranking rather
+ * than flagged, because length is the one thing the payload states outright and
+ * a reviewer cannot fix. `--max-seconds 0` turns the cap off.
+ */
+const DEFAULT_MAX_SECONDS = 60
+
 interface Options {
   track: TrackId
   keywords: string[]
@@ -76,6 +90,7 @@ interface Options {
   sortType: number
   publishTime: number
   staleAfterYears: number
+  maxSeconds: number
   dryRun: boolean
   raw: boolean
 }
@@ -88,6 +103,7 @@ function parseArgs(argv: string[]): Options {
   let sortType: number = SORT_TYPE.mostLiked
   let publishTime: number = PUBLISH_TIME.anyTime
   let staleAfterYears = DEFAULT_STALE_AFTER_YEARS
+  let maxSeconds = DEFAULT_MAX_SECONDS
   let dryRun = false
   let raw = false
 
@@ -105,6 +121,7 @@ function parseArgs(argv: string[]): Options {
       case '--count': count = Number(next()); break
       case '--region': region = next(); break
       case '--stale-after': staleAfterYears = Number(next()); break
+      case '--max-seconds': maxSeconds = Number(next()); break
       case '--dry-run': dryRun = true; break
       case '--raw': raw = true; break
       case '--sort': {
@@ -152,6 +169,7 @@ function parseArgs(argv: string[]): Options {
     sortType,
     publishTime,
     staleAfterYears,
+    maxSeconds,
     dryRun,
     raw,
   }
@@ -169,6 +187,7 @@ Pull candidate videos into a track's review queue.
   --sort <mode>       relevance | liked | recent.                   (liked)
   --max-age <days>    all | 1 | 7 | 30 | 90 | 180 | 365.            (all)
   --stale-after <yrs> Flag anything older than this for the reviewer. (3)
+  --max-seconds <n>   Drop anything longer. 0 disables the cap.        (60)
   --dry-run           Print what would be written; write nothing.
   --raw               Dump the first raw response to a file, for shape checks.
 
@@ -250,7 +269,18 @@ async function main() {
     return
   }
 
-  const ranked = found
+  // Length first, then rank. A long video that ranks well would otherwise take
+  // a slot from a short one that a learner will actually watch to the end.
+  const tooLong = options.maxSeconds > 0
+    ? found.filter(c => c.durationSeconds > options.maxSeconds)
+    : []
+  const shortEnough = found.filter(c => !tooLong.includes(c))
+
+  if (tooLong.length > 0) {
+    console.log(`\n${tooLong.length} dropped as longer than ${options.maxSeconds}s.`)
+  }
+
+  const ranked = shortEnough
     .sort((a, b) => engagementScore(b) - engagementScore(a))
     .slice(0, options.count)
 
@@ -274,7 +304,11 @@ async function main() {
   for (const item of queued) {
     const plays = item.engagement.plays.toLocaleString()
     const posted = item.postedAt.slice(0, 7)
-    console.log(`  ${item.id}  ${item.creatorHandle.padEnd(20)} ${posted}  ${plays.padStart(12)} plays`)
+    const length = item.durationSeconds > 0 ? `${item.durationSeconds}s` : '  ?'
+    console.log(
+      `  ${item.id}  ${item.creatorHandle.padEnd(20)} ${posted}  ${length.padStart(5)}  ` +
+      `${plays.padStart(12)} plays`,
+    )
     if (item.concerns) {
       for (const concern of item.concerns) console.log(`            ⚠ ${concern}`)
     }

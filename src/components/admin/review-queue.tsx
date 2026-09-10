@@ -15,21 +15,44 @@ import { Check, ChevronLeft, ChevronRight, Undo2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { VideoEmbed } from '@/components/learning/video-embed'
 import type { TrackId } from '@/lib/learning/tracks'
-import { isReviewComplete, type QueuedVideo } from '@/lib/learning/video-pool/types'
+import {
+  isReviewComplete,
+  type PooledVideo,
+  type QueuedVideo,
+} from '@/lib/learning/video-pool/types'
 
 interface ReviewQueueProps {
   trackId: TrackId
   trackTitle: string
   initialQueue: QueuedVideo[]
+  initialApproved: PooledVideo[]
 }
+
+/** Which list is on screen. The fields are the same either way. */
+type Mode = 'queue' | 'approved'
+
+/** Both lists carry every field this screen reads. */
+type Reviewable = QueuedVideo | PooledVideo
+
+const isQueued = (item: Reviewable): item is QueuedVideo => item.status === 'draft'
+
+const asClock = (seconds: number) =>
+  seconds > 0 ? `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}` : '—'
 
 /** The rubric is one point per line — the fastest thing to type while watching. */
 const rubricToText = (rubric?: string[]) => (rubric ?? []).join('\n')
 const textToRubric = (text: string) =>
   text.split('\n').map(line => line.trim()).filter(Boolean)
 
-export function ReviewQueue({ trackId, trackTitle, initialQueue }: ReviewQueueProps) {
+export function ReviewQueue({
+  trackId,
+  trackTitle,
+  initialQueue,
+  initialApproved,
+}: ReviewQueueProps) {
   const [queue, setQueue] = useState(initialQueue)
+  const [approved, setApproved] = useState(initialApproved)
+  const [mode, setMode] = useState<Mode>('queue')
   const [index, setIndex] = useState(0)
   const [dirty, setDirty] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -42,7 +65,8 @@ export function ReviewQueue({ trackId, trackTitle, initialQueue }: ReviewQueuePr
   const [reference, setReference] = useState('')
   const [rubricText, setRubricText] = useState('')
 
-  const current = queue[index]
+  const list: Reviewable[] = mode === 'queue' ? queue : approved
+  const current = list[index]
 
   // Load the candidate's saved draft whenever the screen moves to a new one.
   useEffect(() => {
@@ -69,7 +93,17 @@ export function ReviewQueue({ trackId, trackTitle, initialQueue }: ReviewQueuePr
     : false
 
   const post = useCallback(
-    async (action: 'save' | 'approve' | 'reject' | 'unreject', extra?: Record<string, unknown>) => {
+    async (
+      action:
+        | 'save'
+        | 'approve'
+        | 'reject'
+        | 'unreject'
+        | 'update-approved'
+        | 'retire'
+        | 'unretire',
+      extra?: Record<string, unknown>,
+    ) => {
       if (!current) return null
       setBusy(true)
       setError(null)
@@ -90,7 +124,7 @@ export function ReviewQueue({ trackId, trackTitle, initialQueue }: ReviewQueuePr
           setError(payload.error ?? 'That did not save.')
           return null
         }
-        return payload as { ok: true; item?: QueuedVideo; approvedId?: string }
+        return payload as { ok: true; item?: Reviewable; approvedId?: string }
       } catch {
         setError('Could not reach the review route. Is the dev server still running?')
         return null
@@ -102,25 +136,30 @@ export function ReviewQueue({ trackId, trackTitle, initialQueue }: ReviewQueuePr
   )
 
   const save = useCallback(async () => {
-    const result = await post('save')
+    const result = await post(mode === 'queue' ? 'save' : 'update-approved')
     if (!result?.item) return false
     const item = result.item
-    setQueue(prev => prev.map(row => (row.id === item.id ? item : row)))
+    if (isQueued(item)) {
+      setQueue(prev => prev.map(row => (row.id === item.id ? item : row)))
+    } else {
+      const saved = item
+      setApproved(prev => prev.map(row => (row.id === saved.id ? saved : row)))
+    }
     setDirty(false)
-    setNote('Draft saved.')
+    setNote(mode === 'queue' ? 'Draft saved.' : 'Saved. Commit the diff to ship the edit.')
     return true
-  }, [post])
+  }, [mode, post])
 
   const move = useCallback(
     async (delta: number) => {
       const next = index + delta
-      if (next < 0 || next >= queue.length) return
+      if (next < 0 || next >= list.length) return
       // Never lose typing to a stray arrow click.
       if (dirty && !(await save())) return
       setNote(null)
       setIndex(next)
     },
-    [dirty, index, queue.length, save],
+    [dirty, index, list.length, save],
   )
 
   const approve = useCallback(async () => {
@@ -130,39 +169,109 @@ export function ReviewQueue({ trackId, trackTitle, initialQueue }: ReviewQueuePr
     setQueue(prev => prev.filter(row => row.id !== approvedId))
     setIndex(prev => Math.max(0, Math.min(prev, queue.length - 2)))
     setNote(`${approvedId} approved. Commit the diff to ship it.`)
+    // It has changed files, so it leaves the queue and joins the approved tab.
+    const item = result.item
+    if (item && !isQueued(item)) setApproved(prev => [...prev, item])
   }, [post, queue.length])
 
   const reject = useCallback(async () => {
     const reason = window.prompt('Why is this one out? (optional)') ?? ''
     const result = await post('reject', { reason })
-    if (!result?.item) return
-    const item = result.item
+    const item = result?.item
+    if (!item || !isQueued(item)) return
     setQueue(prev => prev.map(row => (row.id === item.id ? item : row)))
     setNote('Rejected. It stays in the file so ingestion will not offer it again.')
   }, [post])
 
   const unreject = useCallback(async () => {
     const result = await post('unreject')
-    if (!result?.item) return
-    const item = result.item
+    const item = result?.item
+    if (!item || !isQueued(item)) return
     setQueue(prev => prev.map(row => (row.id === item.id ? item : row)))
     setNote(null)
   }, [post])
 
-  const pending = queue.filter(row => !row.rejected).length
+  const retire = useCallback(async () => {
+    const reason = window.prompt('Why is this one coming out? (optional)') ?? ''
+    const result = await post('retire', { reason })
+    const item = result?.item
+    if (!item || isQueued(item)) return
+    setApproved(prev => prev.map(row => (row.id === item.id ? item : row)))
+    setNote('Removed from the pool. Commit the diff to take it off the quiz.')
+  }, [post])
 
-  if (queue.length === 0) {
+  const unretire = useCallback(async () => {
+    const result = await post('unretire')
+    const item = result?.item
+    if (!item || isQueued(item)) return
+    setApproved(prev => prev.map(row => (row.id === item.id ? item : row)))
+    setNote(null)
+  }, [post])
+
+  const pending = queue.filter(row => !row.rejected).length
+  // What a learner can actually draw. Retired rows stay listed so they can be
+  // put back, but they are not part of the count that matters.
+  const live = approved.filter(row => row.status === 'approved').length
+
+  // Switching tabs starts at the top of the new list rather than at whatever
+  // index the old one happened to be on.
+  const switchTo = (next: Mode) => {
+    if (next === mode) return
+    setMode(next)
+    setIndex(0)
+    setNote(null)
+  }
+
+  const tabs = (
+    <div className="flex items-center gap-1 rounded-lg bg-surface-container-low p-1">
+      {(
+        [
+          ['queue', `To review (${pending})`],
+          ['approved', `Approved (${live})`],
+        ] as const
+      ).map(([value, label]) => (
+        <button
+          key={value}
+          type="button"
+          onClick={() => switchTo(value)}
+          disabled={busy}
+          className={`rounded-md px-3 py-1.5 text-label-md transition-colors ${
+            mode === value
+              ? 'bg-surface-container-lowest text-on-surface shadow-card'
+              : 'text-on-surface-variant hover:text-on-surface'
+          }`}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  )
+
+  if (list.length === 0) {
     return (
-      <div className="rounded-2xl bg-surface-container-lowest p-8 text-center shadow-card">
-        <p className="text-headline-sm text-on-surface">Nothing waiting for {trackTitle}.</p>
-        <p className="mx-auto mt-2 max-w-md text-body-md text-on-surface-variant">
-          Candidates arrive here when the ingestion script runs. It pulls from TikHub, ranks
-          by engagement, drops anything already in the pool, and writes{' '}
-          <code className="rounded bg-surface-container px-1 py-0.5 text-label-md">
-            {trackId}.candidates.json
-          </code>
-          . Nothing it writes is ever approved on its own.
-        </p>
+      <div className="flex flex-col gap-4">
+        {tabs}
+        <div className="rounded-2xl bg-surface-container-lowest p-8 text-center shadow-card">
+          <p className="text-headline-sm text-on-surface">
+            {mode === 'queue'
+              ? `Nothing waiting for ${trackTitle}.`
+              : `Nothing approved for ${trackTitle} yet.`}
+          </p>
+          <p className="mx-auto mt-2 max-w-md text-body-md text-on-surface-variant">
+            {mode === 'queue' ? (
+              <>
+                Candidates arrive here when the ingestion script runs. It pulls from TikHub,
+                ranks by engagement, drops anything already in the pool, and writes{' '}
+                <code className="rounded bg-surface-container px-1 py-0.5 text-label-md">
+                  {trackId}.candidates.json
+                </code>
+                . Nothing it writes is ever approved on its own.
+              </>
+            ) : (
+              'Approve something from the review queue and it will show up here, where you can still edit what it asks.'
+            )}
+          </p>
+        </div>
       </div>
     )
   }
@@ -170,6 +279,8 @@ export function ReviewQueue({ trackId, trackTitle, initialQueue }: ReviewQueuePr
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
+        {tabs}
+
         <div className="ml-auto flex items-center gap-2">
           <button
             type="button"
@@ -181,12 +292,13 @@ export function ReviewQueue({ trackId, trackTitle, initialQueue }: ReviewQueuePr
             <ChevronLeft className="h-4 w-4" />
           </button>
           <span className="text-label-md tabular-nums text-on-surface-variant">
-            {index + 1} / {queue.length} · {pending} to go
+            {index + 1} / {list.length}
+            {mode === 'queue' ? ` · ${pending} to go` : ' · live'}
           </span>
           <button
             type="button"
             onClick={() => move(1)}
-            disabled={index >= queue.length - 1 || busy}
+            disabled={index >= list.length - 1 || busy}
             className="rounded-md p-2 text-on-surface-variant hover:bg-surface-container disabled:opacity-40"
             aria-label="Next candidate"
           >
@@ -206,6 +318,12 @@ export function ReviewQueue({ trackId, trackTitle, initialQueue }: ReviewQueuePr
               postedAt={current.postedAt}
             />
             <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-label-md">
+              <div className="flex justify-between gap-2">
+                <dt className="text-on-surface-variant">Length</dt>
+                <dd className="tabular-nums text-on-surface">
+                  {asClock(current.durationSeconds)}
+                </dd>
+              </div>
               {(
                 [
                   ['Plays', current.engagement.plays],
@@ -233,7 +351,26 @@ export function ReviewQueue({ trackId, trackTitle, initialQueue }: ReviewQueuePr
           </div>
 
           <div className="flex flex-col gap-4">
-            {current.rejected && (
+            {!isQueued(current) && current.status === 'retired' && (
+              <div className="flex items-center justify-between gap-3 rounded-xl bg-error/10 px-4 py-3">
+                <span className="text-body-md text-error">
+                  Removed from the pool
+                  {current.retiredReason ? ` — ${current.retiredReason}` : ''}. Learners no
+                  longer see it.
+                </span>
+                <button
+                  type="button"
+                  onClick={unretire}
+                  disabled={busy}
+                  className="inline-flex items-center gap-1 text-label-md text-error hover:underline"
+                >
+                  <Undo2 className="h-3.5 w-3.5" aria-hidden />
+                  Put back
+                </button>
+              </div>
+            )}
+
+            {isQueued(current) && current.rejected && (
               <div className="flex items-center justify-between gap-3 rounded-xl bg-error/10 px-4 py-3">
                 <span className="text-body-md text-error">
                   Rejected{current.rejectedReason ? ` — ${current.rejectedReason}` : ''}.
@@ -296,22 +433,42 @@ export function ReviewQueue({ trackId, trackTitle, initialQueue }: ReviewQueuePr
             {!error && note && <p className="text-body-md text-success">{note}</p>}
 
             <div className="flex flex-wrap items-center gap-3">
-              <Button onClick={approve} disabled={busy || !complete}>
-                <span className="inline-flex items-center gap-2">
-                  <Check className="h-4 w-4" aria-hidden />
-                  Approve
-                </span>
-              </Button>
-              <Button variant="secondary" onClick={save} disabled={busy || !dirty}>
-                Save draft
-              </Button>
-              {!current.rejected && (
-                <Button variant="ghost" onClick={reject} disabled={busy}>
-                  <span className="inline-flex items-center gap-2">
-                    <X className="h-4 w-4" aria-hidden />
-                    Reject
-                  </span>
-                </Button>
+              {/* An approved video is already in front of learners, so the only
+                  action it offers is editing what it asks. */}
+              {isQueued(current) ? (
+                <>
+                  <Button onClick={approve} disabled={busy || !complete}>
+                    <span className="inline-flex items-center gap-2">
+                      <Check className="h-4 w-4" aria-hidden />
+                      Approve
+                    </span>
+                  </Button>
+                  <Button variant="secondary" onClick={save} disabled={busy || !dirty}>
+                    Save draft
+                  </Button>
+                  {!current.rejected && (
+                    <Button variant="ghost" onClick={reject} disabled={busy}>
+                      <span className="inline-flex items-center gap-2">
+                        <X className="h-4 w-4" aria-hidden />
+                        Reject
+                      </span>
+                    </Button>
+                  )}
+                </>
+              ) : (
+                <>
+                  <Button onClick={save} disabled={busy || !dirty || !complete}>
+                    Save changes
+                  </Button>
+                  {current.status === 'approved' && (
+                    <Button variant="ghost" onClick={retire} disabled={busy}>
+                      <span className="inline-flex items-center gap-2">
+                        <X className="h-4 w-4" aria-hidden />
+                        Remove from pool
+                      </span>
+                    </Button>
+                  )}
+                </>
               )}
               {!complete && (
                 <span className="text-label-md text-on-surface-variant">

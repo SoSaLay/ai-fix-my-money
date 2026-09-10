@@ -159,7 +159,6 @@ interface PooledVideo {
   /** SERVER ONLY. The specific points an answer must hit, in order of weight. */
   rubric: string[]
 
-  reviewedBy: string
   reviewedAt: string        // ISO
   status: 'draft' | 'approved' | 'unavailable' | 'retired'
   /** Last time the embed was confirmed to still load. */

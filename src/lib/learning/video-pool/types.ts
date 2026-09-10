@@ -29,6 +29,8 @@ export interface VideoCandidate {
   creatorHandle: string
   /** ISO. */
   postedAt: string
+  /** Whole seconds. 0 when the platform did not report one. */
+  durationSeconds: number
   /** The creator's own caption. Reviewer context only, never shown as material. */
   caption: string
   engagement: {
@@ -60,6 +62,12 @@ export interface PooledVideo extends VideoCandidate, VideoReview {
   status: VideoStatus
   /** ISO. Last time the embed was confirmed to still load. */
   lastCheckedAt: string
+  /**
+   * Why it was taken out of circulation, when `status` is 'retired'. Retiring
+   * rather than deleting is deliberate: the row keeps the id out of the reuse
+   * pool and keeps ingestion from offering the same video again.
+   */
+  retiredReason?: string
 }
 
 /**
@@ -96,8 +104,11 @@ export interface PublicVideoQuestion {
   postedAt: string
 }
 
-/** The reviewer's fields are all present and non-empty. */
-export function isReviewComplete(item: QueuedVideo): boolean {
+/**
+ * The reviewer's fields are all present and non-empty. Takes the review fields
+ * alone, so it gates a queued draft and an edit to an approved item alike.
+ */
+export function isReviewComplete(item: Partial<VideoReview>): boolean {
   return Boolean(
     item.question?.trim() &&
     item.referenceAnswer?.trim() &&
