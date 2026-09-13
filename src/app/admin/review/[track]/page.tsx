@@ -11,6 +11,9 @@ import {
 } from '@/lib/learning/video-pool/pool'
 import { ReviewQueue } from '@/components/admin/review-queue'
 
+/** Read fresh from the pool files on every request, never from a cache. */
+export const dynamic = 'force-dynamic'
+
 export default async function TrackReviewPage({
   params,
 }: {

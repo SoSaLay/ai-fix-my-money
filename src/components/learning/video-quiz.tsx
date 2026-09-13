@@ -170,10 +170,11 @@ export function VideoQuiz({ track, onSubmit, onDone, attemptKey }: VideoQuizProp
           </span>
         </div>
         <p className="text-body-md text-on-surface-variant leading-relaxed">
-          {videos.length} videos to watch and answer in your own words, then {choices.length}{' '}
-          multiple choice. Each is worth {POINTS_PER_QUESTION} points — {totalPoints} in total,
-          and you need {Math.ceil(totalPoints * PASS_FRACTION)} to pass. Every answer is marked
-          as soon as you give it, and cannot be changed after that.
+          {videos.length} videos to watch and answer in your own words
+          {choices.length > 0 ? `, then ${choices.length} multiple choice` : ''}. Each is worth{' '}
+          {POINTS_PER_QUESTION} points — {totalPoints} in total, and you need{' '}
+          {Math.ceil(totalPoints * PASS_FRACTION)} to pass. Every answer is marked as soon as
+          you give it, and cannot be changed after that.
         </p>
       </div>
 

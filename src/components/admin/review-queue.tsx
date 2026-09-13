@@ -28,8 +28,8 @@ interface ReviewQueueProps {
   initialApproved: PooledVideo[]
 }
 
-/** Which list is on screen. The fields are the same either way. */
-type Mode = 'queue' | 'approved'
+/** Which list is on screen. The fields are the same whichever it is. */
+type Mode = 'queue' | 'approved' | 'rejected'
 
 /** Both lists carry every field this screen reads. */
 type Reviewable = QueuedVideo | PooledVideo
@@ -65,7 +65,11 @@ export function ReviewQueue({
   const [reference, setReference] = useState('')
   const [rubricText, setRubricText] = useState('')
 
-  const list: Reviewable[] = mode === 'queue' ? queue : approved
+  const pendingQueue = useMemo(() => queue.filter(row => !row.rejected), [queue])
+  const rejectedQueue = useMemo(() => queue.filter(row => row.rejected), [queue])
+
+  const list: Reviewable[] =
+    mode === 'approved' ? approved : mode === 'rejected' ? rejectedQueue : pendingQueue
   const current = list[index]
 
   // Load the candidate's saved draft whenever the screen moves to a new one.
@@ -77,6 +81,11 @@ export function ReviewQueue({
     setDirty(false)
     setError(null)
   }, [current])
+
+  // Approving, rejecting or putting something back shortens the list in view.
+  useEffect(() => {
+    if (index > 0 && index >= list.length) setIndex(Math.max(0, list.length - 1))
+  }, [index, list.length])
 
   const draft = useMemo(
     () => ({
@@ -100,8 +109,7 @@ export function ReviewQueue({
         | 'reject'
         | 'unreject'
         | 'update-approved'
-        | 'retire'
-        | 'unretire',
+        | 'retire',
       extra?: Record<string, unknown>,
     ) => {
       if (!current) return null
@@ -150,17 +158,18 @@ export function ReviewQueue({
     return true
   }, [mode, post])
 
-  const move = useCallback(
-    async (delta: number) => {
-      const next = index + delta
-      if (next < 0 || next >= list.length) return
-      // Never lose typing to a stray arrow click.
+  const goTo = useCallback(
+    async (next: number) => {
+      if (next < 0 || next >= list.length || next === index) return
+      // Never lose typing to a stray click.
       if (dirty && !(await save())) return
       setNote(null)
       setIndex(next)
     },
     [dirty, index, list.length, save],
   )
+
+  const move = useCallback((delta: number) => goTo(index + delta), [goTo, index])
 
   const approve = useCallback(async () => {
     const result = await post('approve')
@@ -180,7 +189,7 @@ export function ReviewQueue({
     const item = result?.item
     if (!item || !isQueued(item)) return
     setQueue(prev => prev.map(row => (row.id === item.id ? item : row)))
-    setNote('Rejected. It stays in the file so ingestion will not offer it again.')
+    setNote('Rejected — it moves to the Rejected tab, and ingestion will not offer it again.')
   }, [post])
 
   const unreject = useCallback(async () => {
@@ -195,20 +204,13 @@ export function ReviewQueue({
     const reason = window.prompt('Why is this one coming out? (optional)') ?? ''
     const result = await post('retire', { reason })
     const item = result?.item
-    if (!item || isQueued(item)) return
-    setApproved(prev => prev.map(row => (row.id === item.id ? item : row)))
-    setNote('Removed from the pool. Commit the diff to take it off the quiz.')
+    if (!item || !isQueued(item)) return
+    setApproved(prev => prev.filter(row => row.id !== item.id))
+    setQueue(prev => [...prev.filter(row => row.id !== item.id), item])
+    setNote('Removed from the pool — it is in the Rejected tab now, with its question kept.')
   }, [post])
 
-  const unretire = useCallback(async () => {
-    const result = await post('unretire')
-    const item = result?.item
-    if (!item || isQueued(item)) return
-    setApproved(prev => prev.map(row => (row.id === item.id ? item : row)))
-    setNote(null)
-  }, [post])
-
-  const pending = queue.filter(row => !row.rejected).length
+  const pending = pendingQueue.length
   // What a learner can actually draw. Retired rows stay listed so they can be
   // put back, but they are not part of the count that matters.
   const live = approved.filter(row => row.status === 'approved').length
@@ -228,6 +230,7 @@ export function ReviewQueue({
         [
           ['queue', `To review (${pending})`],
           ['approved', `Approved (${live})`],
+          ['rejected', `Rejected (${rejectedQueue.length})`],
         ] as const
       ).map(([value, label]) => (
         <button
@@ -255,7 +258,9 @@ export function ReviewQueue({
           <p className="text-headline-sm text-on-surface">
             {mode === 'queue'
               ? `Nothing waiting for ${trackTitle}.`
-              : `Nothing approved for ${trackTitle} yet.`}
+              : mode === 'approved'
+                ? `Nothing approved for ${trackTitle} yet.`
+                : `Nothing rejected for ${trackTitle}.`}
           </p>
           <p className="mx-auto mt-2 max-w-md text-body-md text-on-surface-variant">
             {mode === 'queue' ? (
@@ -291,9 +296,15 @@ export function ReviewQueue({
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
+          <JumpTo
+            total={list.length}
+            index={index}
+            disabled={busy}
+            onJump={goTo}
+          />
           <span className="text-label-md tabular-nums text-on-surface-variant">
-            {index + 1} / {list.length}
-            {mode === 'queue' ? ` · ${pending} to go` : ' · live'}
+            / {list.length}
+            {mode === 'approved' && ` · ${live} live`}
           </span>
           <button
             type="button"
@@ -351,25 +362,6 @@ export function ReviewQueue({
           </div>
 
           <div className="flex flex-col gap-4">
-            {!isQueued(current) && current.status === 'retired' && (
-              <div className="flex items-center justify-between gap-3 rounded-xl bg-error/10 px-4 py-3">
-                <span className="text-body-md text-error">
-                  Removed from the pool
-                  {current.retiredReason ? ` — ${current.retiredReason}` : ''}. Learners no
-                  longer see it.
-                </span>
-                <button
-                  type="button"
-                  onClick={unretire}
-                  disabled={busy}
-                  className="inline-flex items-center gap-1 text-label-md text-error hover:underline"
-                >
-                  <Undo2 className="h-3.5 w-3.5" aria-hidden />
-                  Put back
-                </button>
-              </div>
-            )}
-
             {isQueued(current) && current.rejected && (
               <div className="flex items-center justify-between gap-3 rounded-xl bg-error/10 px-4 py-3">
                 <span className="text-body-md text-error">
@@ -435,7 +427,14 @@ export function ReviewQueue({
             <div className="flex flex-wrap items-center gap-3">
               {/* An approved video is already in front of learners, so the only
                   action it offers is editing what it asks. */}
-              {isQueued(current) ? (
+              {mode === 'rejected' ? (
+                <Button variant="secondary" onClick={unreject} disabled={busy}>
+                  <span className="inline-flex items-center gap-2">
+                    <Undo2 className="h-4 w-4" aria-hidden />
+                    Put back in the review queue
+                  </span>
+                </Button>
+              ) : isQueued(current) ? (
                 <>
                   <Button onClick={approve} disabled={busy || !complete}>
                     <span className="inline-flex items-center gap-2">
@@ -460,17 +459,15 @@ export function ReviewQueue({
                   <Button onClick={save} disabled={busy || !dirty || !complete}>
                     Save changes
                   </Button>
-                  {current.status === 'approved' && (
-                    <Button variant="ghost" onClick={retire} disabled={busy}>
-                      <span className="inline-flex items-center gap-2">
-                        <X className="h-4 w-4" aria-hidden />
-                        Remove from pool
-                      </span>
-                    </Button>
-                  )}
+                  <Button variant="ghost" onClick={retire} disabled={busy}>
+                    <span className="inline-flex items-center gap-2">
+                      <X className="h-4 w-4" aria-hidden />
+                      Remove from pool
+                    </span>
+                  </Button>
                 </>
               )}
-              {!complete && (
+              {!complete && mode !== 'rejected' && (
                 <span className="text-label-md text-on-surface-variant">
                   A question, a reference answer, and one rubric point are required.
                 </span>
@@ -480,6 +477,52 @@ export function ReviewQueue({
         </div>
       )}
     </div>
+  )
+}
+
+/**
+ * Type a number, press Enter, land on it. The value is only committed on Enter
+ * or on blur — reacting to every keystroke would jump to candidate 3 on the way
+ * to typing 38.
+ */
+function JumpTo({
+  total, index, disabled, onJump,
+}: {
+  total: number
+  index: number
+  disabled: boolean
+  onJump: (next: number) => void
+}) {
+  const [draft, setDraft] = useState(String(index + 1))
+
+  // Follow the arrows when they move the selection.
+  useEffect(() => { setDraft(String(index + 1)) }, [index])
+
+  const commit = () => {
+    const parsed = Number(draft)
+    if (!Number.isInteger(parsed) || parsed < 1 || parsed > total) {
+      setDraft(String(index + 1))
+      return
+    }
+    onJump(parsed - 1)
+  }
+
+  return (
+    <input
+      value={draft}
+      onChange={event => setDraft(event.target.value.replace(/[^0-9]/g, ''))}
+      onKeyDown={event => {
+        if (event.key === 'Enter') { event.preventDefault(); commit() }
+        if (event.key === 'Escape') setDraft(String(index + 1))
+      }}
+      onBlur={commit}
+      onFocus={event => event.target.select()}
+      disabled={disabled}
+      inputMode="numeric"
+      aria-label={`Candidate number, 1 to ${total}`}
+      title={`Type a number from 1 to ${total} and press Enter`}
+      className="w-12 rounded-md bg-surface-container-low px-2 py-1 text-center text-label-md tabular-nums text-on-surface focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-secondary/35 disabled:opacity-40"
+    />
   )
 }
 

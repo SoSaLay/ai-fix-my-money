@@ -13,7 +13,7 @@
 // tradeoffs are. Nothing here tells a learner what to choose. See DISCLAIMER.
 // ============================================================================
 
-import { DISCLAIMER_INVESTING } from '@/lib/learning/disclaimer'
+import { DISCLAIMER_INVESTING, DISCLAIMER_SHORT } from '@/lib/learning/disclaimer'
 
 export type TrackId = 'accounts' | 'spending' | 'savings' | 'investing'
 
@@ -1059,7 +1059,9 @@ const SAVINGS: Track = {
             { term: 'Savings account', text: 'A basic account for money you are not spending right now.' },
             { term: 'High-yield savings account', text: 'The same idea, but specific banks incentivize you with a higher interest rate to keep your money there.' },
             { term: 'Money market account', text: 'Similar to a savings account and often pays more, can require a higher minimum balance to avoid fees or earn that rate.' },
+            { term: 'Money market fund', text: 'Not a bank account but an investment you hold at a brokerage. Often pays more than one, and is not FDIC insured.' },
             { term: 'CD (certificate of deposit)', text: 'Pays more, but your money is locked in for a set term.' },
+            { term: 'Treasurys', text: 'Lending money to the US government for a set term. Backed by the government rather than by FDIC insurance.' },
           ],
         },
         {
@@ -1270,7 +1272,7 @@ const INVESTING: Track = {
         {
           heading: 'Growth or loss',
           bullets: [
-            { term: 'Grow your money', text: 'Your investment can increase in value, and you may earn income through dividends or interest.' },
+            { term: 'Grow your money', text: 'Your investment can increase in value, and you may also earn income through dividends or interest.' },
             { term: 'Lose your money', text: 'Your investment can fall in value, fail completely, or lose its income.' },
           ],
         },
@@ -1459,21 +1461,16 @@ const INVESTING: Track = {
           heading: 'Lower Risk, Built for the Long Term',
           gridTable: {
             columns: ['Type', 'Definition', 'Risk'],
-            risk: [1, 1, 1, 1, 2],
+            risk: [1, 1, 1, 2, 2],
             rows: [
               [
                 'ETFs',
-                'Funds you can buy and sell like a stock. They can hold many investments at once, making diversification easy.',
+                'A fund holding many investments at once, most often tracking an index. Traded like a stock, so the price moves all day and you can buy or sell whenever the market is open.',
                 'Risk depends on what it holds; broad ETFs are generally more diversified than narrow ones.',
               ],
               [
-                'Index funds',
-                'Funds designed to track a market index instead of trying to pick individual winners.',
-                'Diversification spreads your risk across many companies.',
-              ],
-              [
                 'Mutual funds',
-                'Pools of investments managed together.',
+                'The same idea in a different wrapper, also commonly tracking an index. Bought and sold once a day at the closing price instead of throughout it, so you cannot trade on intraday moves.',
                 'Risk depends on what the fund owns; diversified funds are generally less risky.',
               ],
               [
@@ -1485,6 +1482,11 @@ const INVESTING: Track = {
                 'REITs',
                 'A way to invest in real estate without buying property yourself. You can earn income and growth.',
                 'Your returns can fall when property values, rents, or interest rates move against you.',
+              ],
+              [
+                'Real estate',
+                'Buying property yourself, to rent out or to manage. You earn rent and any rise in what the property is worth.',
+                'Your money is not liquid — selling takes months and costs a lot. It is also one asset in one place, and a mortgage means borrowing against it.',
               ],
             ],
           },
@@ -1514,7 +1516,7 @@ const INVESTING: Track = {
           heading: 'Highest Risk, Easy to Lose Money',
           gridTable: {
             columns: ['Type', 'Definition', 'Risk'],
-            risk: [5, 5, 5],
+            risk: [5, 5, 5, 5],
             rows: [
               [
                 'Options',
@@ -1525,6 +1527,11 @@ const INVESTING: Track = {
                 'Futures',
                 'Contracts to buy or sell something at a future date, usually using leverage.',
                 'Leverage can magnify losses, potentially costing you more than you invested.',
+              ],
+              [
+                'Swing trading',
+                'Holding an investment for days or weeks to profit from a short-term price move. Not the same as day trading, where a position is opened and closed within the same day.',
+                'Your result still depends on the price moving your way inside a short window, and holding overnight means news can move it while you cannot act.',
               ],
               [
                 'Day trading',
@@ -1551,15 +1558,15 @@ const INVESTING: Track = {
       questions: [
         {
           id: 'inv-6-q1',
-          question: 'What is an index fund designed to do?',
+          question: 'An ETF and a mutual fund can track the very same index. What actually differs?',
           options: [
-            'Pick the companies most likely to outperform',
-            'Track a market index instead of trying to pick individual winners',
-            'Guarantee a set return each year',
-            'Hold a single company at a time',
+            'The mutual fund is not diversified',
+            'When you can trade it — an ETF trades all day, a mutual fund once a day at the closing price',
+            'Only the ETF can lose value',
+            'Nothing at all',
           ],
           answer: 1,
-          why: 'It tracks the index rather than choosing between the companies in it. The diversification that comes with that is what spreads your risk across many companies.',
+          why: 'They are two wrappers around the same idea. Both hold many investments and both commonly track an index; the difference is that an ETF prices all day and a mutual fund settles once, at the close.',
         },
         {
           id: 'inv-6-q2',
@@ -1624,10 +1631,119 @@ const INVESTING: Track = {
       ],
     },
     {
+      id: 'inv-5',
+      title: 'What do I buy?',
+      readSeconds: 60,
+      sections: [
+        {
+          // Kept to one line. This is the lesson most likely to be read as a
+          // recommendation, and a wall of legal text is the thing people skip.
+          body: `${DISCLAIMER_SHORT} Nothing below is a recommendation — these are the three patterns people fall into, and what each one costs.`,
+        },
+        {
+          heading: 'Less Risk, Long Term',
+          bullets: [
+            {
+              term: 'What you buy',
+              text: 'Funds that hold many investments at once, such as ETFs, index funds, or mutual funds. Add to them regularly and leave them invested for years. The focus is consistency, not picking individual winners. If you want to take even less risk, you can also add bonds.',
+            },
+            {
+              term: 'The risk',
+              text: 'These investments can still fall when the market falls. Diversification reduces the impact of any one investment, but it does not eliminate risk.',
+            },
+          ],
+        },
+        {
+          divider: true,
+          heading: 'More Risk, Short Term',
+          bullets: [
+            {
+              term: 'What you buy',
+              text: 'Individual stocks, or higher-risk investments such as crypto, options, futures, or day trading. Frequently research, choose, and make decisions about when to buy and sell. More effort is involved, and many of these investments also depend on timing.',
+            },
+            {
+              term: 'The risk',
+              text: 'You have to make the right decision in a shorter time frame. This increases your chance of losing money, and some investments can even lose more than you put in.',
+            },
+          ],
+        },
+        {
+          divider: true,
+          heading: 'Combination Risk',
+          bullets: [
+            {
+              term: 'What you buy',
+              text: 'A mix of the two. Some hold mostly funds and put a smaller portion into options or futures to supplement income while the baseline stays steady. Others run it the other way round, mostly options or futures with a small portion in funds.',
+            },
+            {
+              term: 'The risk',
+              text: 'You are managing several investments at once, so it takes more effort and the overall picture can get cloudy. Done properly it can supplement income while keeping a steadier base underneath it.',
+            },
+          ],
+        },
+        {
+          divider: true,
+          heading: 'Risk Comes Down to Your Goal',
+          body: 'The more risk you take, the greater the chance of losing money. Think about what you want investing to do for you.',
+          // Ties back to the three ways of increasing income in the Income vs.
+          // Spending track. Investing is the third, and which job you give it is
+          // what decides how much risk someone ends up carrying.
+          bullets: [
+            {
+              term: 'To increase your income',
+              text: 'You may take more risk by making shorter-term or more speculative investments.',
+            },
+            {
+              term: 'To grow the money you already earn',
+              text: 'You can take a steadier approach. Build your income through a career or business, invest part of what you earn, and give your investments time to grow.',
+            },
+          ],
+        },
+        {
+          // Lands on the inputs the next lesson opens with, so "Your goals"
+          // reads as the answer to the question this leaves open.
+          body: 'There is no single approach for everyone. Choose the level of risk that fits your goals, timeline, and ability to handle losses.',
+        },
+      ],
+      aside: {
+        heading: 'Effort is not edge',
+        body: [
+          'Putting more work into investing does not make a return more certain.',
+          'It widens the range of what can happen — in both directions.',
+        ],
+      },
+      questions: [
+        {
+          id: 'inv-5-q1',
+          question: 'What does the less-risk, long-term pattern ask of you?',
+          options: [
+            'Picking the companies most likely to win',
+            'Adding to diversified funds on a regular schedule and leaving them for years',
+            'Watching the market daily to decide when to buy',
+            'Nothing — the return is guaranteed',
+          ],
+          answer: 1,
+          why: 'The work is consistency rather than selection. It still falls when the market falls, so it removes the risk of one company failing, not the risk of a market downturn.',
+        },
+        {
+          id: 'inv-5-q2',
+          question: 'Someone researches carefully before every trade. What does that effort buy them?',
+          options: [
+            'A more certain return',
+            'A wider range of outcomes — bigger swings in either direction',
+            'Protection from losing more than they put in',
+            'A guaranteed result above the market average',
+          ],
+          answer: 1,
+          why: 'Effort is not edge. Working harder at picking widens what can happen rather than narrowing it, and some of these instruments can lose more than you put in.',
+        },
+      ],
+    },
+    {
       id: 'inv-4',
       title: 'Your goals',
       readSeconds: 60,
-      intro: 'Your investment plan should fit five things:',
+      intro: 'Your investment plan should fit six things:',
       sections: [
         {
           bullets: [
@@ -1635,6 +1751,7 @@ const INVESTING: Track = {
             { term: 'Time', text: 'When you’ll need it; more time gives investments longer to recover and compound.' },
             { term: 'Savings', text: 'How much you can regularly contribute.' },
             { term: 'Risk tolerance', text: 'How much of a drop you can handle without selling.' },
+            { term: 'Emotions', text: 'Your feelings rise and fall with the balance. A long-term plan means fewer decisions to make; more risk means bigger swings to sit through.' },
             { term: 'Required return', text: 'The return you need to reach your goal based on your time and savings.' },
           ],
         },

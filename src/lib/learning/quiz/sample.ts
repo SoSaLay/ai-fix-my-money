@@ -9,10 +9,9 @@ import 'server-only'
 
 import { getTrack, type QuizQuestion, type TrackId } from '@/lib/learning/tracks'
 import {
-  CHOICE_QUESTIONS_PER_QUIZ,
   liveVideos,
+  quizMix,
   toPublicQuestion,
-  VIDEO_QUESTIONS_PER_QUIZ,
 } from '@/lib/learning/video-pool/pool'
 import type { PublicVideoQuestion } from '@/lib/learning/video-pool/types'
 
@@ -51,18 +50,21 @@ export function samplePaper(trackId: string): (SampledPaper & { ok: true }) | Sa
   const track = getTrack(trackId)
   if (!track) return { ok: false, reason: 'unknown-track' }
 
+  const mix = quizMix(track.id)
+
   const live = liveVideos(track.id as TrackId)
-  if (live.length < VIDEO_QUESTIONS_PER_QUIZ) {
+  if (live.length < mix.videos) {
     return {
       ok: false,
       reason: 'pool-too-small',
       live: live.length,
-      needed: VIDEO_QUESTIONS_PER_QUIZ,
+      needed: mix.videos,
     }
   }
 
-  const videos = shuffled(live).slice(0, VIDEO_QUESTIONS_PER_QUIZ)
-  const choices = shuffled(track.finalQuiz).slice(0, CHOICE_QUESTIONS_PER_QUIZ)
+  const videos = shuffled(live).slice(0, mix.videos)
+  // A track with no choice slots never touches `finalQuiz`.
+  const choices = mix.choices > 0 ? shuffled(track.finalQuiz).slice(0, mix.choices) : []
 
   return {
     ok: true,

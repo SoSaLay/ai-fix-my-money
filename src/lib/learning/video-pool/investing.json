@@ -1,1 +1,362 @@
-[]
+[
+  {
+    "id": "inv-v-006",
+    "trackId": "investing",
+    "platform": "tiktok",
+    "videoId": "7636546262371683598",
+    "shareUrl": "https://www.tiktok.com/@calltoleap/video/7636546262371683598",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7636546262371683598",
+    "creatorHandle": "@calltoleap",
+    "postedAt": "2026-05-05T23:00:06.000Z",
+    "durationSeconds": 58,
+    "caption": "So this is how I would invest $1,000 in 2026 👀 Simple, diversified, and built for long-term growth Comment SHEETS and I’ll send you my favorite list of beginner investments 📩 — Steve If you’re ready to start investing this year, don’t miss my next Beginner’s Investing Masterclass! Sign up now - link in bio! Follow @calltoleap Follow @calltoleap for investing videos Follow me @calltoleap to start your journey toward financial freedom! #InvestingForBeginners #StockMarket #BuildWealth #FinancialFreedom #MoneyMindset #CallToLeap",
+    "engagement": {
+      "likes": 19411,
+      "comments": 4391,
+      "shares": 2919,
+      "plays": 405968
+    },
+    "question": "This creator says he'd put a first $1,000 mostly into ETFs rather than individual stocks. Why is that the common recommendation for someone just starting out?",
+    "claimUnderTest": "For a beginner investing their first $1,000, ETFs are a better choice than picking individual stocks.",
+    "referenceAnswer": "The main reason is diversification per dollar. A single ETF share buys a slice of dozens or hundreds of companies at once, so no one company's failure can do serious damage. With $1,000 in individual stocks, a beginner realistically owns a handful of positions, which means the outcome depends heavily on whether those specific picks work out. The same money in a broad ETF spreads that risk automatically — it's the one thing a small account can't achieve any other way.\n\nSecond, it removes the need for skill the beginner doesn't have yet. Picking individual stocks well requires evaluating businesses, and someone starting out has no basis for that judgment — so early picks tend to come from headlines, social media, or familiar brand names, none of which predict returns. A broad ETF sidesteps the question entirely: you're buying the market's overall performance rather than betting you can beat it. Most professional managers don't beat it either, which is why this isn't just beginner advice.\n\nThird, it's built for the behavior that actually produces results. ETFs suit buying regularly and holding for years, which is where compounding does its work. Individual stocks invite watching, second-guessing and trading — and a beginner holding a few volatile positions is far more likely to sell at the wrong moment. The ETF's boringness is a feature; it makes the strategy survivable.\n\nThe creator's own story is worth reading carefully, though. Growing an account past a million is mostly a function of contributions over many years plus market returns compounding — not of the specific picks. His $1,000 starting point illustrates the approach; the result came from time and consistency, and a learner shouldn't take the outcome as a promise attached to those particular funds.",
+    "rubric": [
+      "One ETF gives instant diversification across many companies, which $1,000 in individual stocks can't achieve",
+      "It doesn't require stock-picking skill a beginner doesn't have — you own the market rather than betting on specific winners",
+      "ETFs suit regular buying and long holding, which is where compounding works and where beginners are least likely to panic-sell",
+      "The million-dollar outcome came mainly from years of contributions and compounding, not from the particular picks"
+    ],
+    "reviewedAt": "2026-09-13T04:22:36.357Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-13T04:22:36.357Z"
+  },
+  {
+    "id": "inv-v-031",
+    "trackId": "investing",
+    "platform": "tiktok",
+    "videoId": "7534882316624186679",
+    "shareUrl": "https://www.tiktok.com/@ivorilu/video/7534882316624186679",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7534882316624186679",
+    "creatorHandle": "@ivorilu",
+    "postedAt": "2025-08-04T23:52:12.000Z",
+    "durationSeconds": 58,
+    "caption": "Replying to @J⭐️ZZ I’m not a financial advisor/expert, but I hope this helps! ",
+    "engagement": {
+      "likes": 793,
+      "comments": 8,
+      "shares": 28,
+      "plays": 11749
+    },
+    "question": "Once you've compared brokerage accounts and picked one, what's the thing that matters most going forward? And when you eventually take money out, is there anything you can do to reduce the tax you owe?",
+    "claimUnderTest": "Brokerage accounts come with various options and trade-offs, and withdrawing money from one has tax consequences.",
+    "referenceAnswer": "Once the account is open, the choice of brokerage stops mattering much. What determines the outcome is whether money actually keeps going in. The single most effective thing you can do is automate it — set a transfer that fires when you get paid, so a portion goes into the account before you've had a chance to spend it. Investing then stops depending on remembering, or on having money left at the end of the month, which is where most people's investing quietly stalls.\n\nAutomating also makes the amount easy to grow. Starting small is fine; what matters is that the habit exists, because raising an automatic contribution when your income rises is a one-time decision rather than a monthly act of discipline. And each contribution starts compounding from the day it lands, so consistent deposits over years do far more work than any decision about which platform to use.\n\nWorth understanding one thing about how the tax works: you're not taxed on money you withdraw, you're taxed on gains you realize. Selling an investment for more than you paid triggers the tax, whether or not the cash leaves the account. So moving money out isn't the taxable event — selling is.\n\nOn reducing it: holding period is the main lever. Sell an investment you've held more than one year and the profit is taxed at long-term capital gains rates — 0%, 15% or 20% depending on income, with many people in the 0% or 15% band. Sell at one year or less and it's a short-term gain, taxed as ordinary income at your regular rate, which for most people is meaningfully higher. Since the clock runs from each purchase, automatic contributions each have their own holding period — so the money that's been in longest is the cheapest to sell.",
+    "rubric": [
+      "What matters most is contributing consistently — the brokerage you picked matters far less than whether money keeps going in",
+      "Automate it: set a transfer on payday so investing happens before you can spend the money",
+      "Tax is triggered by selling at a gain, not by withdrawing cash",
+      "Holding more than one year before selling gets long-term capital gains rates, which are lower than the ordinary-income short-term rates"
+    ],
+    "reviewedAt": "2026-09-13T04:41:16.972Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-13T04:41:16.972Z"
+  },
+  {
+    "id": "inv-v-039",
+    "trackId": "investing",
+    "platform": "tiktok",
+    "videoId": "7672954300536065311",
+    "shareUrl": "https://www.tiktok.com/@mariahakinbi/video/7672954300536065311",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7672954300536065311",
+    "creatorHandle": "@mariahakinbi",
+    "postedAt": "2026-08-12T01:41:47.000Z",
+    "durationSeconds": 57,
+    "caption": "understanding stocks starts with knowing a couple things!!! VOO is an ETF index fund that tracks the S&P 500, which is the 500 largest US companies. so one purchase gets you a slice of all 500 companies. VFIAX is the same 500 companies in mutual fund form (so you can only buy it once a day). Often times, mutual funds will have minimum investments. Sometimes $1,000, sometimes $3,000, just depends. But ETFs dont have minimums. SO WHY WOULD ANYONE PICK A MUTUAL FUND??? back in the day, the investing platforms didnt have a way to trade funds (mutual funds), but nowadays, there are ETFs that hold the same thing as mutual funds and trade throughout the day. ALSO! not every ETF is an index fund. some ETFs are actively managed with higher fees. the word ETF only tells you that it’s a fund (group of investments) and it can be bought throughout the day. Your 401k is probably mostly mutual funds. Also, target date funds are almost always mutual funds too, which is part of why they live inside employer plans. #understandingstocks #investingforbeginners #PersonalFinance #investing101 #financialliteracy ",
+    "engagement": {
+      "likes": 284,
+      "comments": 12,
+      "shares": 24,
+      "plays": 2718
+    },
+    "question": "This creator compares buying an individual stock to buying one grocery item, versus a fund being a full cart. Given that, when would buying an individual stock actually make sense?",
+    "claimUnderTest": "Diversifying through index funds or mutual funds protects you in a way that owning individual stocks doesn't — one stock is a single item, a fund is the whole cart.",
+    "referenceAnswer": "For most people building wealth, the honest answer is close to never — at least not as the foundation of a portfolio. The analogy explains why. One grocery item going bad leaves you with nothing to eat; a full cart means a spoiled item is an inconvenience rather than a crisis. A fund holds hundreds of companies, so any single one failing barely registers, and the portfolio can still be up overall even while individual holdings are down. That's the whole point of diversification: it doesn't prevent bad outcomes, it prevents any one bad outcome from mattering much.\n\nAn individual stock offers no such protection. The company's fate is your outcome, and the risk you take on isn't compensated — you can't expect a higher return for holding one company rather than many, because that risk is avoidable by diversifying. It's risk you're taking for free.\n\nThe situations where individual stocks legitimately show up are mostly not investment decisions. Equity from an employer is the common one: you're issued shares as compensation rather than choosing to buy them. Worth knowing that this concentrates risk badly — your income and your investment both depend on the same company, so a bad stretch hits twice — which is why selling and diversifying that equity is usually the right move rather than holding out of loyalty. The other honest case is deliberately setting aside a small portion you're willing to lose, treating stock-picking as something you're doing for interest, with the core of your money in funds. What doesn't justify it is conviction — feeling sure about a company isn't an edge, and the market price already reflects what's publicly known.",
+    "rubric": [
+      "Rarely if ever as the core of a portfolio — a single stock means one company's failure is your failure, with no cart to fall back on",
+      "Diversification doesn't stop bad outcomes; it keeps any one of them from sinking the whole portfolio",
+      "Employer stock is the common real-world case, and it doubles up your risk since your income depends on the same company",
+      "Single-stock risk isn't rewarded with higher expected returns, since you could have avoided it by diversifying"
+    ],
+    "reviewedAt": "2026-09-13T04:53:15.023Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-13T04:53:15.023Z"
+  },
+  {
+    "id": "inv-v-017",
+    "trackId": "investing",
+    "platform": "tiktok",
+    "videoId": "7342514196363414827",
+    "shareUrl": "https://www.tiktok.com/@lifegoalinvestments/video/7342514196363414827",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7342514196363414827",
+    "creatorHandle": "@lifegoalinvestments",
+    "postedAt": "2024-03-04T14:26:09.000Z",
+    "durationSeconds": 58,
+    "caption": "Bonds, the most important investment you’re not using. #bonds #stocks #stockmarket #diversification #diversify #cfp #cima #wallstreet #finance #finance101 #investing #investor #wealth #economics #recession #lifegoalnation #lifegoalinvestments ",
+    "engagement": {
+      "likes": 2719,
+      "comments": 50,
+      "shares": 272,
+      "plays": 76213
+    },
+    "question": "This creator is right that bonds are worth holding. But when would bonds actually cost you — and in what situations would that money have been better put to work elsewhere?",
+    "claimUnderTest": "Bonds are a valuable holding because they pay reliable interest and tend not to move with the stock market.",
+    "referenceAnswer": "The creator's case is sound as far as it goes. Bonds pay on a known schedule and return principal at maturity, so they're the right home for money attached to a date. The inverse relationship with stocks does the real work: when equities fall, bonds typically hold up better, so a portfolio holding both takes less damage in a downturn and there's something to draw on without selling stocks at a loss. For anyone who'll need the money soon, that floor is worth more than any ceiling.\n\nThe cost shows up over long horizons. The return is capped by the structure — you're a lender, so the best outcome is being repaid with interest. You get none of the upside if the borrower thrives, which is exactly what stock ownership gives you. Over decades that difference compounds into a large gap, so a young investor holding a lot of bonds is paying for stability they don't yet need, in growth they can't get back. The years given up are the expensive part, not the percentage.\n\nThe clearest version of this is a strong market. When the economy is expanding and stocks are climbing, bonds keep paying their fixed coupon while equities capture the growth — and the money in bonds simply doesn't participate. A run of good years is where a bond-heavy portfolio falls furthest behind, and the gap compounds, since the forgone growth would itself have been growing. There's a second hit in the same conditions: a strong economy usually brings rising rates, and rising rates push down the price of bonds already held, because new bonds paying more make existing ones less attractive to a buyer. Inflation does similar damage from another direction — when it runs above the yield, a fixed payment loses purchasing power, a real loss disguised as a flat line.\n\nSo the shape is: bonds buy certainty, and certainty is worth paying for when you need the money soon and worth very little when you don't. The mistake isn't holding bonds — it's holding them at a point in life where growth matters more than protection.",
+    "rubric": [
+      "Where they cost you: in a strong economy, the money in bonds keeps earning its fixed coupon while stocks capture the growth, and that gap compounds",
+      "Where they cost you: the return is capped because you're lending, so you forgo the upside stock ownership provides",
+      "Where they help: they usually hold up better than stocks in a downturn, so the portfolio falls less and you're not forced to sell shares",
+      "Where they help: predictable payments and a known maturity, suited to money you'll need on a set timeline"
+    ],
+    "reviewedAt": "2026-09-13T05:06:48.542Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-13T05:06:48.542Z"
+  },
+  {
+    "id": "inv-v-027",
+    "trackId": "investing",
+    "platform": "tiktok",
+    "videoId": "7198766499413232939",
+    "shareUrl": "https://www.tiktok.com/@stackassets/video/7198766499413232939",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7198766499413232939",
+    "creatorHandle": "@stackassets",
+    "postedAt": "2023-02-11T05:31:01.000Z",
+    "durationSeconds": 45,
+    "caption": "What are reits? #reits #realestate #realestateinvesting #stocktok ",
+    "engagement": {
+      "likes": 808,
+      "comments": 10,
+      "shares": 117,
+      "plays": 14379
+    },
+    "question": "This video shows how REITs span everything from cell towers to residential property. When would adding REITs benefit a portfolio, and what risks come with them?",
+    "claimUnderTest": "REITs let you invest across a wide range of property types without owning real estate directly.",
+    "referenceAnswer": "The benefit is real estate exposure without being a landlord. Buying property directly takes a large down payment, concentrates your money in one building in one city, and comes with tenants, repairs and vacancies to manage. A REIT gives you a share of a portfolio of properties for the price of a share — and because REITs are required to distribute the large majority of their taxable income to shareholders, they tend to pay substantial dividends, which suits someone wanting income rather than only price growth.\n\nThe diversification argument is the other half. Real estate doesn't move in lockstep with stocks, so adding it can smooth returns. And the range the video shows matters — data centers, warehouses, healthcare facilities, apartments and retail respond to different forces, so a REIT fund spreads across sectors that don't rise and fall together.\n\nThe risks are worth being specific about. Interest rate sensitivity is the biggest: REITs borrow heavily to buy properties, so rising rates raise their costs, and their dividends compete with bonds, so when bond yields rise REIT prices often fall. They're still stocks — publicly traded REITs move with the market, so the diversification is weaker than it looks, and in a broad crash they usually fall too. Sector risk is real even within real estate; office REITs are the recent example, where remote work hit occupancy hard and a whole category underperformed. And dividends aren't guaranteed — the payout requirement applies to taxable income, so if properties stop earning, the distribution can be cut. One tax note: REIT dividends are generally taxed as ordinary income rather than at the lower qualified-dividend rate, which makes them better suited to a tax-advantaged account than a regular brokerage.",
+    "rubric": [
+      "Benefit: real estate exposure without buying, financing or managing property yourself",
+      "Benefit: REITs distribute most of their income, so they suit investors wanting steady dividends alongside diversification across property sectors",
+      "Risk: rate sensitivity — REITs borrow to buy property, and rising rates raise their costs while making bonds more competitive with their dividends",
+      "Risk: they trade as stocks and can fall with the broader market, and individual property sectors can slump on their own"
+    ],
+    "reviewedAt": "2026-09-13T05:14:23.772Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-13T05:14:23.772Z"
+  },
+  {
+    "id": "inv-v-042",
+    "trackId": "investing",
+    "platform": "tiktok",
+    "videoId": "7638390229879131405",
+    "shareUrl": "https://www.tiktok.com/@dailychriscamillo/video/7638390229879131405",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7638390229879131405",
+    "creatorHandle": "@dailychriscamillo",
+    "postedAt": "2026-05-10T22:15:35.000Z",
+    "durationSeconds": 41,
+    "caption": "The reality of taking risk in the stock market. Are you willing to take high risk when investing for higher returns? #investing #risk #chriscamillo ",
+    "engagement": {
+      "likes": 98,
+      "comments": 1,
+      "shares": 6,
+      "plays": 2982
+    },
+    "question": "This trader says outsized returns require accepting real losses. If you invest in higher-risk assets, what's the reality you're signing up for?",
+    "claimUnderTest": "You can't generate outsized returns without losing meaningful capital along the way, but high-conviction researched bets pay off over time because the returns are asymmetric.",
+    "referenceAnswer": "The reality is that you will lose money, and not just briefly. Losses in higher-risk assets aren't a bad week — a position can be down for months or years before recovering, if it recovers. That's the part the framing \"you'll have bad times\" understates. Being down for a long stretch, with no way to know whether you're early or simply wrong, is the normal experience rather than the exception.\n\nThat makes the emotional side the real test. Watching money you worked for shrink, and holding anyway, is harder than it sounds. This is where most people fail — not by picking badly but by selling at the bottom, because the loss became unbearable at exactly the point when holding mattered most. And gains are their own trap: a position running up invites concentrating further, right when the risk is highest. You're signing up to manage your own reactions in both directions, for years.\n\nYou're also signing up to learn through mistakes, which means paying for them. Nobody gets good at this without losing money finding out what they got wrong, and the useful version requires actually examining the losses rather than writing them off as bad luck. That's slow, and it only works if you stay in long enough to accumulate the lessons.\n\nWhich is why consistency does more work here than any individual decision. Continuing to contribute through bad stretches is what turns the eventual recovery into something meaningful — and it's only possible if the money is genuinely surplus, on a horizon long enough to wait out being wrong, with an emergency fund and stable finances underneath. Higher risk isn't a technique you apply to a portfolio; it's a set of conditions your life has to be able to support.",
+    "rubric": [
+      "You can lose money, and stay down for months or years — not just short dips",
+      "The hardest part is emotional: holding through losses without panic-selling, and not getting overconfident during gains",
+      "You learn by making mistakes and paying for them, which takes time and honest review",
+      "It only works if you keep contributing consistently, with money you don't need and a long enough horizon to recover"
+    ],
+    "reviewedAt": "2026-09-13T05:21:15.743Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-13T05:21:15.743Z"
+  },
+  {
+    "id": "inv-v-002",
+    "trackId": "investing",
+    "platform": "tiktok",
+    "videoId": "7674692215729425694",
+    "shareUrl": "https://www.tiktok.com/@robeverydayfinance/video/7674692215729425694",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7674692215729425694",
+    "creatorHandle": "@robeverydayfinance",
+    "postedAt": "2026-08-16T18:05:46.000Z",
+    "durationSeconds": 57,
+    "caption": "✍️👇 How much you need to invest each month in order to retire with $2m  Have you started investing? Comment which amount you want to see next!  For reference, this is about $80k per year in withdrawals using a safe withdrawal rate The longer you wait to invest, the more you have to contribute on a monthly basis to catch up.  #PersonalFinance #personalfinancetips #financialliteracy #investingforbeginners ",
+    "engagement": {
+      "likes": 45955,
+      "comments": 2625,
+      "shares": 15004,
+      "plays": 498764
+    },
+    "question": "This video shows that the younger you start, the less you need to invest each month to reach $2 million. What's the lesson behind that, and what does it tell you about how investing grows money?",
+    "claimUnderTest": "Reaching the same investment target requires far smaller monthly contributions the earlier you begin.",
+    "referenceAnswer": "The lesson is that time is doing most of the work. The reason an older starter needs to contribute so much more isn't that they're behind on saving — it's that they have fewer years for growth to compound, so more of the final number has to come out of their own pocket. Start young and the market supplies a larger share of the total; start late and you supply it yourself. Every year you wait shifts more of the burden onto your contributions.\n\nConsistency is what makes time usable. Starting early only matters if money keeps going in, because each monthly contribution begins its own compounding clock from the day it lands. Steady contributions build a runway: the balance grows, that growth earns its own growth, and the whole thing accelerates without requiring you to contribute more. That's why a modest amount paid monthly for decades beats a large amount paid for a few years — the early dollars have the most time to work, which is exactly what the video's numbers illustrate.\n\nWhat that runway gives you is options for the rest of your life. Once a balance has grown, the returns it produces can be reinvested to compound further, or drawn on for expenses as they come up. The money stops being just savings and becomes something that generates more. That's the real reason investing grows money in a way saving alone doesn't — you're not only adding to a pile, you're building something that produces on its own.\n\nThe practical takeaway: the amount matters less than when you start and whether you keep going. Waiting for a moment when you can contribute more is usually more expensive than starting now with less.",
+    "rubric": [
+      "Time is the main driver — start earlier and growth covers more of the total, start later and your own contributions have to",
+      "Contributing consistently is what makes time work, since each contribution starts compounding from the day it's made",
+      "Steady contributions build a runway: growth earns its own growth, so the balance accelerates without larger contributions",
+      "That grown balance gives you options — reinvest it to compound further, or draw on it for expenses across your life"
+    ],
+    "reviewedAt": "2026-09-13T05:26:40.189Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-13T05:26:40.189Z"
+  },
+  {
+    "id": "inv-v-071",
+    "trackId": "investing",
+    "platform": "tiktok",
+    "videoId": "7575292086392589623",
+    "shareUrl": "https://www.tiktok.com/@octaviatrades/video/7575292086392589623",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7575292086392589623",
+    "creatorHandle": "@octaviatrades",
+    "postedAt": "2025-11-21T21:22:53.000Z",
+    "durationSeconds": 50,
+    "caption": "Losing is just part of the game. People LOVE to talk about the wins, the streaks, the home-run weeks... and I’m not gonna lie, I do too! But the reality is that every single trader, no matter how skilled, experienced, or disciplined, goes through periods like this. Losing days and losing weeks aren’t a sign that something is wrong. Instead, they’re LITERALLY part of the process. It’s just data. What nobody tells you is how emotional it can get. You’ll hear people say “you have to be emotionless,” but that’s just not realistic. We’re human, and when money is involved, of COURSE you’re going to feel something, whether that’s frustration, fear, hesitation, disappointment, etc. The goal isn’t to erase those feelings but to learn how to handle them without letting them run the show. Over time, with REAL discipline, strict rules, and great risk management, you start building better habits. You have to evolve the way you think as well, and some people may even have to completely rebuild their mindset. But once you do those things, you stop reacting the way you used to. The same setups that once had you stressed out don’t hit as hard anymore. It’ll get easier to not crash out, easier to avoid revenge trades, and easier to close your laptop and walk away when you know you’re supposed to. Eventually, people might start to wonder if you are emotionless but the truth is that all you did was learn to manage your emotions SO WELL that the things that used to break you now just get a little “dang, that sucks” and you keep it moving. That’s the REAL growth in trading. Not getting rid of your emotions but learning how to live with them without letting them take the wheel. - - - - #daytrading #futures #futurestrading #daytrader #tradingadvice #tradezella ",
+    "engagement": {
+      "likes": 2743,
+      "comments": 172,
+      "shares": 215,
+      "plays": 48764
+    },
+    "question": "If you're taking on higher-risk investments, why does managing emotion matter so much? And can you take emotion out of investing entirely?",
+    "claimUnderTest": "Emotions are a natural part of trading, and discipline and consistency with your setup are what get you through losing periods.",
+    "referenceAnswer": "Emotion matters because in higher-risk investing, losing is routine rather than exceptional. If you're going to trade actively, you should expect losing months — that's what the creator is showing. Accepting that upfront is the only honest basis for doing it: this is money you can afford to lose, in pursuit of larger gains, and ideally supplementary rather than money your life depends on. Emotion enters precisely because it's your money and you worked for it. That's human, not a flaw.\n\nThe problem is that emotion tends to strike at the worst moments. Fear peaks when a position is down, which is when selling locks in the loss. Confidence peaks after a win, which is when people size up and take on more risk than they'd have chosen calmly. The damage usually isn't the losing trade — it's the reaction to it: revenge trading to recover, or abandoning a plan mid-loss. Discipline means deciding the rules before the money is at stake, when you're thinking clearly, and then following them when you aren't.\n\nOn removing emotion entirely — no, and it's worth being honest about that. But you can reduce how often it gets a chance to act on you. Emotion is triggered by watching short-term movement, so the more frequently you trade and check, the more decision points you create. A longer time horizon flips that: money invested for years doesn't demand a decision when it dips, because the dip isn't information about the outcome. Automating contributions removes another set of decisions, since the money moves without you choosing each time.\n\nWhat a long horizon doesn't do is remove risk. Thinking long-term doesn't make you immune — your money can still fall substantially, and you'll still feel it. The difference is that a long horizon gives losses time to recover, so feeling the emotion doesn't have to mean acting on it. That's the realistic goal: not eliminating the feeling, but reducing how many chances it gets to make a decision for you.",
+    "rubric": [
+      "Higher-risk investing means expecting to lose money — you should only do it with money you can afford to lose",
+      "Emotion peaks at the worst times: fear when you're down (selling at the bottom), overconfidence after wins (taking on too much)",
+      "You can't eliminate emotion, but a longer horizon and fewer decision points give it less to act on",
+      "A long horizon reduces reactive decisions, not risk itself — your money can still fall, and you'll still feel it"
+    ],
+    "reviewedAt": "2026-09-13T15:20:22.689Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-13T15:20:22.689Z"
+  },
+  {
+    "id": "inv-v-067",
+    "trackId": "investing",
+    "platform": "tiktok",
+    "videoId": "7654436664823123220",
+    "shareUrl": "https://www.tiktok.com/@justtonch/video/7654436664823123220",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7654436664823123220",
+    "creatorHandle": "@justtonch",
+    "postedAt": "2026-06-23T04:03:46.000Z",
+    "durationSeconds": 41,
+    "caption": "Day Trading is a SCAM  #fintok #fyp ",
+    "engagement": {
+      "likes": 4159,
+      "comments": 306,
+      "shares": 290,
+      "plays": 131526
+    },
+    "question": "This creator says day trading is a scam because retail traders compete against firms with faster technology and better algorithms. Is he right? What holds up, and what's overstated?",
+    "claimUnderTest": "Over 90% of day traders lose money within a year, and 97% would have done better just buying the S&P 500 and doing nothing.",
+    "referenceAnswer": "The structural argument is correct and the most important part. Day trading is a competition against professional firms with faster execution, better data, PhD-designed algorithms, and cost structures a retail trader can't match. Those firms are on the other side of your trades. An individual isn't bringing an edge to that contest, and no amount of enthusiasm compensates for the gap. The high loss rates aren't bad luck — they're what you'd predict from who the opponents are.\n\nHis comparison to the index is the sharpest point. Even a trader who makes money has to clear a high bar: matching the S&P 500 requires no skill, no time, and no stress. Day trading demands full-time attention, sustained learning, and emotional tolerance for losses. If the result after all that effort is roughly what buying and holding would have produced, the effort was the cost. That's the real case against it — not that profit is impossible, but that the realistic outcome doesn't justify what it takes.\n\nWhere \"scam\" overstates: a scam involves deception, and day trading is a legitimate if brutally difficult activity. Some people do profit consistently, usually with serious capital, discipline, and years of development. What's closer to a scam is the marketing around it — the courses, signal groups and lifestyle content selling the Lamborghini fantasy he describes. The activity isn't fraudulent; the promise attached to it usually is.\n\nSo: right about the odds, right about the structural disadvantage, right that most people would do better indexing, and loose with the word \"scam.\" A learner should come away understanding this is a very difficult path with poor expected outcomes — not that it's rigged in a legal sense.",
+    "rubric": [
+      "He's right about the structural disadvantage — you're competing against firms with better speed, data and algorithms",
+      "He's right that most day traders lose money and would likely have done better in a broad index fund",
+      "The index comparison is the strongest point: even profitable trading has to beat a result that requires no effort at all",
+      "\"Scam\" overstates it — the activity is legitimate but very difficult; the deception is usually in what's marketed around it"
+    ],
+    "reviewedAt": "2026-09-13T15:30:23.775Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-13T15:30:23.775Z"
+  },
+  {
+    "id": "inv-v-056",
+    "trackId": "investing",
+    "platform": "tiktok",
+    "videoId": "7676227481933761823",
+    "shareUrl": "https://www.tiktok.com/@erickjablonski/video/7676227481933761823",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7676227481933761823",
+    "creatorHandle": "@erickjablonski",
+    "postedAt": "2026-08-20T21:23:14.000Z",
+    "durationSeconds": 43,
+    "caption": "Day trading explained in under 60 seconds #tradezella #daytrader #wifimoney #daytrading ",
+    "engagement": {
+      "likes": 49595,
+      "comments": 398,
+      "shares": 3601,
+      "plays": 510020
+    },
+    "question": "This creator walks through risk-reward ratios and chart setups. Why does day trading demand so much more of you than other forms of investing? What does it come down to?",
+    "claimUnderTest": "Day trading requires working knowledge of specific technical tools and strategies to earn a return.",
+    "referenceAnswer": "It comes down to how much you have to bring yourself. Buying a broad index fund requires almost no expertise — the diversification is built in and time does the work. Day trading has none of that built in. Every element is a decision you have to make correctly: which setup to take, when to enter, where to exit, how much to risk. The tools the creator shows are the vocabulary for making those decisions, and you can't participate meaningfully without knowing them. Going in without that knowledge isn't investing at speed; it's guessing with real money.\n\nThe learning doesn't stop at reading charts, either. Prices move for reasons — earnings, sector news, economic data, broad sentiment — and a technical setup can be overrun by any of them. So a trader has to hold both the technical layer and some grasp of what actually moves the companies they're trading. That's a lot of ground, and it's why upskilling is continuous rather than a course you finish.\n\nThe second half is that none of it can simply be copied. Investing is tailored to the individual — your risk tolerance, your capital, your time available, your goals. A strategy that works for someone with different circumstances may be wrong for you even if it's sound in itself, because their tolerance for drawdown or their reaction time isn't yours. You're not trading to make anyone else money; the point is growing your own, which means the approach has to fit your situation rather than mirror someone else's. Copying a creator's setup without that translation is one of the most common ways people lose money.\n\nSo the difficulty is twofold: a large body of skill to acquire, and the work of adapting it to yourself. Passive investing asks for neither, which is why it suits most people — and why day trading demands a level of commitment that has to be chosen deliberately.",
+    "rubric": [
+      "Day trading requires you to supply the skill yourself — nothing is built in the way diversification and time are in passive investing",
+      "You need working knowledge of the tools and strategies, plus an understanding of what actually moves prices",
+      "Strategies can't just be copied — they have to be tailored to your own risk tolerance, capital and goals",
+      "The commitment is continuous: ongoing learning and self-assessment, not a one-time skill you acquire"
+    ],
+    "reviewedAt": "2026-09-13T15:41:59.073Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-13T15:41:59.073Z"
+  },
+  {
+    "id": "inv-v-104",
+    "trackId": "investing",
+    "platform": "tiktok",
+    "videoId": "7276597798164892970",
+    "shareUrl": "https://www.tiktok.com/@zhangsta/video/7276597798164892970",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7276597798164892970",
+    "creatorHandle": "@zhangsta",
+    "postedAt": "2023-09-08T23:15:59.000Z",
+    "durationSeconds": 56,
+    "caption": "The main differjece between #optionstrading and #futurestrading ! #lowkeystonks ",
+    "engagement": {
+      "likes": 896,
+      "comments": 15,
+      "shares": 56,
+      "plays": 30445
+    },
+    "question": "Options carry external value like time decay and volatility, while futures move linearly with price. What would make options or futures suitable or unsuitable for someone and what should you consider before getting into either?",
+    "claimUnderTest": "Options have extrinsic value affected by time decay and implied volatility, while futures are intrinsic and move linearly with price action.",
+    "referenceAnswer": "Both instruments give leverage — control of a large position for a fraction of its value — which is what makes them attractive and what makes them dangerous. That leverage is the common thread, but what you're managing differs.\n\nOptions carry extrinsic value, so the price moves for reasons beyond direction. Time decay works against a buyer every day, and implied volatility can change a contract's value without the underlying moving at all. That's an added layer of difficulty — being right about direction isn't sufficient if you're wrong about timing. It also creates uses futures don't have: options can hedge an existing position, and a buyer's loss is capped at the premium paid, which is a genuinely limited downside. Selling options is the opposite, with limited gain and large potential loss.\n\nFutures are simpler in structure, moving linearly with price — the creator's example being $50 per point on ES. That simplicity cuts both ways. There's no time decay eroding your position, but there's also no capped downside. Futures are marked to market daily, so losses are debited as they occur, and a margin call can require more money or force a liquidation. Losing more than you put in is possible, which is the sharpest distinction from buying options.\n\nWhat someone would weigh in deciding: what they want the money to do, how much time they can commit, and what they can afford to lose. Both instruments require real technical knowledge and ongoing attention — they aren't things to hold passively. Someone whose goal is long-term growth can reach it through index funds and ETFs without either, at considerably lower risk and effort. Someone interested in generating income or hedging, who has the knowledge and treats it as a limited portion of a portfolio rather than the core, is in a different position. The deciding factors are goals, expertise, time and risk capacity — not which instrument performs better, since neither does in the abstract.",
+    "rubric": [
+      "Both provide leverage, which amplifies gains and losses alike and is the main source of risk in each",
+      "Options add extrinsic factors — time decay and implied volatility — so being right on direction isn't enough; buying options caps loss at the premium",
+      "Futures move linearly with no time decay, but have no capped downside: daily settlement and margin calls mean you can lose more than you put in",
+      "Both demand technical knowledge and active attention; long-term growth alone can be pursued through index funds without either"
+    ],
+    "reviewedAt": "2026-09-13T15:59:57.830Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-13T15:59:57.830Z"
+  },
+  {
+    "id": "inv-v-091",
+    "trackId": "investing",
+    "platform": "tiktok",
+    "videoId": "7380884859100728606",
+    "shareUrl": "https://www.tiktok.com/@unitedblockchainlearning/video/7380884859100728606",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7380884859100728606",
+    "creatorHandle": "@unitedblockchainlearning",
+    "postedAt": "2024-06-16T00:03:22.000Z",
+    "durationSeconds": 45,
+    "caption": "I’m starting a series that will teach you everything you need to know about crypto, this first video answers a crucial question: What is crypto? #crypto #cryptobasics #blockchain #btc #eth #bitcoin #bitcoin #ethereum #techtok ",
+    "engagement": {
+      "likes": 162,
+      "comments": 75,
+      "shares": 16,
+      "plays": 8888
+    },
+    "question": "This video covers the basics of cryptocurrency. How does crypto differ from holding regular cash or from other investments you've learned about, and what risks come with those differences?",
+    "claimUnderTest": "Cryptocurrency is a decentralized digital asset, not issued or controlled by any government or central institution.",
+    "referenceAnswer": "The defining difference is decentralization. Cash is issued by a government and managed by a central bank; stocks and bonds are claims on companies or governments, traded through regulated institutions. Crypto has none of that — no issuer, no central authority, and no institution standing behind it. That gives a holder direct control over their own asset, which is genuinely different from every other item in a portfolio, and it's why people frame it as a bet on what money might look like in the future.\n\nThat independence removes protections along with the control. Cash in a bank is FDIC-insured; a brokerage has its own safeguards; crypto held in a wallet has neither. If keys are lost or an exchange collapses, there's usually no recovery and no institution to appeal to. Control and responsibility are the same thing here.\n\nThe valuation difference matters just as much. A stock is tied to a company's earnings, a bond to a repayment obligation, cash to a government's backing — each has something anchoring it, however imperfectly. Most crypto has no such anchor. Its price rests largely on what the next buyer will pay, and outside of transferring value between people, many tokens have limited use in practice. Without a grounding factor, there's no reference point for whether a price is reasonable, which is why moves are far larger than in traditional assets.\n\nThat combination — no anchor, limited regulation, thin markets in smaller tokens — also makes it more open to manipulation. Coordinated pump-and-dumps, insider activity around listings, and outright fraud have all been documented repeatedly, in ways that would be prosecuted quickly in regulated markets. And prices respond heavily to external factors: regulatory announcements, exchange failures, influential individuals' statements. Cash simply doesn't behave that way.\n\nSo the honest picture: a genuinely novel asset offering direct ownership and diversification from traditional markets, paired with no institutional protection, no valuation anchor, real vulnerability to manipulation, and volatility severe enough that losses can be difficult to recover from.",
+    "rubric": [
+      "Crypto is decentralized — no government or institution issues or controls it, unlike cash, stocks or bonds",
+      "That means no institutional protection: no FDIC insurance, and little recourse if keys are lost or an exchange fails",
+      "Most crypto has no grounding factor tying it to earnings or a repayment obligation, so price rests on speculation and swings hard",
+      "Limited regulation and thin markets make manipulation and scandals more common than in traditional markets"
+    ],
+    "reviewedAt": "2026-09-13T16:21:04.885Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-13T16:21:04.885Z"
+  }
+]

@@ -7,10 +7,13 @@ import { TRACKS } from '@/lib/learning/tracks'
 import {
   poolHealth,
   readQueue,
+  quizMix,
   REPLENISH_BELOW,
   TARGET_POOL_SIZE,
-  VIDEO_QUESTIONS_PER_QUIZ,
 } from '@/lib/learning/video-pool/pool'
+
+/** Read fresh from the pool files on every request, never from a cache. */
+export const dynamic = 'force-dynamic'
 
 export default async function ReviewIndexPage() {
   const rows = await Promise.all(
@@ -20,6 +23,7 @@ export default async function ReviewIndexPage() {
         track,
         health: poolHealth(track.id),
         waiting: queue.filter(item => !item.rejected).length,
+        perPaper: quizMix(track.id).videos,
       }
     }),
   )
@@ -27,13 +31,13 @@ export default async function ReviewIndexPage() {
   return (
     <div className="flex flex-col gap-6">
       <p className="max-w-2xl text-body-md text-on-surface-variant">
-        Each track needs {TARGET_POOL_SIZE} approved videos so the{' '}
-        {VIDEO_QUESTIONS_PER_QUIZ} on a paper can be sampled without the set becoming
-        memorisable. Below {REPLENISH_BELOW} live, the track wants a new ingestion round.
+        Each track needs {TARGET_POOL_SIZE} approved videos so the ones on a paper can be
+        sampled without the set becoming memorisable. Below {REPLENISH_BELOW} live, a track
+        wants a new ingestion round. How many a paper draws varies by track.
       </p>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        {rows.map(({ track, health, waiting }) => (
+        {rows.map(({ track, health, waiting, perPaper }) => (
           <Link
             key={track.id}
             href={`/admin/review/${track.id}`}
@@ -60,7 +64,7 @@ export default async function ReviewIndexPage() {
 
             {health.belowQuizSize ? (
               <span className="text-label-md text-error">
-                Cannot fill a paper yet — needs {VIDEO_QUESTIONS_PER_QUIZ - health.live} more.
+                Cannot fill a paper yet — needs {perPaper - health.live} more.
               </span>
             ) : health.needsReplenishment ? (
               <span className="text-label-md text-tertiary">Needs a new ingestion round.</span>

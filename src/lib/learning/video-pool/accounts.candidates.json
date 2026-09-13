@@ -101,7 +101,9 @@
       "shares": 35121,
       "plays": 8565213
     },
-    "status": "draft"
+    "status": "draft",
+    "rejected": true,
+    "rejectedReason": "Duplicate — kept in the spending track; not accounts material"
   },
   {
     "id": "acc-v-025",

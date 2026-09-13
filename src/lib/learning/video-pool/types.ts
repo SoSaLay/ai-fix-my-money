@@ -62,12 +62,6 @@ export interface PooledVideo extends VideoCandidate, VideoReview {
   status: VideoStatus
   /** ISO. Last time the embed was confirmed to still load. */
   lastCheckedAt: string
-  /**
-   * Why it was taken out of circulation, when `status` is 'retired'. Retiring
-   * rather than deleting is deliberate: the row keeps the id out of the reuse
-   * pool and keeps ingestion from offering the same video again.
-   */
-  retiredReason?: string
 }
 
 /**

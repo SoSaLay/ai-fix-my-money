@@ -14,7 +14,7 @@
 import { promises as fs } from 'fs'
 import path from 'path'
 
-import type { TrackId } from '@/lib/learning/tracks'
+import { TRACK_ORDER, type TrackId } from '@/lib/learning/tracks'
 import type { PooledVideo, QueuedVideo } from './types'
 
 export const POOL_DIR = path.join(process.cwd(), 'src', 'lib', 'learning', 'video-pool')
@@ -73,14 +73,27 @@ export async function writeApprovedFile(trackId: TrackId, pool: PooledVideo[]): 
   await writeJson(approvedPath(trackId), pool)
 }
 
-/** Ids already spoken for, so ingestion never re-offers a video or reuses an id. */
+/**
+ * Ids already spoken for, so ingestion never re-offers a video or reuses an id.
+ *
+ * Our own ids are per-track, because the prefix and the numbering are. Video ids
+ * are checked across every track: the same clip turning up in two tracks means
+ * two reviewers write two questions for it, and a learner who finishes both
+ * tracks meets the same video twice.
+ */
 export async function knownIds(
   trackId: TrackId,
 ): Promise<{ ids: Set<string>; videoIds: Set<string> }> {
-  const [approved, queue] = await Promise.all([readApprovedFile(trackId), readQueue(trackId)])
-  const rows = [...approved, ...queue]
+  const perTrack = await Promise.all(
+    TRACK_ORDER.map(async id => {
+      const [approved, queue] = await Promise.all([readApprovedFile(id), readQueue(id)])
+      return { id, rows: [...approved, ...queue] }
+    }),
+  )
+
+  const mine = perTrack.find(t => t.id === trackId)?.rows ?? []
   return {
-    ids: new Set(rows.map(r => r.id)),
-    videoIds: new Set(rows.map(r => r.videoId)),
+    ids: new Set(mine.map(r => r.id)),
+    videoIds: new Set(perTrack.flatMap(t => t.rows.map(r => r.videoId))),
   }
 }

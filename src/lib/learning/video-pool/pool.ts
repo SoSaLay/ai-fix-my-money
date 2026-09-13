@@ -28,12 +28,14 @@ import investingPool from './investing.json'
 // code has one place to import from.
 export {
   CHOICE_QUESTIONS_PER_QUIZ,
+  DEFAULT_QUIZ_MIX,
+  quizMix,
   REPLENISH_BELOW,
   TARGET_POOL_SIZE,
   VIDEO_QUESTIONS_PER_QUIZ,
 } from './constants'
 
-import { REPLENISH_BELOW, VIDEO_QUESTIONS_PER_QUIZ } from './constants'
+import { quizMix } from './constants'
 
 // ─── Loading ─────────────────────────────────────────────────────────────────
 
@@ -108,6 +110,7 @@ export interface PoolHealth {
 }
 
 export function poolHealth(trackId: TrackId): PoolHealth {
+  const perPaper = quizMix(trackId).videos
   const all = allVideos(trackId)
   const live = all.filter(v => v.status === 'approved').length
   return {
@@ -116,8 +119,9 @@ export function poolHealth(trackId: TrackId): PoolHealth {
     unavailable: all.filter(v => v.status === 'unavailable').length,
     retired: all.filter(v => v.status === 'retired').length,
     total: all.length,
-    needsReplenishment: live < REPLENISH_BELOW,
-    belowQuizSize: live < VIDEO_QUESTIONS_PER_QUIZ,
+    // Both thresholds come from what this track's own paper needs.
+    needsReplenishment: live < perPaper * 2,
+    belowQuizSize: live < perPaper,
   }
 }
 

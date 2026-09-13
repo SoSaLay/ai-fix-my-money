@@ -1,1 +1,332 @@
-[]
+[
+  {
+    "id": "spd-v-002",
+    "trackId": "spending",
+    "platform": "tiktok",
+    "videoId": "7626859168443698455",
+    "shareUrl": "https://www.tiktok.com/@adviseclip/video/7626859168443698455",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7626859168443698455",
+    "creatorHandle": "@adviseclip",
+    "postedAt": "2026-04-09T20:28:26.000Z",
+    "durationSeconds": 32,
+    "caption": "Working a salary job won’t make you rich, and neither will just running a business. The real wealth is created at the finish line: the exit. While most entrepreneurs get caught in the daily grind of cash flow crises, the smartest ones are building to sell. But what is the biggest mistake founders make when it comes time to cash out? Hear the brutal truth about what it actually takes to build a company worth selling. #entrepreneurship #wealthmindset #businessstrategy #startups #financialfreedom",
+    "engagement": {
+      "likes": 164346,
+      "comments": 948,
+      "shares": 13260,
+      "plays": 2638678
+    },
+    "question": "The creator says the best way to get rich is to build a business you can sell, and dismisses salary and employment. Is that the right way to think about it?",
+    "claimUnderTest": "Wealth comes from building and selling equity in a business; a salary will never get you there.",
+    "referenceAnswer": "The underlying point about equity is fair. A salary is capped and trades hours for money, while ownership can be sold in one event for a multiple of what it earns, so a successful exit does move money at a scale employment doesn't. Taken narrowly, the claim about the ceiling holds.\n\nWhere it fails is as advice. It names the destination and skips everything required to reach it. Building a sellable business takes expertise, judgment, industry knowledge, a network, and usually capital — and most people acquire those by working for someone else first. A job isn't the opposite of the goal; for most founders it's the training for it. Dismissing employment tells someone with none of that groundwork to skip straight to the hardest version of the task.\n\nIt also ignores the failure rate. Most businesses don't sell — most don't survive. What lowers that risk is a financial foundation underneath the attempt: savings that let you take a shot without gambling rent, invested money compounding while you build, income that buys runway and lets you refuse a bad deal. Founders who start from stability can survive a failed attempt and try again; founders with nothing behind them get one shot and are wiped out by it.\n\nSo the honest framing is sequencing, not either/or. Equity is the highest ceiling and a reasonable long-term aim. Career, savings, and investing are what make attempting it survivable and make the attempt more likely to work. Advice that treats them as opposites is selling the outcome without the path.",
+    "rubric": [
+      "Credits what's right: ownership and a sale have a far higher ceiling than a capped salary",
+      "Identifies the gap — skills, experience, network, and capital take time, and employment is how most people build them",
+      "Raises the failure rate, and notes a financial foundation lowers the risk and allows recovery",
+      "Frames it as sequencing rather than either/or — career and investing support the goal rather than competing with it"
+    ],
+    "reviewedAt": "2026-09-11T00:30:29.148Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-11T00:30:29.148Z"
+  },
+  {
+    "id": "spd-v-032",
+    "trackId": "spending",
+    "platform": "tiktok",
+    "videoId": "7579804892198440247",
+    "shareUrl": "https://www.tiktok.com/@liquidgoldtaxservices/video/7579804892198440247",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7579804892198440247",
+    "creatorHandle": "@liquidgoldtaxservices",
+    "postedAt": "2025-12-04T01:14:43.000Z",
+    "durationSeconds": 56,
+    "caption": "Gross Income Vs. Net Income #incometax #taxinformation #taxtok  In Booking a Service? Please Check The Link In The Bio 🔗 • Tax Preparation • Bookkeeping • Quarterly Filings • Tax Extension Serving TN, MS, LA, AR, KY, AL, GA, NC, SC, & FL Video Is For Educational Purposes Only.",
+    "engagement": {
+      "likes": 157,
+      "comments": 1,
+      "shares": 8,
+      "plays": 11989
+    },
+    "question": "Two people are offered the same gross salary, but their take-home pay ends up different. What explains that, and which number should each of them use when deciding whether they can afford a $2,000 apartment?",
+    "claimUnderTest": "Gross is what you earn before deductions; net is what reaches you — and the two get used for different purposes.",
+    "referenceAnswer": "The gap between gross and net isn't fixed, which is why identical salaries produce different paychecks. Deductions vary by person: how much each contributes to a 401(k), which health plan they picked and whether they cover dependents, tax withholding driven by filing status and dependents, and state and local taxes that differ by where they live. Someone contributing heavily to retirement takes home less while still being paid the same — the money isn't gone, it's redirected.\n\nFor the apartment, the two numbers do different jobs and both get used. The landlord will screen on gross, applying a rule like income of three times the rent, so gross is what determines whether they qualify. Whether they can actually afford it is a question for net, since rent is paid out of take-home. Those can disagree: someone can clear the landlord's threshold on gross and still be stretched once deductions come out, which is exactly how people end up approved for housing they can't comfortably carry.\n\nSo the right read is that gross is the qualifying and comparison number — loans, rent screening, tax brackets, weighing job offers — and net is the operating number that spending has to fit inside. The person with heavier deductions qualifies the same but has less room, and should judge the apartment against their actual take-home rather than the offer letter.",
+    "rubric": [
+      "Explains why identical gross pay yields different net: retirement contributions, health premiums, withholding/filing status, state and local taxes",
+      "Notes that deductions like 401(k) reduce take-home without being lost money",
+      "Identifies that the landlord qualifies on gross while affordability depends on net",
+      "Recognizes the two can disagree — qualifying for rent doesn't mean it fits the budget"
+    ],
+    "reviewedAt": "2026-09-11T01:12:10.346Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-11T01:12:10.346Z"
+  },
+  {
+    "id": "spd-v-033",
+    "trackId": "spending",
+    "platform": "tiktok",
+    "videoId": "7190841521300671787",
+    "shareUrl": "https://www.tiktok.com/@inspiredbudget/video/7190841521300671787",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7190841521300671787",
+    "creatorHandle": "@inspiredbudget",
+    "postedAt": "2023-01-20T20:57:57.000Z",
+    "durationSeconds": 34,
+    "caption": "What’s your favorite expense? Mine is monthly therapy! #financialfreedom #financialeducation #financialliteracy #fintok #budget #budgettok #PersonalFinance #personalfinancetips",
+    "engagement": {
+      "likes": 359,
+      "comments": 6,
+      "shares": 17,
+      "plays": 9299
+    },
+    "question": "Two people have identical take-home pay, but one has mostly fixed expenses and the other mostly variable. Both need to cut spending after a pay cut. Who's in the better position, and why?",
+    "claimUnderTest": "Fixed expenses stay the same each month; variable expenses change with your choices and usage — and knowing which is which is what makes a budget work.",
+    "referenceAnswer": "The one with more variable spending is better positioned, because variable costs are the ones that can actually be cut this month. Groceries, dining out, subscriptions, and discretionary shopping respond immediately to a decision. Fixed costs — rent, car payment, insurance, loan payments — are contractual and don't move without a major change like breaking a lease, refinancing, or selling the car, none of which happen quickly or for free.\n\nThat's the real reason the distinction matters. It isn't just labeling; it tells you how much of your budget is actually reachable in a crisis. Someone whose take-home is mostly consumed by fixed obligations has a thin cushion no matter how disciplined they are, because discipline only operates on the variable portion. Someone with the same income and lower fixed costs has room to absorb a shock.\n\nThe tradeoff runs the other way too, which is why \"fixed is bad\" is too simple. Fixed expenses are predictable and easy to plan against — you know the number before the month starts. Variable spending is where budgets quietly fail, since it's untracked, driven by habit, and only visible after the fact. So the person with high variable spending has flexibility but has to exercise it, and may not even know what they're spending until they look.\n\nThe practical conclusion is to keep fixed obligations low enough that variable spending can still be squeezed when income drops, and to track variable spending closely enough that the flexibility is real rather than theoretical.",
+    "rubric": [
+      "Says the higher-variable person is better positioned, because variable costs can be cut immediately",
+      "Explains fixed costs are contractual and can't change without a major, slow decision",
+      "Notes the flip side — fixed expenses are predictable, while variable spending is where budgets drift unnoticed",
+      "Draws the conclusion: low fixed obligations preserve the ability to absorb a pay cut"
+    ],
+    "reviewedAt": "2026-09-11T01:17:36.224Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-11T01:17:36.224Z"
+  },
+  {
+    "id": "spd-v-041",
+    "trackId": "spending",
+    "platform": "tiktok",
+    "videoId": "7562726082575633695",
+    "shareUrl": "https://www.tiktok.com/@cosette.nelson/video/7562726082575633695",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7562726082575633695",
+    "creatorHandle": "@cosette.nelson",
+    "postedAt": "2025-10-19T00:39:55.000Z",
+    "durationSeconds": 51,
+    "caption": "How I budget my 35k salary. #howibudget #financialtransparency #moneytransparency #salarytransparency #payday #paydayroutine #studentloans #howtobudget #budget #budgetingtips #moneytok #investing #debt #debtfreejourney ",
+    "engagement": {
+      "likes": 182390,
+      "comments": 962,
+      "shares": 2004,
+      "plays": 1717295
+    },
+    "question": "The creator is stuck making minimum payments on her debt and says she gave up on financial stability. What would actually move her situation, and where should she start?",
+    "claimUnderTest": "Her income isn't enough to get ahead of her debt, and after years of trying she's concluded stability isn't reachable.",
+    "referenceAnswer": "The math problem is real, and it's specific: when only the minimum is paid, most of that payment goes to interest and the balance barely moves. Budgeting harder doesn't fix it, because there's no meaningful gap left to cut from. What's missing isn't discipline — it's room. Which means the highest-leverage move is on the income side, not the expense side.\n\nConcretely, that means treating a better-paying job as the primary financial strategy rather than a background wish. Upskilling toward a role that pays more, applying elsewhere in the same field, or negotiating existing pay all raise the ceiling in a way that trimming spending can't. And the gain compounds in her case: income above minimum payments attacks principal directly, so each raise buys more than its face value in debt reduction.\n\nIt also matters that this doesn't require a leap. Small, consistent increases are enough — a modest raise creates the first real surplus, that surplus accelerates payoff, and freed-up payments become the next surplus. Skills and experience are things anyone can trade for money, and building them is a path with a much higher success rate than the alternatives usually pitched.\n\nThe ordering is the practical part. At her stage, investing and business-building are distractions — she needs cash flow before she needs assets. Income first, then high-interest debt, then a small cushion, and only then investing. Telling someone in her position to invest or start a business misreads which constraint is binding.\n\nThe giving-up piece deserves a direct answer too: her conclusion is understandable given the results she's seen, but it follows from trying to solve an income problem with expense-side tools. The path isn't closed — it just runs through earning more, and that is a slow, ordinary process rather than a dramatic one.",
+    "rubric": [
+      "Identifies income as the binding constraint — minimum payments go mostly to interest, so cutting expenses can't close the gap",
+      "Recommends a concrete income move: upskilling, a higher-paying role, or negotiating pay",
+      "Notes that gains can be incremental and consistent rather than requiring a large leap",
+      "Gets the ordering right: income and high-interest debt come before investing or starting a business"
+    ],
+    "reviewedAt": "2026-09-11T01:31:30.632Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-11T01:31:30.632Z"
+  },
+  {
+    "id": "spd-v-052",
+    "trackId": "spending",
+    "platform": "tiktok",
+    "videoId": "7146252358110956843",
+    "shareUrl": "https://www.tiktok.com/@austinrutherfordo/video/7146252358110956843",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7146252358110956843",
+    "creatorHandle": "@austinrutherfordo",
+    "postedAt": "2022-09-22T17:09:20.000Z",
+    "durationSeconds": 28,
+    "caption": "This is why you buy assets first! #cashflow #Rentalincome #rentalproperty#howtobecomeamillionaire",
+    "engagement": {
+      "likes": 1015247,
+      "comments": 3114,
+      "shares": 8299,
+      "plays": 10023572
+    },
+    "question": "The creator is right that assets generate cash flow and that cash flow can cover your liabilities — but then says $25,000 down on four properties gets you there. How realistic is that second part?",
+    "claimUnderTest": "Buying income-producing assets and using their cash flow to cover liabilities is the right model — and $100,000 split across four properties puts you in it.",
+    "referenceAnswer": "The framework is correct and worth keeping. Assets produce income, liabilities consume it, and routing asset income toward your liabilities rather than paying for them out of your labor is genuinely how financial independence is structured. None of that is in dispute.\n\nWhat's unrealistic is the example, because it skips everything between buying and collecting. The down payment isn't the cost — each property carries a mortgage whose payment is mostly interest in the early years, plus property taxes, insurance, maintenance, vacancy when no one's renting, and management if you're not doing it yourself. Rent has to clear all of it before a single dollar of cash flow exists. Leveraging into four multiplies the obligations along with the assets: four mortgages, four sets of repairs, four chances of a bad month landing at once.\n\nWhich is the part worth catching. Most assets begin life as liabilities. Early on the property takes money out of your pocket instead of putting money in, and it only crosses over as the loan is paid down, rents rise, or the value grows — a process measured in years, and not guaranteed. Bought at the wrong price or in the wrong market, it can stay cash-flow negative indefinitely.\n\nSo the model is right and the timeline is wrong. Someone deploying $100,000 this way needs reserves to survive the negative stretch, not a plan that assumes income starts on day one. Asset and liability aren't fixed at purchase — they're something a purchase grows into, or fails to.",
+    "rubric": [
+      "Affirms the correct part: assets produce income, and that income covering liabilities is a sound model",
+      "Notes the down payment isn't the full cost — interest, taxes, insurance, maintenance, and vacancy come out before cash flow",
+      "Identifies that assets often start as liabilities and take years to turn cash-flow positive, if they do",
+      "Recognizes leverage multiplies risk, so reserves are needed to survive the early period"
+    ],
+    "reviewedAt": "2026-09-11T01:43:39.304Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-11T01:43:39.304Z"
+  },
+  {
+    "id": "spd-v-044",
+    "trackId": "spending",
+    "platform": "tiktok",
+    "videoId": "7680364913382100244",
+    "shareUrl": "https://www.tiktok.com/@financewjessie/video/7680364913382100244",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7680364913382100244",
+    "creatorHandle": "@financewjessie",
+    "postedAt": "2026-09-01T00:58:43.000Z",
+    "durationSeconds": 24,
+    "caption": "a nice little budget hack :) not financial advice #investing #finance #PersonalFinance #budget ",
+    "engagement": {
+      "likes": 16436,
+      "comments": 439,
+      "shares": 3322,
+      "plays": 299829
+    },
+    "question": "Instead of calculating percentages by hand each month, is there a simpler way to make this happen?",
+    "claimUnderTest": "Budgeting means applying a specific multiplier to your income for each spending category — 6% dining, 40% saving and investing, 10% fun, 2% subscriptions, 8% car.",
+    "referenceAnswer": "The creator's numbers aren't the problem. Any set of percentages works as long as you've fitted them to your own income and what you're comfortable saving and spending — the math is just a way to decide the split. What's clumsy is doing it manually every month, and that part is solvable.\n\nMost of this can be automated. Direct deposit can be split so a portion of each paycheck lands in savings before it ever reaches checking. Brokerages and retirement accounts support recurring auto-investing on a schedule you set. Bills and card payments can run automatically off checking. Once it's configured, the split happens whether or not you think about it, which removes the two things that break budgets: forgetting, and choosing to skip a month when money feels tight. The percentages still exist — they're just enforced by the setup rather than by willpower.\n\nThe tradeoff is that automation makes it easy to stop paying attention, so it needs periodic review rather than none. Investments drift from their target allocation and want occasional rebalancing. Raises should raise the savings transfer, since otherwise the extra just expands spending. And recurring charges deserve a real look now and then — automation is exactly how subscriptions survive for years without being used, which is money leaving on schedule for nothing.\n\nSo the practical version is: pick numbers that fit your situation, automate the transfers so they happen on payday without your involvement, and check the whole setup a few times a year to confirm it still matches your income and that nothing is being paid for that you don't use.",
+    "rubric": [
+      "Says the percentages themselves are fine — they should be fitted to your own income and comfort",
+      "Names automation as the simpler path: split direct deposit, auto-transfer to savings, recurring auto-invest",
+      "Explains why it works — saving happens before spending, without relying on memory or discipline",
+      "Notes it still needs periodic review — rebalancing, raising contributions after a raise, and cutting unused subscriptions"
+    ],
+    "reviewedAt": "2026-09-11T01:52:11.989Z",
+    "status": "retired",
+    "lastCheckedAt": "2026-09-11T01:52:11.989Z"
+  },
+  {
+    "id": "spd-v-047",
+    "trackId": "spending",
+    "platform": "tiktok",
+    "videoId": "6933801858175651078",
+    "shareUrl": "https://www.tiktok.com/@vanader/video/6933801858175651078",
+    "embedUrl": "https://www.tiktok.com/embed/v2/6933801858175651078",
+    "creatorHandle": "@vanader",
+    "postedAt": "2021-02-27T04:52:53.000Z",
+    "durationSeconds": 46,
+    "caption": "learn these to learn your business 💪 #entrepreneurtips #businessowner #smallbusinesstip #SmallBusiness #biztok #vanadergrowth #LearnOnTikTok #EduTok",
+    "engagement": {
+      "likes": 12598,
+      "comments": 113,
+      "shares": 1848,
+      "plays": 137511
+    },
+    "question": "The video walks $50,000 in sales down to $17,500 after tax. How does that same breakdown apply to your personal finances, and why does it matter if you start a business?",
+    "claimUnderTest": "Revenue isn't profit — costs of goods, overhead, and taxes come out in sequence, and only the last number is what you actually keep.",
+    "referenceAnswer": "The structure is the same one that runs your paycheck, just with more steps exposed. Gross salary is your revenue — the headline number that never arrives intact. Taxes and withholdings come out the way they do for the business, and what lands in your account is net income. Your fixed costs — rent, insurance, car payment, utilities — are the personal version of overhead, and what survives all of it is your real discretionary money. In both cases the top number describes the size of what flows through you, and the bottom number describes what you keep. Judging yourself or a business by revenue is the same mistake in two settings.\n\nThe difference matters most if you start a business, because the steps that were invisible in a paycheck become yours to manage. An employer hides the deductions; a business owner has to subtract them manually and keep the result straight. Two traps follow. First, revenue feels like income — a $50,000 month doesn't mean $50,000 to spend, and confusing the two is how owners overspend while technically profitable. Second, taxes aren't withheld for you. Nobody removes that $7,500 before it hits your account, so it has to be set aside deliberately, usually through quarterly estimated payments, or it comes due as a bill you've already spent.\n\nKnowing the intermediate numbers is what makes the business improvable. Gross profit tells you whether the product itself makes money after what it costs to produce and sell; if that margin is thin, more sales won't save you. Net profit tells you whether the operation supports its overhead. A business can grow revenue every month and still be losing, and you can't see which problem you have from the top line alone.\n\nThe practical version for someone starting out: separate business and personal accounts so the numbers stay readable, price off gross margin rather than revenue, reserve for taxes as money comes in rather than at year-end, and treat after-tax profit as the only figure comparable to a salary.",
+    "rubric": [
+      "Maps the structure to personal finances — gross pay is revenue, taxes and withholdings come out, fixed costs are overhead, what's left is what you keep",
+      "States that revenue isn't income, in either setting — the top number isn't what you can spend",
+      "Notes that a business owner must set aside taxes themselves, since nothing is withheld for them",
+      "Explains why the intermediate numbers matter — gross margin shows whether the product is profitable, net profit whether the operation is"
+    ],
+    "reviewedAt": "2026-09-11T01:56:40.011Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-11T01:56:40.011Z"
+  },
+  {
+    "id": "spd-v-003",
+    "trackId": "spending",
+    "platform": "tiktok",
+    "videoId": "7659980182207417613",
+    "shareUrl": "https://www.tiktok.com/@reg360_/video/7659980182207417613",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7659980182207417613",
+    "creatorHandle": "@reg360_",
+    "postedAt": "2026-07-08T02:35:41.000Z",
+    "durationSeconds": 59,
+    "caption": "Start that small service based business…. I was let go in 2022 and like many who have been let go…. My whole world stopped. 4 years later and we’re still growing to the point we need to hire more employees. If I can do it, I promise you can too. Drop a question if you have one. Would love to help. #SmallBusiness #motivation #cleaningbusiness ",
+    "engagement": {
+      "likes": 206203,
+      "comments": 5706,
+      "shares": 20084,
+      "plays": 1628806
+    },
+    "question": "The creator says he got laid off, started a cleaning business, and built it into something successful. What did he leave unstated about why it actually worked?",
+    "claimUnderTest": "Starting and staying consistent is what turned a cleaning business into a successful one.",
+    "referenceAnswer": "He never names the underlying mechanism: the business worked because it solved a real problem people would pay to have solved. Cleaning is a chore with genuine demand — people want it done and are willing to pay someone else to do it. That's the actual foundation, and everything he does mention sits on top of it. Starting and being consistent are how you find and serve the problem, not substitutes for having one.\n\nThat omission matters because \"just start and stay consistent\" is advice that transfers badly on its own. Applied to something nobody needs, consistency produces years of effort and no revenue. The reason his version worked isn't that he persisted — it's that he persisted at something with demand behind it, and the persistence is what let him get good at delivering it and build a reputation that brought repeat customers and referrals.\n\nThe scaling point is the same idea extended. Hiring wasn't a milestone he earned by lasting long enough; it was what let him solve the problem for more people than his own hours allowed. A business grows by serving the same problem at larger volume, which is why he stopped cleaning houses himself and moved to managing people who do. Without that step, he'd have a job with a capped ceiling rather than a business.\n\nSo the honest version of his story is: he found a problem with real demand, committed to solving it well and repeatedly, then expanded capacity so the solution could reach more customers. That sequence is what generalizes — the cleaning specifics don't.",
+    "rubric": [
+      "Identifies the unstated foundation: the business solved a real problem people would pay to have solved",
+      "Explains that starting and consistency only work when applied to something with actual demand",
+      "Notes that consistency built skill and reputation, which brought repeat business and referrals",
+      "Frames hiring as scaling the solution beyond his own hours, which is what makes it a business rather than a job"
+    ],
+    "reviewedAt": "2026-09-11T02:02:55.801Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-11T02:02:55.801Z"
+  },
+  {
+    "id": "spd-v-013",
+    "trackId": "spending",
+    "platform": "tiktok",
+    "videoId": "7172686130402331947",
+    "shareUrl": "https://www.tiktok.com/@ryanscribnerofficial/video/7172686130402331947",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7172686130402331947",
+    "creatorHandle": "@ryanscribnerofficial",
+    "postedAt": "2022-12-02T22:45:35.000Z",
+    "durationSeconds": 45,
+    "caption": "5 Cash Flowing Assets For Passive Income #passiveincome #cashflow #assets #investing ",
+    "engagement": {
+      "likes": 5102,
+      "comments": 48,
+      "shares": 333,
+      "plays": 98529
+    },
+    "question": "The creator lists assets like farmland and storage units. What do all of these have in common that makes them assets — and what downsides does the video leave out?",
+    "claimUnderTest": "Farmland, storage units, and similar holdings are assets worth owning because of the income and appreciation they produce.",
+    "referenceAnswer": "What they share is that they produce or hold value rather than consume it. Each one generates income from someone else paying to use it — a farmer leasing the land, a tenant renting the unit — and each is something you could sell later for a real price. That's the common thread across every asset regardless of category: money comes toward you from owning it, and ownership itself has resale value. The specific items on his list are just less obvious versions of the same thing, which is presumably his point.\n\nThe downsides get skipped. Most of these require significant capital up front, which makes them inaccessible to the audience being told about them. They're illiquid — farmland or a storage facility can take months to sell, unlike a stock, so money put in isn't money you can reach in an emergency. They're often bought with debt, meaning a loan and interest sit against the income before anything reaches you, and a bad stretch still leaves the payment due.\n\nThey also aren't passive. Storage units need management, maintenance, and marketing to stay occupied; farmland depends on tenants, weather, and commodity prices. Vacancy, repairs, property taxes, and insurance all come out of the gross figure. And none of it is guaranteed — values fall, tenants leave, a sector gets overbuilt. Concentrating capital in one property means one bad outcome hits everything at once, and an asset bought at the wrong price can lose money for years or permanently.\n\nSo the definition holds, but \"asset\" isn't a synonym for \"good investment.\" It describes what a thing does structurally, not whether this particular one, at this price, is worth owning.",
+    "rubric": [
+      "Identifies the common thread: assets produce income and/or hold resale value, rather than costing you to own",
+      "Names the capital requirement and illiquidity as barriers — money is locked up and slow to retrieve",
+      "Notes ongoing costs and effort — maintenance, management, vacancy, taxes, insurance — plus debt and interest if financed",
+      "Recognizes returns aren't guaranteed; values can fall and concentration increases risk"
+    ],
+    "reviewedAt": "2026-09-11T02:05:44.480Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-11T02:05:44.480Z"
+  },
+  {
+    "id": "spd-v-071",
+    "trackId": "spending",
+    "platform": "tiktok",
+    "videoId": "7176488283411680554",
+    "shareUrl": "https://www.tiktok.com/@nolangouveia/video/7176488283411680554",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7176488283411680554",
+    "creatorHandle": "@nolangouveia",
+    "postedAt": "2022-12-13T04:40:06.000Z",
+    "durationSeconds": 57,
+    "caption": "Dividends explained for beginners #dividendstocks #dividends101 #dividendetfs #bestdividendstock #attdividend ",
+    "engagement": {
+      "likes": 28044,
+      "comments": 537,
+      "shares": 3679,
+      "plays": 1046641
+    },
+    "question": "The video calculates that $169,000 in AT&T stock generates $1,000 a month in dividends. What does that math tell you about investing as a source of income, and what does it leave out?",
+    "claimUnderTest": "Divide your desired annual income by a stock's dividend yield and you get the amount you need to invest to receive that income passively.",
+    "referenceAnswer": "The arithmetic is right and it makes a useful point: investments can pay you without being sold. Dividends are cash paid out of company profits to shareholders, so the position generates income while you still own it. That's a real second mode of return alongside price appreciation, and the calculation correctly shows the relationship — the income you want divided by the yield equals the capital required.\n\nThe honest takeaway is how much capital that is. $169,000 for $1,000 a month is the actual price of passive income at that yield, and seeing the number kills the idea that dividend investing is a shortcut. It's a destination reached by accumulating principal over years, not a strategy that produces meaningful income early. Which means for most people the sequence runs the other way: income and savings build the portfolio first, and dividends become significant only once the balance is large.\n\nWhat gets left out matters. A 7% yield is unusually high, and high yields are often a warning rather than a bargain — yield rises when the share price falls, and a struggling company may cut the dividend entirely. AT&T has cut its dividend before. Dividends are never guaranteed; they're declared at the company's discretion. The math also assumes the share price holds, when a stock can pay you 7% while losing 20% of its value, leaving you behind overall. Putting $169,000 into a single company concentrates all of that risk in one place. And dividends are taxable in a regular brokerage account, so the income before tax isn't what arrives.\n\nA more realistic version diversifies across many dividend-paying companies or a dividend fund, accepts a lower and safer yield, reinvests the dividends during the accumulation years to compound rather than spending them, and treats total return — income plus price change — as the measure rather than yield alone.",
+    "rubric": [
+      "Explains the concept correctly: dividends pay cash to shareholders, so investments can produce income without selling",
+      "Recognizes the capital requirement is the real lesson — meaningful dividend income requires a large portfolio built over time",
+      "Notes dividends aren't guaranteed and a high yield can signal a falling share price or a cut ahead",
+      "Raises concentration risk, taxes, or total return — that yield alone doesn't determine whether the investment is good"
+    ],
+    "reviewedAt": "2026-09-11T03:14:54.820Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-11T03:14:54.820Z"
+  },
+  {
+    "id": "spd-v-065",
+    "trackId": "spending",
+    "platform": "tiktok",
+    "videoId": "7669462337849445663",
+    "shareUrl": "https://www.tiktok.com/@juliandpodcastshorts/video/7669462337849445663",
+    "embedUrl": "https://www.tiktok.com/embed/v2/7669462337849445663",
+    "creatorHandle": "@juliandpodcastshorts",
+    "postedAt": "2026-08-02T15:51:18.000Z",
+    "durationSeconds": 43,
+    "caption": "He says that trade professions like electricians and plumbers are the best career path for young people. Do you agree? #plumbersoftiktok #electrician  #careeradvice #workforce #electricianlife ",
+    "engagement": {
+      "likes": 14915,
+      "comments": 1163,
+      "shares": 6961,
+      "plays": 321231
+    },
+    "question": "The creator says his journeyman license means his \"new minimum wage is a six figure salary.\" What makes a skill valuable enough to do that, and what does that suggest about how people should think about building skills?",
+    "claimUnderTest": "A licensed trade is worth acquiring because it produces high pay permanently, transfers anywhere, and doesn't expire.",
+    "referenceAnswer": "What makes the skill valuable is the combination of real demand and limited supply. Electrical work has to be done, can't be outsourced or automated away easily, and the number of people qualified to do it is constrained by the training and licensing required. That's the general shape of a high-income skill: something people need, that not many can do, where the barrier is real enough to keep the field from flooding but low enough that an ordinary person can cross it.\n\nThe durability is the underrated part. He describes the license as a floor rather than a ceiling — something he can always return to. A skill you own doesn't disappear when a job does, doesn't depend on one employer, and travels with you geographically. That's a different kind of security than a high salary at a single company, and it's why he can treat six figures as his worst case rather than his best.\n\nThe broader point is about the path in. His was an apprenticeship — paid training, no tuition, no debt, and earning by his early twenties. That's one route among several, and the common thread is that valuable skills are acquired, not credentialed into existence. Trades, certifications, self-taught technical skills, and sales all have paths that don't run through a four-year degree, and the market pays for demonstrated capability rather than for the method used to acquire it. What's actually required is choosing something with real demand and committing long enough to reach competence, since the value comes from the scarcity that the difficulty creates.\n\nThe regret he expresses — not knowing at eighteen — is really about time. Skills compound: the earlier the investment, the longer it pays, and the sooner the income can be used to build everything else",
+    "rubric": [
+      "Identifies what creates value: genuine demand plus limited supply, with a real barrier to entry",
+      "Notes the skill is durable and portable — it belongs to you, outlasts any job, and works as a floor rather than a one-time win",
+      "Recognizes multiple paths to acquiring it — apprenticeships, certifications, self-teaching — not only a degree",
+      "Points out the time element: acquiring skills earlier means a longer payoff period"
+    ],
+    "reviewedAt": "2026-09-11T03:18:48.859Z",
+    "status": "approved",
+    "lastCheckedAt": "2026-09-11T03:18:48.859Z"
+  }
+]

@@ -33,10 +33,9 @@ type Action =
   | 'unreject'
   | 'update-approved'
   | 'retire'
-  | 'unretire'
 
 /** Actions that act on the approved file rather than the candidate queue. */
-const APPROVED_ACTIONS: Action[] = ['update-approved', 'retire', 'unretire']
+const APPROVED_ACTIONS: Action[] = ['update-approved', 'retire']
 
 interface Body {
   trackId?: string
@@ -83,35 +82,43 @@ export async function POST(request: Request) {
     if (at === -1) return bad(`No approved video ${id} in ${trackId}.`)
     const existing = pool[at]
 
-    let updated: PooledVideo
-
+    // Removing a video moves the row out of the approved file and back into the
+    // candidate queue as a rejected tombstone. Never a delete: the row is what
+    // keeps the id spoken for and keeps ingestion from offering the video again.
+    // Everything the reviewer wrote travels with it, so putting it back does not
+    // mean writing the question a second time.
     if (action === 'retire') {
-      // Retired, never deleted. The row keeps the id spoken for and keeps
-      // ingestion from offering the same video back as a fresh candidate.
-      updated = {
-        ...existing,
-        status: 'retired',
-        retiredReason: body.reason?.trim() || undefined,
-      }
-    } else if (action === 'unretire') {
-      const { retiredReason: _reason, ...rest } = existing
-      updated = { ...rest, status: 'approved' }
-    } else {
-      const review = body.review ?? {}
-      updated = {
-        ...existing,
-        question: (review.question ?? existing.question).trim(),
-        claimUnderTest: (review.claimUnderTest ?? existing.claimUnderTest)?.trim() || undefined,
-        referenceAnswer: (review.referenceAnswer ?? existing.referenceAnswer).trim(),
-        rubric: (review.rubric ?? existing.rubric).map(point => point.trim()).filter(Boolean),
-        reviewedAt: new Date().toISOString(),
-      }
+      const { status: _status, lastCheckedAt: _checked, ...carried } = existing
 
-      // This one is already in front of learners. Emptying a field here would
-      // break a live question, so the same completeness gate applies.
-      if (!isReviewComplete(updated)) {
-        return bad('A question, a reference answer, and at least one rubric point are required.')
+      await writeApprovedFile(trackId, pool.filter(item => item.id !== id))
+
+      const queue = await readQueue(trackId)
+      const tombstone: QueuedVideo = {
+        ...carried,
+        status: 'draft',
+        rejected: true,
+        rejectedReason: body.reason?.trim() || undefined,
       }
+      await writeQueue(trackId, [...queue.filter(item => item.id !== id), tombstone])
+
+      return NextResponse.json({ ok: true, item: tombstone })
+    }
+
+    // Everything left is an edit to a live question.
+    const review = body.review ?? {}
+    const updated: PooledVideo = {
+      ...existing,
+      question: (review.question ?? existing.question).trim(),
+      claimUnderTest: (review.claimUnderTest ?? existing.claimUnderTest)?.trim() || undefined,
+      referenceAnswer: (review.referenceAnswer ?? existing.referenceAnswer).trim(),
+      rubric: (review.rubric ?? existing.rubric).map(point => point.trim()).filter(Boolean),
+      reviewedAt: new Date().toISOString(),
+    }
+
+    // This one is already in front of learners. Emptying a field here would
+    // break a live question, so the same completeness gate applies.
+    if (!isReviewComplete(updated)) {
+      return bad('A question, a reference answer, and at least one rubric point are required.')
     }
 
     pool[at] = updated
