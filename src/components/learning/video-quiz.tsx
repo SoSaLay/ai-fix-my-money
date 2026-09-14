@@ -20,6 +20,7 @@ import { VideoEmbed } from '@/components/learning/video-embed'
 import { completeAttempt, reportVideoUnavailable } from '@/lib/learning/quiz/client'
 import { findLessonImage, type QuizQuestion, type Track } from '@/lib/learning/tracks'
 import type { PublicVideoQuestion } from '@/lib/learning/video-pool/types'
+import { finalRankPoints } from '@/lib/learning/rank'
 
 /** Both question kinds are worth the same, so neither dominates the paper. */
 const POINTS_PER_QUESTION = 2
@@ -48,7 +49,7 @@ interface Grade {
 interface VideoQuizProps {
   track: Track
   /** Returns whether the attempt passed. Scored in points, not questions. */
-  onSubmit: (points: number, totalPoints: number, missed: string[]) => boolean
+  onSubmit: (points: number, totalPoints: number, missed: string[], rankPoints: number) => boolean
   onDone: () => void
   /** Bumped by the parent to draw a fresh paper. */
   attemptKey: number
@@ -117,7 +118,11 @@ export function VideoQuiz({ track, onSubmit, onDone, attemptKey }: VideoQuizProp
       ...Object.entries(grades).filter(([, g]) => g.score < POINTS_PER_QUESTION).map(([id]) => id),
       ...choices.filter(q => picks[q.id] !== q.answer).map(q => q.id),
     ]
-    const passed = onSubmit(points, totalPoints, missed)
+    const rankPoints = finalRankPoints(
+      Object.values(grades).map(g => g.score),
+      choices.filter(q => picks[q.id] === q.answer).length,
+    )
+    const passed = onSubmit(points, totalPoints, missed, rankPoints)
     setResult({ points, passed })
     void completeAttempt({
       attemptId: paper.attemptId,

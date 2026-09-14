@@ -166,7 +166,9 @@ export default function TrackPage({ params }: { params: Promise<{ track: string 
           {view.kind === 'final' && (
             <FinalStage
               track={track}
-              onSubmit={(correct, total, missed) => recordFinal(track.id, correct, total, missed)}
+              onSubmit={(correct, total, missed, rankPoints) =>
+                recordFinal(track.id, correct, total, missed, rankPoints)
+              }
               onDone={advance}
             />
           )}
@@ -366,15 +368,15 @@ function FinalStage({
   track, onSubmit, onDone,
 }: {
   track: Track
-  onSubmit: (correct: number, total: number, missed: string[]) => boolean
+  onSubmit: (correct: number, total: number, missed: string[], rankPoints: number) => boolean
   onDone: () => void
 }) {
   // A retake draws a fresh paper rather than re-showing the one just sat.
   const [attemptKey, setAttemptKey] = useState(0)
 
   const submit = useCallback(
-    (points: number, totalPoints: number, missed: string[]) => {
-      const passed = onSubmit(points, totalPoints, missed)
+    (points: number, totalPoints: number, missed: string[], rankPoints: number) => {
+      const passed = onSubmit(points, totalPoints, missed, rankPoints)
       if (!passed) setAttemptKey(k => k + 1)
       return passed
     },

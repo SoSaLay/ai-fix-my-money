@@ -10,6 +10,7 @@ import { TRACKS, readingMinutes, type Track } from '@/lib/learning/tracks'
 import { progressColor } from '@/lib/learning/progress-colors'
 import { AcknowledgmentGate } from '@/components/learning/acknowledgment-gate'
 import { DisclaimerFooter } from '@/components/learning/disclaimer-footer'
+import { RankButton } from '@/components/learning/rank-button'
 
 const ICONS: Record<string, React.ReactNode> = {
   accounts:  <CreditCard size={20} />,
@@ -42,24 +43,28 @@ export default function LearningPage() {
               features, understand how your money works.
             </h3>
 
-            {/* Always here. Review is somewhere to test yourself whenever you
-                want, not a notification that only appears when something falls
-                due — a finished learner still has everything to practise. */}
-            <Link
-              href="/learning/review"
-              title={
-                due.length > 0
-                  ? `${due.length} ${due.length === 1 ? 'question' : 'questions'} due for review`
-                  : 'Practise questions from the lessons you have finished'
-              }
-              className="btn-action items-center justify-center gap-1.5 shrink-0"
-            >
-              <RotateCcw size={13} aria-hidden />
-              Go to review mode
-              {due.length > 0 && (
-                <span className="tabular-nums font-semibold">({due.length})</span>
-              )}
-            </Link>
+            <div className="flex items-center gap-3 shrink-0">
+              <RankButton />
+
+              {/* Always here. Review is somewhere to test yourself whenever you
+                  want, not a notification that only appears when something falls
+                  due — a finished learner still has everything to practise. */}
+              <Link
+                href="/learning/review"
+                title={
+                  due.length > 0
+                    ? `${due.length} ${due.length === 1 ? 'question' : 'questions'} due for review`
+                    : 'Practise questions from the lessons you have finished'
+                }
+                className="btn-action items-center justify-center gap-1.5 shrink-0"
+              >
+                <RotateCcw size={13} aria-hidden />
+                Go to review mode
+                {due.length > 0 && (
+                  <span className="tabular-nums font-semibold">({due.length})</span>
+                )}
+              </Link>
+            </div>
           </header>
 
           {/* Tracks */}

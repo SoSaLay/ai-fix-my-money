@@ -58,6 +58,8 @@ export interface LessonProgress {
   answered: boolean
   /** Question ids answered wrong — these drive deliberate practice. */
   missed: string[]
+  /** Correct on the first time through. Revisits do not change it — see rank.ts. */
+  firstCorrect?: number
   completedAt?: string
 }
 
@@ -68,6 +70,8 @@ export interface FinalResult {
   total: number
   passed: boolean
   passedAt?: string
+  /** Best rank points across attempts. Written answers weigh more — see rank.ts. */
+  bestRankPoints?: number
 }
 
 export interface TrackProgress {
@@ -124,7 +128,9 @@ interface LearningContextValue {
   /** Mark the real-data step done. */
   recordAction: (trackId: TrackId) => void
   /** Record a final-quiz attempt. Returns whether it passed. */
-  recordFinal: (trackId: TrackId, correct: number, total: number, missed: string[]) => boolean
+  recordFinal: (
+    trackId: TrackId, correct: number, total: number, missed: string[], rankPoints: number,
+  ) => boolean
 
   /** The step the learner should be on right now. */
   stageFor: (trackId: TrackId) => Stage
@@ -354,17 +360,30 @@ export function LearningProvider({ children }: { children: ReactNode }) {
 
   const recordLesson = useCallback(
     (trackId: TrackId, lessonId: string, missed: string[]) => {
-      mutate(trackId, current => ({
-        ...current,
-        lessons: {
-          ...current.lessons,
-          [lessonId]: { answered: true, missed, completedAt: new Date().toISOString() },
-        },
-      }))
+      const lesson = getTrack(trackId)?.lessons.find(l => l.id === lessonId)
+
+      mutate(trackId, current => {
+        const prior = current.lessons[lessonId]
+        return {
+          ...current,
+          lessons: {
+            ...current.lessons,
+            [lessonId]: {
+              answered: true,
+              missed,
+              // The first pass is what ranks. Answering again after seeing
+              // every reason would otherwise always be full marks.
+              firstCorrect: prior?.answered
+                ? prior.firstCorrect
+                : lesson ? lesson.questions.length - missed.length : undefined,
+              completedAt: new Date().toISOString(),
+            },
+          },
+        }
+      })
 
       // Everything answered enters spaced review. Missed questions come back
       // tomorrow; correct ones start further along.
-      const lesson = getTrack(trackId)?.lessons.find(l => l.id === lessonId)
       if (!lesson) return
 
       setReviewQueue(prev => {
@@ -389,7 +408,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
   )
 
   const recordFinal = useCallback(
-    (trackId: TrackId, correct: number, total: number, missed: string[]): boolean => {
+    (trackId: TrackId, correct: number, total: number, missed: string[], rankPoints: number): boolean => {
       // Derived from this paper's own total, so a video paper scored out of 20
       // points and a choice-only paper scored out of 10 questions use the same
       // threshold. For a choice-only quiz this is exactly passMark(track).
@@ -406,6 +425,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
             total,
             passed: prior?.passed || passed,
             passedAt: prior?.passedAt ?? (passed ? new Date().toISOString() : undefined),
+            bestRankPoints: Math.max(prior?.bestRankPoints ?? 0, rankPoints),
           },
         }
       })

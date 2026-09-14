@@ -6,61 +6,65 @@ import { Check, Plus, X } from 'lucide-react'
 import {
   INVESTMENT_CATEGORIES,
   type CategoryAllocations,
-  type InvestmentCategory,
+  type CustomAllocation,
   type InvestmentCategoryId,
 } from '@/lib/investing/categories'
-import { RISK_LABEL, RISK_RAMP } from '@/lib/investing/risk-ramp'
+import { RISK_LABEL, RISK_RAMP, type RiskShade } from '@/lib/investing/risk-ramp'
+
+/** Other entries have no tier to colour them by, so they wear the brand's. */
+const CUSTOM_SHADE: RiskShade = { tint: '#eeedfb', stripe: '#4c49c9' }
 
 /**
- * The instrument list, and what share of income the learner has put behind
- * each one.
+ * The investments on offer, and what share of income the learner has put
+ * behind each one. Every row carries its risk tier as a colour and as a word,
+ * the same pairing the lesson table uses.
  *
- * The savings tool's shape, with one difference: the categories are fixed
- * rather than invented. A savings goal is whatever you are saving for, so the
- * learner names it; an investment category is a thing that exists in the world,
- * and the nine here are exactly the nine the lesson taught. Letting someone
- * type a tenth would be letting them allocate to something we never explained.
- *
- * Every row carries its risk tier as a colour and as a word, the same pairing
- * the lesson table uses.
+ * Anything the list does not name goes under Other, where the learner writes
+ * the investment in and allocates to it the same way.
  */
 interface AllocationListProps {
   allocations: CategoryAllocations
+  custom: CustomAllocation[]
   monthlyIncome: number
   /** What is still uncommitted, so a row cannot take more than exists. */
   headroomPct: number
   disabled?: boolean
   onChange: (id: InvestmentCategoryId, pct: number) => void
+  onCustomChange: (custom: CustomAllocation[]) => void
 }
 
 export function AllocationList({
-  allocations, monthlyIncome, headroomPct, disabled, onChange,
+  allocations, custom, monthlyIncome, headroomPct, disabled, onChange, onCustomChange,
 }: AllocationListProps) {
   const chosen = INVESTMENT_CATEGORIES.filter(c => (allocations[c.id] ?? 0) > 0)
   const rest = INVESTMENT_CATEGORIES.filter(c => (allocations[c.id] ?? 0) <= 0)
+
+  const setCustomPct = (id: string, pct: number) =>
+    onCustomChange(custom.map(c => (c.id === id ? { ...c, pct } : c)))
 
   return (
     <div className="flex flex-col gap-5">
       <div>
         <h2 className="text-headline-sm text-on-surface font-bold">Where it goes</h2>
         <p className="text-body-md text-on-surface-variant mt-1 leading-relaxed">
-          Set the share of your monthly income behind each investment you hold. Drag the
-          slider or type the number. Anything you invest without naming an instrument
-          stays as general investing.
+          Select the investments you want and set the share of your monthly income behind
+          each one. Drag the slider or type the number. Not listed? Add your own under Other.
         </p>
       </div>
 
       {chosen.length > 0 && (
         <div className="flex flex-col gap-2.5">
           {chosen.map(category => (
-            <CategoryRow
+            <AllocationRow
               key={category.id}
-              category={category}
+              name={category.name}
+              badge={RISK_LABEL[category.tier]}
+              shade={RISK_RAMP[category.tier]}
               pct={allocations[category.id] ?? 0}
               monthlyIncome={monthlyIncome}
               headroomPct={headroomPct}
               disabled={disabled}
-              onChange={onChange}
+              onSet={pct => onChange(category.id, pct)}
             />
           ))}
         </div>
@@ -74,35 +78,104 @@ export function AllocationList({
             </p>
           )}
           {rest.map(category => (
-            <CategoryRow
+            <AllocationRow
               key={category.id}
-              category={category}
+              name={category.name}
+              badge={RISK_LABEL[category.tier]}
+              shade={RISK_RAMP[category.tier]}
               pct={0}
               monthlyIncome={monthlyIncome}
               headroomPct={headroomPct}
               disabled={disabled}
-              onChange={onChange}
+              onSet={pct => onChange(category.id, pct)}
             />
           ))}
         </div>
       )}
+
+      <div className="flex flex-col gap-2.5">
+        <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">Other</p>
+        {custom.map(entry => (
+          <AllocationRow
+            key={entry.id}
+            name={entry.name}
+            badge="Your own"
+            shade={CUSTOM_SHADE}
+            pct={entry.pct}
+            monthlyIncome={monthlyIncome}
+            headroomPct={headroomPct}
+            disabled={disabled}
+            startOpen
+            onSet={pct => setCustomPct(entry.id, pct)}
+            onRemove={() => onCustomChange(custom.filter(c => c.id !== entry.id))}
+          />
+        ))}
+        {!disabled && (
+          <AddCustom
+            onAdd={name =>
+              onCustomChange([...custom, { id: `custom_${Date.now()}`, name, pct: 0 }])
+            }
+          />
+        )}
+      </div>
     </div>
   )
 }
 
-function CategoryRow({
-  category, pct, monthlyIncome, headroomPct, disabled, onChange,
+function AddCustom({ onAdd }: { onAdd: (name: string) => void }) {
+  const [name, setName] = useState('')
+
+  const add = () => {
+    const trimmed = name.trim()
+    if (!trimmed) return
+    onAdd(trimmed)
+    setName('')
+  }
+
+  return (
+    <div
+      className="rounded-xl px-4 py-3 flex items-center gap-3"
+      style={{ boxShadow: 'inset 0 0 0 1px rgba(172,173,177,0.35)' }}
+    >
+      <input
+        type="text"
+        value={name}
+        onChange={e => setName(e.target.value)}
+        onKeyDown={e => { if (e.key === 'Enter') add() }}
+        maxLength={60}
+        placeholder="Type your own investment"
+        className="flex-1 min-w-0 bg-transparent text-body-md text-on-surface placeholder:text-on-surface-variant/70 outline-none"
+        aria-label="Name of your own investment"
+      />
+      <button
+        onClick={add}
+        disabled={!name.trim()}
+        className="shrink-0 inline-flex items-center gap-1 text-label-sm text-secondary font-medium disabled:opacity-40"
+      >
+        <Plus size={13} /> Add
+      </button>
+    </div>
+  )
+}
+
+function AllocationRow({
+  name, badge, shade, pct, monthlyIncome, headroomPct, disabled, startOpen = false, onSet, onRemove,
 }: {
-  category: InvestmentCategory
+  name: string
+  badge: string
+  shade: RiskShade
   pct: number
   monthlyIncome: number
   headroomPct: number
   disabled?: boolean
-  onChange: (id: InvestmentCategoryId, pct: number) => void
+  /** A row the learner just wrote in opens ready to set. */
+  startOpen?: boolean
+  onSet: (pct: number) => void
+  /** Deletes the row itself, not just its share. Other entries only. */
+  onRemove?: () => void
 }) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(startOpen)
   const [draft, setDraft] = useState(String(pct || ''))
-  const shade = RISK_RAMP[category.tier]
   const active = pct > 0
   const amount = Math.round((pct / 100) * monthlyIncome)
 
@@ -116,7 +189,7 @@ function CategoryRow({
   }, [pct])
 
   const set = (value: number) => {
-    onChange(category.id, Math.max(0, Math.min(Math.round(value), ceiling)))
+    onSet(Math.max(0, Math.min(Math.round(value), ceiling)))
   }
 
   const commitTyped = () => {
@@ -139,12 +212,12 @@ function CategoryRow({
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 min-w-0">
-          <p className="text-body-md font-semibold text-on-surface truncate">{category.name}</p>
+          <p className="text-body-md font-semibold text-on-surface truncate">{name}</p>
           <span
             className="text-label-sm font-semibold shrink-0 px-2 py-0.5 rounded-full"
             style={{ color: shade.stripe, backgroundColor: active ? 'rgba(255,255,255,0.6)' : shade.tint }}
           >
-            {RISK_LABEL[category.tier]}
+            {badge}
           </span>
         </div>
 
@@ -163,7 +236,7 @@ function CategoryRow({
             disabled={disabled}
             className="shrink-0 inline-flex items-center gap-1 text-label-sm text-secondary font-medium disabled:opacity-50"
           >
-            <Plus size={13} /> Allocate
+            <Plus size={13} /> Select
           </button>
         ) : null}
       </div>
@@ -181,7 +254,7 @@ function CategoryRow({
             value={pct}
             onChange={e => set(Number(e.target.value))}
             className="flex-1 min-w-0 h-1.5 cursor-pointer accent-secondary"
-            aria-label={`Percent of income for ${category.name}`}
+            aria-label={`Percent of income for ${name}`}
           />
           <div className="flex items-center gap-1.5 shrink-0">
             {/* The field sits on a tinted row and on a plain one, so it carries
@@ -205,7 +278,7 @@ function CategoryRow({
                 // digits end up underneath them. Centring puts clear space on
                 // both sides of the number.
                 className="w-16 bg-transparent text-body-md text-on-surface text-center outline-none"
-                aria-label={`Percent of income for ${category.name}, typed`}
+                aria-label={`Percent of income for ${name}, typed`}
               />
               <span className="text-label-sm text-on-surface-variant">%</span>
             </div>
@@ -213,16 +286,19 @@ function CategoryRow({
             <button
               onClick={commitTyped}
               className="p-1.5 rounded-lg hover:bg-surface-container"
-              aria-label={`Confirm ${category.name}`}
+              aria-label={`Confirm ${name}`}
             >
               <Check size={15} className="text-on-surface" />
             </button>
 
-            {active && (
+            {(active || onRemove) && (
               <button
-                onClick={() => { set(0); setOpen(false) }}
+                onClick={() => {
+                  if (onRemove) onRemove()
+                  else { set(0); setOpen(false) }
+                }}
                 className="p-1.5 rounded-lg hover:bg-surface-container"
-                aria-label={`Clear ${category.name}`}
+                aria-label={onRemove ? `Remove ${name}` : `Clear ${name}`}
               >
                 <X size={15} className="text-on-surface-variant" />
               </button>

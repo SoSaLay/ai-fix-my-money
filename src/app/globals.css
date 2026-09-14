@@ -99,6 +99,18 @@
     box-shadow: 0 2px 5px 0 rgb(213 217 217 / 50%);
   }
 
+  /* The top rank's colours drift slowly across the rank button. */
+  .rank-shimmer {
+    animation: rank-shimmer 8s ease-in-out infinite alternate;
+  }
+  @keyframes rank-shimmer {
+    from { background-position: 0% 50%; }
+    to   { background-position: 100% 50%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rank-shimmer { animation: none; }
+  }
+
   /* Archetype trading cards. The scene holds the perspective, the inner
      element does the rotating, and both faces sit stacked in the same grid
      cell so the card keeps one height regardless of which side is showing. */

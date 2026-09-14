@@ -9,48 +9,43 @@ import { AllocationList } from '@/components/investing/allocation-list'
 import { useDashboardSummary, useInvestingGoal } from '@/hooks/use-data'
 import { SectionGate } from '@/components/learning/section-gate'
 import {
+  knownAllocations,
   riskProfileFor,
   totalCategoryPct,
   type CategoryAllocations,
+  type CustomAllocation,
   type InvestmentCategoryId,
 } from '@/lib/investing/categories'
 
 const CATEGORIES_COLOR = '#4c49c9'
-const GENERAL_COLOR = '#8b89e0'
 
 /**
- * The same two-part shape as the savings tool: named commitments on one side,
- * a draggable remainder on the other, both measured against monthly income.
+ * Every percent going to investing is put behind a named investment — one from
+ * the list, or one the learner writes in under Other. There is no unnamed
+ * remainder: money allocated to investing is money allocated to something.
  *
- * The difference is where the names come from. A savings goal is whatever the
- * learner is saving for, so they write it. An investment category is a thing
- * that exists whether or not they name it, and the nine on offer are the nine
- * the Investment choices lesson taught — so the tool can never ask for money
- * against something it never explained.
- *
- * General investing is what is going in without an instrument named against
- * it. Someone who knows they want to invest 15% before they know what they are
- * buying should be able to record that and come back.
+ * The dial shows the total. It is set from the list, not dragged.
  */
 function InvestingPageTool() {
   const { data: summary, loading: summaryLoading } = useDashboardSummary()
   const { goal, loading: goalLoading, updateGoal, updating } = useInvestingGoal()
 
   const [allocations, setAllocations] = useState<CategoryAllocations>({})
-  const [generalPct, setGeneralPct] = useState(0)
+  const [custom, setCustom] = useState<CustomAllocation[]>([])
   const [isLocked, setIsLocked] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const loadedRef = useRef(false)
 
-  // Load the stored plan once. A goal saved before categories existed has its
-  // whole allocation read as general investing, which is what it was.
+  // Load the stored plan once. Categories no longer offered, and any old
+  // unnamed "general" share, are dropped rather than carried as money nobody
+  // can see or edit.
   useEffect(() => {
     if (loadedRef.current || !goal) return
-    const stored = goal.categories ?? {}
-    const storedGeneral = goal.general_pct ?? Math.max(0, Number(goal.allocation_pct) - totalCategoryPct(stored))
+    const stored = knownAllocations(goal.categories)
+    const storedCustom = goal.custom ?? []
     setAllocations(stored)
-    setGeneralPct(storedGeneral)
-    setIsLocked(Number(goal.allocation_pct) > 0)
+    setCustom(storedCustom)
+    setIsLocked(totalCategoryPct(stored, storedCustom) > 0)
     loadedRef.current = true
   }, [goal])
 
@@ -104,14 +99,10 @@ function InvestingPageTool() {
   const totalSavingsPct = Math.round(summary.goals.savings_total_allocated || 0)
   const maxInvestingPct = Math.max(0, 100 - lockedSpendingPct - totalSavingsPct)
 
-  const categoriesPct = totalCategoryPct(allocations)
-  const totalInvestingPct = categoriesPct + generalPct
-  const maxGeneralPct = Math.max(0, maxInvestingPct - categoriesPct)
+  const totalInvestingPct = totalCategoryPct(allocations, custom)
   /** What a single row may still claim on top of what it already holds. */
   const headroomPct = Math.max(0, maxInvestingPct - totalInvestingPct)
 
-  const categoriesAmount = Math.round((categoriesPct / 100) * monthlyIncome)
-  const generalAmount = Math.round((generalPct / 100) * monthlyIncome)
   const totalInvestingAmount = Math.round((totalInvestingPct / 100) * monthlyIncome)
 
   const handleCategoryChange = (id: InvestmentCategoryId, pct: number) => {
@@ -124,8 +115,8 @@ function InvestingPageTool() {
     setHasUnsavedChanges(true)
   }
 
-  const handleDialChange = (pct: number) => {
-    setGeneralPct(Math.min(pct, maxGeneralPct))
+  const handleCustomChange = (next: CustomAllocation[]) => {
+    setCustom(next)
     setHasUnsavedChanges(true)
   }
 
@@ -134,7 +125,7 @@ function InvestingPageTool() {
       allocation_pct: totalInvestingPct,
       risk_profile: riskProfileFor(allocations),
       categories: allocations,
-      general_pct: generalPct,
+      custom,
     })
     if (success) {
       setHasUnsavedChanges(false)
@@ -190,16 +181,14 @@ function InvestingPageTool() {
               ) : null}
             </div>
 
-            {/* The instruments are the locked arc; general investing is what
-                the dial drags. Same division as the savings tool. */}
+            {/* Display only: the total is set from the list on the right. */}
             <CircularDial
-              lockedPct={categoriesPct}
-              freePct={generalPct}
+              lockedPct={totalInvestingPct}
+              freePct={0}
               dollarAmount={totalInvestingAmount}
-              onChange={isLocked ? () => {} : handleDialChange}
-              maxFreePct={maxGeneralPct}
+              onChange={() => {}}
+              maxFreePct={0}
               lockedColor={CATEGORIES_COLOR}
-              freeColor={GENERAL_COLOR}
               size={220}
             />
 
@@ -210,34 +199,12 @@ function InvestingPageTool() {
                   <span className="text-on-surface-variant">Selected investments</span>
                 </div>
                 <span className="font-semibold text-on-surface">
-                  {categoriesPct > 0
-                    ? `${categoriesPct}% · $${categoriesAmount.toLocaleString()}/mo`
-                    : <span className="text-on-surface-variant font-normal">Not set — allocate one →</span>
+                  {totalInvestingPct > 0
+                    ? `${totalInvestingPct}% · $${totalInvestingAmount.toLocaleString()}/mo`
+                    : <span className="text-on-surface-variant font-normal">Not set — select one →</span>
                   }
                 </span>
               </div>
-
-              <div className="flex items-center justify-between text-label-sm">
-                <div className="flex items-center gap-2">
-                  <span className="inline-block w-3 h-3 rounded-full" style={{ background: GENERAL_COLOR }} />
-                  <span className="text-on-surface-variant">General investing</span>
-                </div>
-                <span className="font-semibold text-on-surface">
-                  {generalPct > 0
-                    ? `${generalPct}% · $${generalAmount.toLocaleString()}/mo`
-                    : <span className="text-on-surface-variant font-normal">Drag the dial to set</span>
-                  }
-                </span>
-              </div>
-
-              {totalInvestingPct > 0 && (
-                <div className="flex items-center justify-between text-label-sm pt-2 border-t border-outline-variant/30 mt-1">
-                  <span className="text-on-surface-variant">Total Investing</span>
-                  <span className="font-semibold text-on-surface">
-                    {totalInvestingPct}% · ${totalInvestingAmount.toLocaleString()}/mo
-                  </span>
-                </div>
-              )}
             </div>
 
             <CommittedAllocations
@@ -251,10 +218,12 @@ function InvestingPageTool() {
           <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6">
             <AllocationList
               allocations={allocations}
+              custom={custom}
               monthlyIncome={monthlyIncome}
               headroomPct={headroomPct}
               disabled={isLocked}
               onChange={handleCategoryChange}
+              onCustomChange={handleCustomChange}
             />
           </div>
         </div>

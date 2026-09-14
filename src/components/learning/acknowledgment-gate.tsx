@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { ShieldCheck, Check } from 'lucide-react'
+import { ShieldCheck, Check, Medal } from 'lucide-react'
 import { useLearning } from '@/contexts/learning-context'
 import { ACKNOWLEDGMENT_POINTS } from '@/lib/learning/disclaimer'
+import { RANKS } from '@/lib/learning/rank'
 import { LEGAL_ROOT } from '@/lib/legal/documents'
 
 /**
@@ -40,6 +41,18 @@ export function AcknowledgmentGate({ children }: { children: React.ReactNode }) 
             </li>
           ))}
         </ul>
+
+        <div className="bg-surface-container-lowest rounded-2xl px-5 py-4 flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <Medal size={15} className="text-secondary" />
+            <p className="text-title-sm text-on-surface font-semibold">Your progress is governed by your rank</p>
+          </div>
+          <p className="text-body-md text-on-surface-variant leading-relaxed">
+            Every question you answer counts. Right answers to the lesson questions earn points,
+            and written answers on each final test earn more. Answer them right and you rank up —
+            from “{RANKS[0].line}” all the way to {RANKS[RANKS.length - 1].name}.
+          </p>
+        </div>
 
         <div className="flex items-center gap-5 flex-wrap">
           <button

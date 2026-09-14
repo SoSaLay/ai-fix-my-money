@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { useFinancialData } from '@/contexts/financial-data-context'
-import type { CategoryAllocations } from '@/lib/investing/categories'
+import type { CategoryAllocations, CustomAllocation } from '@/lib/investing/categories'
 
 // ============================================================================
 // Types (kept identical so existing pages need zero changes)
@@ -87,8 +87,8 @@ export interface InvestingGoal {
   risk_profile: 'conservative' | 'moderate' | 'aggressive'
   /** Percent of income committed to each named instrument. */
   categories?: CategoryAllocations
-  /** Percent going to investing without a category named against it. */
-  general_pct?: number
+  /** Investments the learner wrote in themselves, under Other. */
+  custom?: CustomAllocation[]
   created_at: string
   updated_at: string
 }
@@ -371,7 +371,7 @@ export function useInvestingGoal() {
       allocation_pct: number
       risk_profile: 'conservative' | 'moderate' | 'aggressive'
       categories?: CategoryAllocations
-      general_pct?: number
+      custom?: CustomAllocation[]
     }) => {
       setUpdating(true)
       setInvestingGoal(data)
