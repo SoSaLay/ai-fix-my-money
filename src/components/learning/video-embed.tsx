@@ -44,7 +44,7 @@ export function VideoEmbed({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="relative w-full max-w-[325px] overflow-hidden rounded-xl bg-surface-container-low">
+      <div className="relative w-full max-w-[325px] overflow-hidden rounded-2xl bg-surface-container-low">
         {/* 9:16, the shape short-form video is actually shot in. */}
         <div className="relative aspect-[9/16]">
           {!loaded && (
@@ -70,19 +70,19 @@ export function VideoEmbed({
           href={shareUrl}
           target="_blank"
           rel="noopener noreferrer nofollow"
-          className="inline-flex items-center gap-1 text-label-md text-secondary hover:underline"
+          className="inline-flex items-center gap-1 text-label-lg text-on-surface hover:underline"
         >
           {creatorHandle}
           <ExternalLink className="h-3 w-3" aria-hidden />
         </a>
         {posted && (
-          <span className="text-label-sm text-on-surface-variant">Posted {posted}</span>
+          <span className="text-label-md text-on-surface-variant">Posted {posted}</span>
         )}
         {onReportUnavailable && (
           <button
             type="button"
             onClick={onReportUnavailable}
-            className="ml-auto inline-flex items-center gap-1 text-label-sm text-on-surface-variant hover:text-on-surface"
+            className="ml-auto inline-flex items-center gap-1 text-label-md text-on-surface-variant hover:text-on-surface"
           >
             <VideoOff className="h-3 w-3" aria-hidden />
             {reportLabel}

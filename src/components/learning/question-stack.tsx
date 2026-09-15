@@ -2,8 +2,8 @@
 
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import Image from 'next/image'
-import { Check, X } from 'lucide-react'
 import type { QuizQuestion, LessonImage } from '@/lib/learning/tracks'
+import { AnswerOption, WhyPanel } from '@/components/learning/answer-option'
 
 interface QuestionStackProps {
   questions: QuizQuestion[]
@@ -63,75 +63,60 @@ export function QuestionStack({
   if (questions.length === 0) return null
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-label-sm uppercase tracking-widest text-on-surface-variant">
-          {questions.length === 1 ? 'Question' : 'Questions'}
-        </p>
-        <span className="text-label-sm text-on-surface-variant tabular-nums">
-          {answeredCount}/{questions.length} answered
+    <section className="flex flex-col gap-5 animate-fade-in" aria-label="Questions">
+      <div className="flex items-end justify-between gap-4">
+        <h2 className="text-display-sm text-on-surface">
+          {questions.length === 1 ? 'Your question' : 'Your questions'}
+        </h2>
+        <span className="rounded-full bg-surface-container-lowest border border-on-surface/[0.06] px-3.5 py-1.5 text-label-lg text-on-surface tabular-nums">
+          {answeredCount} of {questions.length} answered
         </span>
       </div>
 
       {/* One column, top to bottom. Answering should never mean tracking
           back and forth across the page. */}
-      <div className="flex flex-col gap-4">
-      {questions.map((q, qi) => {
-        const picked = answers[q.id]
-        const revealed = picked !== undefined && revealImmediately
-        const answered = picked !== undefined
+      <ol className="flex flex-col gap-4">
+        {questions.map((q, qi) => {
+          const picked = answers[q.id]
+          const answered = picked !== undefined
+          const revealed = answered && revealImmediately
 
-        return (
-          <div key={q.id} className="bg-surface-container-lowest rounded-2xl px-5 py-5 flex flex-col gap-3.5">
-            <p className="text-body-lg text-on-surface font-medium leading-snug">
-              <span className="text-on-surface-variant tabular-nums mr-1.5">{qi + 1}.</span>
-              {q.question}
-            </p>
-
-            {q.imageSrc && bySrc.has(q.imageSrc) && (
-              <QuestionImage image={bySrc.get(q.imageSrc)!} />
-            )}
-
-            <div className="flex flex-col gap-2">
-              {q.options.map((opt, i) => {
-                const isAnswer = i === q.answer
-                const isPicked = i === picked
-
-                let cls = 'border-outline-variant/60 hover:border-secondary/50 hover:bg-surface-container-low'
-                if (revealed && isAnswer) cls = 'border-transparent bg-tertiary-fixed/40'
-                else if (revealed && isPicked) cls = 'border-transparent bg-error/10'
-                else if (revealed) cls = 'border-outline-variant/30 opacity-55'
-                else if (answered && isPicked) cls = 'border-transparent bg-secondary-fixed/40'
-                else if (answered) cls = 'border-outline-variant/30 opacity-55'
-
-                return (
-                  <button
-                    key={i}
-                    onClick={() => choose(q, i)}
-                    disabled={answered}
-                    className={`flex items-center justify-between gap-3 text-left border rounded-xl px-4 py-3 transition-all ${cls}`}
-                  >
-                    <span className="text-body-md text-on-surface">{opt}</span>
-                    {revealed && isAnswer && <Check size={16} style={{ color: '#1a6b3a' }} className="shrink-0" />}
-                    {revealed && isPicked && !isAnswer && <X size={16} className="text-error shrink-0" />}
-                  </button>
-                )
-              })}
-            </div>
-
-            {revealed && (
-              <div className="bg-surface-container rounded-xl px-4 py-3">
-                <p className="text-label-sm uppercase tracking-wider text-on-surface-variant mb-1">
-                  {picked === q.answer ? 'Right — here’s why' : 'Not quite — here’s why'}
+          return (
+            <li
+              key={q.id}
+              className="bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] p-6 sm:p-8 flex flex-col gap-5"
+            >
+              <div className="flex flex-col gap-2">
+                <p className="text-label-lg text-on-surface-variant tabular-nums">
+                  Question {qi + 1}
                 </p>
-                <p className="text-body-sm text-on-surface-variant leading-relaxed">{q.why}</p>
+                <p className="text-headline-lg text-on-surface">{q.question}</p>
               </div>
-            )}
-          </div>
-        )
-      })}
-      </div>
-    </div>
+
+              {q.imageSrc && bySrc.has(q.imageSrc) && (
+                <QuestionImage image={bySrc.get(q.imageSrc)!} />
+              )}
+
+              <div className="flex flex-col gap-2.5" role="group" aria-label={`Answers for question ${qi + 1}`}>
+                {q.options.map((opt, i) => (
+                  <AnswerOption
+                    key={i}
+                    index={i}
+                    label={opt}
+                    picked={i === picked}
+                    isAnswer={i === q.answer}
+                    revealed={revealed}
+                    onPick={() => choose(q, i)}
+                  />
+                ))}
+              </div>
+
+              {revealed && <WhyPanel correct={picked === q.answer} why={q.why} />}
+            </li>
+          )
+        })}
+      </ol>
+    </section>
   )
 }
 
@@ -142,13 +127,13 @@ export function QuestionStack({
  */
 function QuestionImage({ image }: { image: LessonImage }) {
   return (
-    <figure className="w-full max-w-[380px] rounded-xl overflow-hidden bg-surface-container">
+    <figure className="w-full max-w-[420px] rounded-2xl overflow-hidden bg-surface-container-low">
       <div className="relative w-full aspect-[4/3]">
         <Image
           src={image.src}
           alt={image.alt}
           fill
-          sizes="380px"
+          sizes="420px"
           unoptimized={image.src.endsWith('.svg')}
           className="object-contain"
         />

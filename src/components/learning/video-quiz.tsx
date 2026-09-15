@@ -14,9 +14,10 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
-import { ArrowRight, Check, Loader2, Mic, MicOff, RotateCcw, Square, Volume2, X } from 'lucide-react'
+import { ArrowRight, Check, Loader2, Mic, MicOff, RotateCcw, Square, Volume2 } from 'lucide-react'
 
 import { VideoEmbed } from '@/components/learning/video-embed'
+import { AnswerOption, WhyPanel } from '@/components/learning/answer-option'
 import { useDictation } from '@/hooks/use-dictation'
 import { completeAttempt, reportVideoUnavailable } from '@/lib/learning/quiz/client'
 import { findLessonImage, type QuizQuestion, type Track } from '@/lib/learning/tracks'
@@ -135,10 +136,10 @@ export function VideoQuiz({ track, onSubmit, onDone, attemptKey }: VideoQuizProp
 
   if (loadError) {
     return (
-      <div className="bg-surface-container-lowest rounded-3xl px-7 py-10 flex flex-col gap-3 items-center text-center max-w-2xl mx-auto">
-        <p className="text-title-md text-on-surface font-semibold">{loadError.message}</p>
+      <div className="bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] px-7 py-12 flex flex-col gap-3 items-center text-center max-w-2xl mx-auto w-full">
+        <p className="text-headline-lg text-on-surface">{loadError.message}</p>
         {loadError.detail && (
-          <p className="text-body-md text-on-surface-variant">{loadError.detail}</p>
+          <p className="text-body-lg text-on-surface-variant">{loadError.detail}</p>
         )}
       </div>
     )
@@ -146,9 +147,9 @@ export function VideoQuiz({ track, onSubmit, onDone, attemptKey }: VideoQuizProp
 
   if (!paper) {
     return (
-      <div className="flex items-center justify-center gap-2 py-20 text-on-surface-variant">
-        <Loader2 size={18} className="animate-spin" aria-hidden />
-        <span className="text-body-md">Drawing your paper…</span>
+      <div className="flex items-center justify-center gap-2.5 py-24 text-on-surface-variant">
+        <Loader2 size={20} className="animate-spin" aria-hidden />
+        <span className="text-title-lg">Drawing your paper…</span>
       </div>
     )
   }
@@ -165,17 +166,24 @@ export function VideoQuiz({ track, onSubmit, onDone, attemptKey }: VideoQuizProp
   }
 
   return (
-    <div className="flex flex-col gap-6 max-w-3xl mx-auto w-full">
-      <div className="bg-surface-container-lowest rounded-3xl px-7 py-6 flex flex-col gap-2">
-        <div className="flex items-center justify-between gap-3">
-          <span className="text-label-sm text-on-surface-variant uppercase tracking-widest">
-            Final quiz · {track.title}
-          </span>
-          <span className="text-label-sm text-on-surface-variant tabular-nums">
-            {answered}/{total} answered
+    <div className="flex flex-col gap-6 max-w-4xl mx-auto w-full">
+      <div className="bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] p-6 sm:p-10 flex flex-col gap-5">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="flex flex-col gap-1.5">
+            <span className="text-title-md text-on-surface-variant">Final test · {track.title}</span>
+            <h2 className="text-display-sm sm:text-display-md text-on-surface">Show what you know.</h2>
+          </div>
+          <span className="rounded-full bg-surface-container-low px-3.5 py-1.5 text-label-lg text-on-surface tabular-nums">
+            {answered} of {total} answered
           </span>
         </div>
-        <p className="text-body-md text-on-surface-variant leading-relaxed">
+        <div className="h-1.5 rounded-full bg-on-surface/10 overflow-hidden" aria-hidden>
+          <div
+            className="h-full rounded-full bg-[#17171c] transition-[width] duration-300"
+            style={{ width: `${total ? (answered / total) * 100 : 0}%` }}
+          />
+        </div>
+        <p className="text-body-lg text-on-surface-variant leading-relaxed">
           {videos.length} videos to watch and answer in your own words
           {choices.length > 0 ? `, then ${choices.length} multiple choice` : ''}. Each is worth{' '}
           {POINTS_PER_QUESTION} points — {totalPoints} in total, and you need{' '}
@@ -210,12 +218,12 @@ export function VideoQuiz({ track, onSubmit, onDone, attemptKey }: VideoQuizProp
 
       <div className="flex items-center justify-end gap-4 flex-wrap">
         {!allAnswered && (
-          <p className="text-label-sm text-on-surface-variant">Answer every question to finish.</p>
+          <p className="text-body-md text-on-surface-variant">Answer every question to finish.</p>
         )}
         <button
           onClick={submit}
           disabled={!allAnswered}
-          className="btn-action items-center justify-center gap-1.5 disabled:opacity-30"
+          className="btn-action !h-12 !px-6 !text-[15px] items-center justify-center gap-2 disabled:opacity-30"
         >
           Finish quiz <ArrowRight size={16} />
         </button>
@@ -300,19 +308,19 @@ function VideoQuestion({
   }, [trackId, video.id])
 
   return (
-    <div className="bg-surface-container-lowest rounded-3xl px-7 py-6 flex flex-col gap-4">
+    <div className="bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] p-6 sm:p-8 flex flex-col gap-6">
       <div className="flex items-start justify-between gap-3">
-        <p className="text-body-lg text-on-surface font-medium leading-snug">
-          <span className="text-on-surface-variant tabular-nums mr-1.5">{index}.</span>
-          {video.question}
-        </p>
+        <div className="flex flex-col gap-2">
+          <p className="text-label-lg text-on-surface-variant tabular-nums">Question {index}</p>
+          <p className="text-headline-lg text-on-surface">{video.question}</p>
+        </div>
         {canSpeak && (
           <button
             type="button"
             onClick={toggleSpeak}
             aria-label={speaking ? 'Stop reading the question' : 'Read the question aloud'}
             title={speaking ? 'Stop reading' : 'Read aloud'}
-            className="shrink-0 rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors"
+            className="shrink-0 w-11 h-11 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors"
           >
             {speaking ? <Square size={16} aria-hidden /> : <Volume2 size={18} aria-hidden />}
           </button>
@@ -340,11 +348,11 @@ function VideoQuestion({
                 ? 'Type or tap the mic and speak your answer. Spelling and grammar are not marked — what you understood is.'
                 : 'Answer in your own words. Spelling and grammar are not marked — what you understood is.'
             }
-            className="w-full resize-y rounded-2xl bg-surface-container-low px-4 py-3 text-body-md text-on-surface placeholder:text-on-surface-variant/70 focus:bg-surface-container focus:outline-none focus:ring-2 focus:ring-secondary/35 disabled:opacity-70"
+            className="w-full resize-y rounded-2xl border border-on-surface/10 bg-surface-container-low px-5 py-4 text-body-lg text-on-surface placeholder:text-on-surface-variant/70 focus:bg-surface-container-lowest focus:border-on-surface/30 focus:outline-none disabled:opacity-70 transition-colors"
           />
 
           {reported && !grade && (
-            <p className="text-label-sm text-on-surface-variant">
+            <p className="text-body-md text-on-surface-variant">
               Flagged for review. Answer what you can — a dead embed will not count against you.
             </p>
           )}
@@ -356,7 +364,7 @@ function VideoQuestion({
                 onClick={dictation.listening ? dictation.stop : dictation.start}
                 disabled={busy}
                 aria-pressed={dictation.listening}
-                className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-label-md transition-colors disabled:opacity-30 ${
+                className={`inline-flex items-center gap-2 rounded-full px-4 h-10 text-label-lg transition-colors disabled:opacity-30 ${
                   dictation.listening
                     ? 'bg-error/10 text-error'
                     : 'bg-surface-container-low text-on-surface hover:bg-surface-container'
@@ -373,7 +381,7 @@ function VideoQuestion({
                 )}
               </button>
               {dictation.listening && (
-                <span className="flex items-center gap-1.5 text-label-sm text-on-surface-variant">
+                <span className="flex items-center gap-1.5 text-body-md text-on-surface-variant">
                   <span className="h-2 w-2 rounded-full bg-error animate-pulse" aria-hidden />
                   Listening…
                 </span>
@@ -382,7 +390,7 @@ function VideoQuestion({
           )}
 
           {dictation.error && !grade && (
-            <p className="text-label-sm text-error">{dictation.error}</p>
+            <p className="text-body-md text-error">{dictation.error}</p>
           )}
 
           {!grade && (
@@ -390,7 +398,7 @@ function VideoQuestion({
               <button
                 onClick={send}
                 disabled={busy || answer.trim() === ''}
-                className="btn-action items-center justify-center gap-1.5 disabled:opacity-30"
+                className="btn-action !h-12 !px-6 !text-[15px] items-center justify-center gap-2 disabled:opacity-30"
               >
                 {busy ? (
                   <>
@@ -400,7 +408,7 @@ function VideoQuestion({
                   'Submit answer'
                 )}
               </button>
-              <span className="text-label-sm text-on-surface-variant">
+              <span className="text-body-md text-on-surface-variant">
                 You cannot change it afterwards.
               </span>
             </div>
@@ -421,29 +429,29 @@ function GradeCard({ grade }: { grade: Grade }) {
     grade.verdict === 'full' ? 'Full marks' :
     grade.verdict === 'partial' ? 'Partly there' : 'Missed'
 
+  // Green, yellow, red — the same three colours the step rail uses.
   const tone =
-    grade.verdict === 'full' ? 'bg-tertiary-fixed/40' :
-    grade.verdict === 'partial' ? 'bg-secondary-fixed/40' : 'bg-error/10'
+    grade.verdict === 'full' ? 'border-success/30 bg-success/[0.07] text-success' :
+    grade.verdict === 'partial' ? 'border-[#e0a300]/35 bg-[rgba(224,163,0,0.09)] text-[#8a6400]' :
+    'border-error/30 bg-error/[0.06] text-error'
 
   return (
-    <div className={`rounded-2xl px-4 py-3.5 flex flex-col gap-2 ${tone}`}>
+    <div className={`animate-fade-in rounded-2xl border px-5 py-4 flex flex-col gap-2.5 ${tone}`}>
       <div className="flex items-center justify-between gap-3">
-        <span className="text-label-sm uppercase tracking-wider text-on-surface-variant">
-          {label}
-        </span>
-        <span className="text-label-md tabular-nums text-on-surface font-semibold">
+        <span className="text-title-md">{label}</span>
+        <span className="text-title-md tabular-nums">
           {grade.score} / {POINTS_PER_QUESTION}
         </span>
       </div>
 
-      <p className="text-body-md text-on-surface leading-relaxed">{grade.reasoning}</p>
+      <p className="text-body-lg text-on-surface leading-relaxed">{grade.reasoning}</p>
 
       {grade.missed.length > 0 && (
-        <div className="flex flex-col gap-1">
-          <span className="text-label-sm uppercase tracking-wider text-on-surface-variant">
+        <div className="flex flex-col gap-1.5">
+          <span className="text-label-lg text-on-surface">
             Not covered
           </span>
-          <ul className="list-disc pl-5 text-body-sm text-on-surface-variant">
+          <ul className="list-disc pl-5 text-body-md text-on-surface-variant flex flex-col gap-1">
             {grade.missed.map(point => (
               <li key={point}>{point}</li>
             ))}
@@ -468,20 +476,20 @@ function ChoiceQuestion({
   const revealed = picked !== undefined
 
   return (
-    <div className="bg-surface-container-lowest rounded-3xl px-7 py-6 flex flex-col gap-4">
-      <p className="text-body-lg text-on-surface font-medium leading-snug">
-        <span className="text-on-surface-variant tabular-nums mr-1.5">{index}.</span>
-        {question.question}
-      </p>
+    <div className="bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] p-6 sm:p-8 flex flex-col gap-5">
+      <div className="flex flex-col gap-2">
+        <p className="text-label-lg text-on-surface-variant tabular-nums">Question {index}</p>
+        <p className="text-headline-lg text-on-surface">{question.question}</p>
+      </div>
 
       {image && (
-        <figure className="w-full max-w-[380px] rounded-xl overflow-hidden bg-surface-container">
+        <figure className="w-full max-w-[420px] rounded-2xl overflow-hidden bg-surface-container-low">
           <div className="relative w-full aspect-[4/3]">
             <Image
               src={image.src}
               alt={image.alt}
               fill
-              sizes="380px"
+              sizes="420px"
               unoptimized={image.src.endsWith('.svg')}
               className="object-contain"
             />
@@ -489,43 +497,21 @@ function ChoiceQuestion({
         </figure>
       )}
 
-      <div className="flex flex-col gap-2">
-        {question.options.map((option, i) => {
-          const isAnswer = i === question.answer
-          const isPicked = i === picked
-
-          let cls = 'border-outline-variant/60 hover:border-secondary/50 hover:bg-surface-container-low'
-          if (revealed && isAnswer) cls = 'border-transparent bg-tertiary-fixed/40'
-          else if (revealed && isPicked) cls = 'border-transparent bg-error/10'
-          else if (revealed) cls = 'border-outline-variant/30 opacity-55'
-
-          return (
-            <button
-              key={i}
-              onClick={() => onPick(i)}
-              disabled={revealed}
-              className={`flex items-center justify-between gap-3 text-left border rounded-2xl px-4 py-3.5 transition-all ${cls}`}
-            >
-              <span className="text-body-md text-on-surface">{option}</span>
-              {revealed && isAnswer && (
-                <Check size={17} style={{ color: '#1a6b3a' }} className="shrink-0" />
-              )}
-              {revealed && isPicked && !isAnswer && (
-                <X size={17} className="text-error shrink-0" />
-              )}
-            </button>
-          )
-        })}
+      <div className="flex flex-col gap-2.5" role="group" aria-label={`Answers for question ${index}`}>
+        {question.options.map((option, i) => (
+          <AnswerOption
+            key={i}
+            index={i}
+            label={option}
+            picked={i === picked}
+            isAnswer={i === question.answer}
+            revealed={revealed}
+            onPick={() => onPick(i)}
+          />
+        ))}
       </div>
 
-      {revealed && (
-        <div className="bg-surface-container rounded-2xl px-4 py-3.5 flex flex-col gap-1">
-          <span className="text-label-sm uppercase tracking-wider text-on-surface-variant">
-            {picked === question.answer ? 'Right — here’s why' : 'Not quite — here’s why'}
-          </span>
-          <p className="text-body-md text-on-surface-variant leading-relaxed">{question.why}</p>
-        </div>
-      )}
+      {revealed && <WhyPanel correct={picked === question.answer} why={question.why} />}
     </div>
   )
 }
@@ -544,13 +530,13 @@ function Result({
 
   if (passed) {
     return (
-      <div className="flex flex-col gap-5 items-center text-center max-w-2xl mx-auto bg-surface-container-lowest rounded-3xl px-7 py-10">
-        <Check size={24} style={{ color: '#1a6b3a' }} />
-        <h2 className="text-headline-sm text-on-surface font-bold">Passed</h2>
-        <p className="text-body-lg text-on-surface-variant tabular-nums">
-          {points} of {totalPoints} points.
-        </p>
-        <button onClick={onDone} className="btn-action items-center justify-center gap-1.5 mt-1">
+      <div className="animate-fade-in flex flex-col gap-5 items-center text-center max-w-2xl mx-auto w-full bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] px-7 py-14 sm:py-16">
+        <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center">
+          <Check size={30} className="text-success" />
+        </div>
+        <p className="text-display-lg text-on-surface tabular-nums">{points}/{totalPoints}</p>
+        <h2 className="text-display-sm text-on-surface">Passed.</h2>
+        <button onClick={onDone} className="btn-action !h-12 !px-6 !text-[15px] items-center justify-center gap-2 mt-2">
           See your result <ArrowRight size={16} />
         </button>
       </div>
@@ -558,18 +544,21 @@ function Result({
   }
 
   return (
-    <div className="bg-surface-container-lowest rounded-3xl px-7 py-10 flex flex-col gap-5 items-center text-center max-w-2xl mx-auto">
-      <RotateCcw size={24} className="text-on-surface-variant" />
-      <h2 className="text-headline-sm text-on-surface font-bold">Not quite yet</h2>
-      <p className="text-body-lg text-on-surface-variant tabular-nums">
-        {points} of {totalPoints} points. You need {needed} to pass.
+    <div className="animate-fade-in bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] px-7 py-14 sm:py-16 flex flex-col gap-5 items-center text-center max-w-2xl mx-auto w-full">
+      <div className="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center">
+        <RotateCcw size={28} className="text-on-surface" />
+      </div>
+      <p className="text-display-lg text-on-surface tabular-nums">{points}/{totalPoints}</p>
+      <h2 className="text-display-sm text-on-surface">Not quite yet.</h2>
+      <p className="text-title-lg text-on-surface-variant tabular-nums">
+        You need {needed} to pass.
       </p>
-      <p className="text-body-md text-on-surface-variant max-w-md leading-relaxed">
+      <p className="text-body-lg text-on-surface-variant max-w-md leading-relaxed">
         Everything you did not get full marks on is in your review queue. Go back over what
         you want to revisit, then take it again — a retake draws a different paper, and there
         is no limit on attempts.
       </p>
-      <button onClick={onDone} className="btn-action items-center justify-center gap-1.5 mt-1">
+      <button onClick={onDone} className="btn-action !h-12 !px-6 !text-[15px] items-center justify-center gap-2 mt-2">
         Back to the track <ArrowRight size={16} />
       </button>
     </div>

@@ -93,28 +93,28 @@ export default function TrackPage({ params }: { params: Promise<{ track: string 
 
   return (
     <div className="flex flex-col">
-        <div className="flex flex-col gap-6 px-8 py-8 max-w-6xl w-full mx-auto">
+        <div className="flex flex-col gap-8 px-4 sm:px-8 py-8 sm:py-10 max-w-6xl w-full mx-auto">
           {/* Header */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-5">
             {previous ? (
               <button
                 onClick={() => setView(previous.stage)}
-                className="flex items-center gap-2 text-label-lg text-on-surface-variant hover:text-on-surface transition-colors w-fit text-left"
+                className="flex items-center gap-2 text-body-lg text-on-surface-variant hover:text-on-surface transition-colors w-fit text-left"
               >
-                <ArrowLeft size={15} className="shrink-0" />
+                <ArrowLeft size={17} className="shrink-0" />
                 <span className="truncate">Back to {shortTitle(previous.label)}</span>
               </button>
             ) : (
               <Link
                 href="/learning"
-                className="flex items-center gap-2 text-label-lg text-on-surface-variant hover:text-on-surface transition-colors w-fit"
+                className="flex items-center gap-2 text-body-lg text-on-surface-variant hover:text-on-surface transition-colors w-fit"
               >
-                <ArrowLeft size={15} /> Learning
+                <ArrowLeft size={17} /> Learning
               </Link>
             )}
 
             <div className="flex items-center justify-between gap-6 flex-wrap">
-              <h1 className="text-headline-lg text-on-surface font-bold">{track.title}</h1>
+              <h1 className="text-display-md text-on-surface">{track.title}</h1>
 
               <div className="flex items-center gap-3 shrink-0">
                 {finished && (
@@ -199,13 +199,13 @@ function LessonStage({
   const onElapsed = useCallback(() => setReading(false), [])
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       {/* Content on the left, reference imagery on the right */}
       <div className="flex flex-col lg:flex-row gap-6 items-start">
-        <div className="flex-1 min-w-0 bg-surface-container-lowest rounded-3xl px-7 py-7 flex flex-col gap-5">
+        <div className="flex-1 min-w-0 bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] p-6 sm:p-10 flex flex-col gap-8">
           {/* No step counter. The rail above already shows where you are, and
               a second count only made the lesson feel like a queue. */}
-          <h2 className="text-headline-sm text-on-surface font-bold leading-snug">
+          <h2 className="text-display-sm sm:text-display-md text-on-surface">
             {lesson.title}
           </h2>
           <LessonContent lesson={lesson} />
@@ -218,7 +218,7 @@ function LessonStage({
       {reading ? (
         <ReadTimer seconds={lesson.readSeconds} onElapsed={onElapsed} />
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
           <QuestionStack
             questions={lesson.questions}
             images={lesson.images}
@@ -226,14 +226,14 @@ function LessonStage({
           />
           <div className="flex items-center justify-end gap-4 flex-wrap">
             {!state.allAnswered && (
-              <p className="text-label-sm text-on-surface-variant">
+              <p className="text-body-md text-on-surface-variant">
                 Answer every question to continue. Getting one wrong won’t hold you back.
               </p>
             )}
             <button
               onClick={() => onComplete(state.missed)}
               disabled={!state.allAnswered}
-              className="btn-action items-center justify-center gap-1.5 disabled:opacity-30"
+              className="btn-action !h-12 !px-6 !text-[15px] items-center justify-center gap-2 disabled:opacity-30"
             >
               {alreadyAnswered ? 'Continue' : 'Next step'} <ArrowRight size={16} />
             </button>
@@ -254,26 +254,26 @@ function LessonStage({
  */
 function ActionBrief({ sections }: { sections: LessonSection[] }) {
   return (
-    <div className="bg-surface-container-low rounded-2xl px-5 py-5 flex flex-col gap-4">
+    <div className="bg-surface-container-low rounded-2xl p-5 sm:p-6 flex flex-col gap-5">
       {sections.map((section, i) => (
         <div
           key={section.heading ?? i}
-          className={section.divider && i > 0 ? 'border-t border-outline-variant/40 pt-4' : undefined}
+          className={section.divider && i > 0 ? 'border-t border-on-surface/10 pt-5' : undefined}
         >
           {section.heading && (
-            <p className="text-title-sm text-on-surface font-semibold mb-2">{section.heading}</p>
+            <p className="text-title-md text-on-surface mb-2">{section.heading}</p>
           )}
           {section.body && (
-            <p className="text-body-md text-on-surface-variant leading-relaxed">{section.body}</p>
+            <p className="text-body-lg text-on-surface-variant leading-relaxed">{section.body}</p>
           )}
           {section.bullets && (
-            <ul className="flex flex-col gap-2">
+            <ul className="flex flex-col gap-2.5">
               {section.bullets.map(bullet => (
-                <li key={bullet.term ?? bullet.text} className="flex gap-2.5">
-                  <span className="mt-[9px] w-1.5 h-1.5 rounded-full bg-secondary/40 shrink-0" aria-hidden />
-                  <p className="text-body-md text-on-surface-variant leading-relaxed">
+                <li key={bullet.term ?? bullet.text} className="flex gap-3">
+                  <span className="mt-[10px] w-1.5 h-1.5 rounded-full bg-on-surface/40 shrink-0" aria-hidden />
+                  <p className="text-body-lg text-on-surface-variant leading-relaxed">
                     {bullet.term && (
-                      <span className="text-on-surface font-semibold">{bullet.term}. </span>
+                      <span className="text-on-surface font-medium">{bullet.term}. </span>
                     )}
                     {bullet.text}
                   </p>
@@ -297,48 +297,53 @@ function ActionStage({
 }) {
   const action = track.action!
   return (
-    <div className="bg-surface-container-lowest rounded-3xl px-7 py-7 flex flex-col gap-6 max-w-3xl">
+    <div className="bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] p-6 sm:p-10 flex flex-col gap-8 max-w-3xl w-full">
       <div className="flex items-center gap-2.5">
-        <PenLine size={15} className="text-secondary" />
-        <span className="text-label-sm text-on-surface-variant uppercase tracking-widest">
+        <span className="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center">
+          <PenLine size={15} className="text-on-surface" />
+        </span>
+        <span className="text-title-md text-on-surface-variant">
           {action.label ?? 'Your turn'}
         </span>
       </div>
 
       <div className="flex flex-col gap-3">
-        <h2 className="text-headline-sm text-on-surface font-bold">{action.title}</h2>
-        <p className="text-body-lg text-on-surface-variant leading-relaxed">{action.prompt}</p>
+        <h2 className="text-display-sm sm:text-display-md text-on-surface">{action.title}</h2>
+        <p className="text-title-lg text-on-surface-variant">{action.prompt}</p>
       </div>
 
       {action.brief && <ActionBrief sections={action.brief} />}
 
-      <div className="flex flex-col gap-2.5">
-        <p className="text-title-md text-on-surface font-semibold">What to do</p>
-        <ul className="flex flex-col gap-2.5">
-          {action.tasks.map(task => (
-            <li key={task} className="flex gap-2.5">
-              <span className="mt-[9px] w-1.5 h-1.5 rounded-full bg-secondary/60 shrink-0" aria-hidden />
-              <p className="text-body-md text-on-surface-variant leading-relaxed">{task}</p>
+      <div className="flex flex-col gap-4">
+        <h3 className="text-headline-md text-on-surface">What to do</h3>
+        <ol className="flex flex-col gap-3">
+          {action.tasks.map((task, i) => (
+            <li key={task} className="flex gap-3.5">
+              <span className="mt-0.5 w-7 h-7 rounded-full bg-surface-container-low flex items-center justify-center text-label-lg text-on-surface tabular-nums shrink-0" aria-hidden>
+                {i + 1}
+              </span>
+              <p className="text-body-lg text-on-surface-variant leading-relaxed">{task}</p>
             </li>
           ))}
-        </ul>
+        </ol>
       </div>
 
-      <div className="bg-surface-container rounded-2xl px-5 py-4">
-        <p className="text-label-sm uppercase tracking-wider text-on-surface-variant mb-1.5">
-          Done when
-        </p>
-        <p className="text-body-md text-on-surface leading-relaxed">{action.doneWhen}</p>
+      <div className="rounded-2xl border border-on-surface/10 px-5 py-4 flex gap-3">
+        <Check size={18} className="text-success mt-0.5 shrink-0" aria-hidden />
+        <div className="flex flex-col gap-1">
+          <p className="text-title-md text-on-surface">Done when</p>
+          <p className="text-body-lg text-on-surface-variant leading-relaxed">{action.doneWhen}</p>
+        </div>
       </div>
 
       {done ? (
         <div className="flex items-center gap-4 flex-wrap">
-          <span className="flex items-center gap-2 text-body-md" style={{ color: '#1a6b3a' }}>
-            <Check size={16} /> Recorded
+          <span className="flex items-center gap-2 text-body-lg text-success">
+            <Check size={18} /> Recorded
           </span>
           <button
             onClick={onContinue}
-            className="btn-action items-center justify-center gap-1.5"
+            className="btn-action !h-12 !px-6 !text-[15px] items-center justify-center gap-2"
           >
             Take the final quiz <ArrowRight size={16} />
           </button>
@@ -346,7 +351,7 @@ function ActionStage({
       ) : (
         <button
           onClick={onGo}
-          className="btn-action items-center justify-center gap-1.5 self-start"
+          className="btn-action !h-12 !px-6 !text-[15px] items-center justify-center gap-2 self-start"
         >
           Open {track.title} and do it <ArrowRight size={16} />
         </button>
@@ -397,29 +402,29 @@ function Congratulations({
   didAction: boolean
 }) {
   return (
-    <div className="flex items-center justify-center px-8 py-20">
+    <div className="flex items-center justify-center bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] px-6 sm:px-8 py-16 sm:py-20 animate-fade-in">
       <div className="flex flex-col gap-6 items-center text-center max-w-xl">
-        <div className="w-20 h-20 rounded-3xl bg-tertiary-fixed/40 flex items-center justify-center">
-          <Trophy size={34} style={{ color: '#1a6b3a' }} />
+        <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center">
+          <Trophy size={34} className="text-success" />
         </div>
 
         <div className="flex flex-col gap-3">
-          <h2 className="text-display-md text-on-surface font-bold leading-tight">
+          <h2 className="text-display-md sm:text-display-lg text-on-surface">
             {track.title} complete
           </h2>
           {result && (
-            <p className="text-body-lg text-on-surface-variant">
+            <p className="text-title-lg text-on-surface-variant tabular-nums">
               {result.best} of {result.total} on the final
               {result.attempts > 1 ? ` — ${result.attempts} attempts` : ''}.
             </p>
           )}
         </div>
 
-        <p className="text-body-lg text-on-surface leading-relaxed max-w-md">
+        <p className="text-title-lg text-on-surface max-w-md">
           {track.outcome}
         </p>
 
-        <p className="text-body-md text-on-surface-variant leading-relaxed max-w-md">
+        <p className="text-body-lg text-on-surface-variant leading-relaxed max-w-md">
           {didAction
             ? `${track.title} is unlocked for good, and it already holds the data you entered. Everything you covered will come back in review over the next week.`
             : `${track.title} is unlocked for good. The lessons are still here whenever you want them, and anything you missed comes back in review over the next week.`}
@@ -428,13 +433,13 @@ function Congratulations({
         <div className="flex items-center gap-3 flex-wrap justify-center mt-2">
           <Link
             href={track.unlocks}
-            className="btn-action items-center justify-center gap-1.5"
+            className="btn-action !h-12 !px-6 !text-[15px] items-center justify-center gap-2"
           >
             <Unlock size={16} /> Open {track.title}
           </Link>
           <Link
             href="/learning"
-            className="flex items-center gap-2 text-label-lg font-medium text-on-surface-variant hover:text-on-surface px-5 py-3.5 transition-colors"
+            className="flex items-center gap-2 text-body-lg text-on-surface-variant hover:text-on-surface px-5 py-3 transition-colors"
           >
             Next track <ArrowRight size={16} />
           </Link>
@@ -451,10 +456,10 @@ function ComingSoon({ track }: { track: Track }) {
     <div className="flex-1 flex items-center justify-center px-8 py-20">
       <div className="max-w-md flex flex-col gap-5 text-center items-center">
         <Sparkles size={22} className="text-on-surface-variant" />
-        <h1 className="text-headline-md text-on-surface font-bold">
+        <h1 className="text-display-sm text-on-surface">
           {track.title} is still being written
         </h1>
-        <p className="text-body-lg text-on-surface-variant leading-relaxed">{track.outcome}</p>
+        <p className="text-title-lg text-on-surface-variant">{track.outcome}</p>
         <p className="text-body-md text-on-surface-variant leading-relaxed">
           {DISCLAIMER_INVESTING}
         </p>
@@ -473,7 +478,7 @@ function Missing({ message }: { message: string }) {
   return (
     <div className="flex-1 flex items-center justify-center px-8 py-20">
       <div className="max-w-sm flex flex-col gap-5 text-center items-center">
-        <p className="text-body-lg text-on-surface-variant leading-relaxed">{message}</p>
+        <p className="text-title-lg text-on-surface-variant">{message}</p>
         <Link
           href="/learning"
           className="btn-action items-center justify-center gap-1.5"

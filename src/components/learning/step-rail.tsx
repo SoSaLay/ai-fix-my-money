@@ -43,8 +43,11 @@ export function StepRail({
   return (
     // Seven steps do not fit a phone. Scrolling the rail beats shrinking the
     // labels until they are unreadable.
-    <nav aria-label="Course steps" className="-mx-1 overflow-x-auto px-1 pb-1">
-      <ol className="flex min-w-[560px] items-start">
+    <nav
+      aria-label="Course steps"
+      className="overflow-x-auto rounded-3xl bg-surface-container-lowest border border-on-surface/[0.06] px-3 sm:px-5 pt-5 pb-4"
+    >
+      <ol className="flex min-w-[600px] items-start">
         {items.map((item, i) => {
           const current = i === currentIndex
           const reachable = browsable && i <= furthestIndex
@@ -69,8 +72,8 @@ export function StepRail({
 
               <span
                 title={item.label}
-                className={`mt-2 line-clamp-2 px-1 text-center text-label-sm leading-snug ${
-                  current ? 'font-semibold text-on-surface' : 'text-on-surface-variant'
+                className={`mt-2.5 line-clamp-2 px-1 text-center text-label-lg leading-snug ${
+                  current ? 'text-on-surface' : item.done ? 'text-on-surface' : 'text-on-surface-variant'
                 }`}
               >
                 {item.shortLabel}
@@ -87,7 +90,7 @@ function Connector({ visible, filled }: { visible: boolean; filled: boolean }) {
   return (
     <span
       aria-hidden
-      className="h-0.5 flex-1 rounded-full"
+      className="h-[3px] flex-1 rounded-full transition-colors duration-300"
       style={{
         background: !visible ? 'transparent' : filled ? PROGRESS_GREEN : 'rgba(0,0,0,0.12)',
       }}
@@ -107,8 +110,8 @@ interface StepMarkerProps {
 function StepMarker({ index, done, current, reachable, label, onSelect }: StepMarkerProps) {
   // Done is green, the step in progress is yellow, and anything still ahead is
   // a plain outline — the same three-colour language as the track bars.
-  const ring = done ? PROGRESS_GREEN : current ? PROGRESS_YELLOW : 'rgba(0,0,0,0.22)'
-  const text = done ? '#ffffff' : current ? '#8a6400' : undefined
+  const ring = done ? PROGRESS_GREEN : current ? PROGRESS_YELLOW : 'rgba(0,0,0,0.18)'
+  const text = done ? '#ffffff' : current ? '#8a6400' : '#5a5b60'
 
   return (
     <button
@@ -118,16 +121,19 @@ function StepMarker({ index, done, current, reachable, label, onSelect }: StepMa
       title={label}
       aria-label={label}
       aria-current={current ? 'step' : undefined}
-      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-label-md font-semibold tabular-nums transition-all ${
-        reachable ? 'hover:opacity-80' : 'cursor-not-allowed'
+      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 text-label-lg tabular-nums transition-all duration-200 ${
+        reachable ? 'cursor-pointer hover:scale-105' : 'cursor-not-allowed'
       }`}
       style={{
         borderColor: ring,
-        background: done ? PROGRESS_GREEN : 'transparent',
+        // The step you are on glows faintly yellow, so it reads at a glance
+        // without a second colour.
+        background: done ? PROGRESS_GREEN : current ? 'rgba(224,163,0,0.12)' : '#ffffff',
+        boxShadow: current ? '0 0 0 4px rgba(224,163,0,0.14)' : undefined,
         color: text,
       }}
     >
-      {done ? <Check size={15} strokeWidth={3} /> : index + 1}
+      {done ? <Check size={17} strokeWidth={3} /> : index + 1}
     </button>
   )
 }
