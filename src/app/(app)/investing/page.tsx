@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import Link from 'next/link'
-import { Lock, Unlock, Upload } from 'lucide-react'
+import { Lock, Unlock } from 'lucide-react'
 import { TopNav } from '@/components/layout/top-nav'
+import { EmptyState } from '@/components/layout/empty-state'
 import { CircularDial } from '@/components/savings/circular-dial'
 import { AllocationList } from '@/components/investing/allocation-list'
 import { useDashboardSummary, useInvestingGoal } from '@/hooks/use-data'
@@ -67,25 +67,12 @@ function InvestingPageTool() {
     return (
       <div className="flex flex-col min-h-full">
         <TopNav title="Investing" />
-        <div className="flex-1 px-8 pb-10 flex items-center justify-center">
-          <div className="text-center max-w-sm">
-            <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center mx-auto mb-5">
-              <Upload size={28} className="text-secondary" />
-            </div>
-            <p className="text-headline-sm text-on-surface font-semibold mb-2">Nothing recorded yet</p>
-            <p className="text-body-md text-on-surface-variant mb-6 leading-relaxed">
-              Record your income and spending first — this page allocates from those figures.
-            </p>
-            <Link
-              href="/learning"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-label-lg transition-all hover:opacity-80"
-              style={{ background: '#4c49c9', color: '#fff' }}
-            >
-              <Upload size={16} />
-              Go to Learning
-            </Link>
-          </div>
-        </div>
+        <EmptyState
+          image="/onboarding/waiting.svg"
+          title="Nothing here yet."
+          body="Add your income and spending first. Investing works from those numbers."
+          action={{ href: '/spending', label: 'Go to Income vs. Spending' }}
+        />
       </div>
     )
   }

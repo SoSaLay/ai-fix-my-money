@@ -11,6 +11,7 @@ import {
   Lock,
   Check,
   LogOut,
+  X,
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useLearning } from '@/contexts/learning-context'
@@ -36,18 +37,41 @@ const NAV_ITEMS: NavItem[] = [
 
 interface SidebarProps {
   pathname: string
+  /** Below md the sidebar is a drawer, shown only while this is true. */
+  open: boolean
+  onClose: () => void
 }
 
-export function Sidebar({ pathname }: SidebarProps) {
+export function Sidebar({ pathname, open, onClose }: SidebarProps) {
   const { ready, isToolUnlocked, isTrackComplete, dueReviews } = useLearning()
   const { user, enabled: authEnabled } = useAuth()
   const due = ready ? dueReviews().length : 0
 
   return (
+    <>
+    {open && (
+      <div
+        className="md:hidden fixed inset-0 z-40 bg-black/40"
+        onClick={onClose}
+        aria-hidden
+      />
+    )}
     <aside
-      className="fixed top-0 left-0 h-screen bg-surface-container-lowest flex flex-col py-8 px-4 z-40"
+      className={clsx(
+        'fixed top-0 left-0 h-screen bg-surface-container-lowest flex flex-col py-8 px-4 z-50 overflow-y-auto transition-transform duration-200 md:translate-x-0',
+        open ? 'translate-x-0 shadow-xl' : '-translate-x-full',
+      )}
       style={{ width: 220 }}
     >
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close menu"
+        className="md:hidden absolute top-3 right-3 p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low"
+      >
+        <X size={18} />
+      </button>
+
       {/* Brand — links back to home */}
       <Link href="/" className="px-2 mb-6 block group">
         <p className="text-headline-sm text-on-surface font-bold leading-tight group-hover:text-secondary transition-colors">
@@ -142,5 +166,6 @@ export function Sidebar({ pathname }: SidebarProps) {
         </div>
       )}
     </aside>
+    </>
   )
 }

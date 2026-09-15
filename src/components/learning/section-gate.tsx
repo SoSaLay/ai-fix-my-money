@@ -1,10 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { Lock, ArrowRight, CheckCircle2, Check } from 'lucide-react'
+import { CheckCircle2 } from 'lucide-react'
 import { useLearning } from '@/contexts/learning-context'
-import { getTrack, shortTitle, type TrackId } from '@/lib/learning/tracks'
-import { DisclaimerBar } from './disclaimer-bar'
+import { getTrack, type TrackId } from '@/lib/learning/tracks'
 
 /**
  * Hard gate on a section's tool.
@@ -20,10 +19,7 @@ export function SectionGate({
   trackId: TrackId
   children: React.ReactNode
 }) {
-  const {
-    ready, isToolUnlocked, guided, endGuided, recordAction,
-    trackCompletion,
-  } = useLearning()
+  const { ready, isToolUnlocked, guided, endGuided, recordAction } = useLearning()
   const track = getTrack(trackId)
 
   if (!ready || !track) return null
@@ -77,110 +73,27 @@ export function SectionGate({
     )
   }
 
-  // Locked. Say the rule in one line, show the path, then offer the shortcut.
-  const { done, total } = trackCompletion(trackId)
-  const started = done > 0
+  // Locked. One picture, one line, one way forward.
   const comingSoon = track.status === 'coming-soon'
 
   return (
-    <div className="flex-1 flex items-center justify-center px-8 py-16">
-      <div className="max-w-md w-full flex flex-col gap-7 items-center">
-        <div className="flex flex-col gap-3 items-center text-center">
-          <div className="w-12 h-12 rounded-2xl bg-surface-container flex items-center justify-center">
-            <Lock size={20} className="text-on-surface-variant" />
-          </div>
-          <h1 className="text-headline-md text-on-surface font-bold">
-            Learn it to unlock it
-          </h1>
-          <p className="text-body-lg text-on-surface-variant leading-relaxed">
-            In this app, every feature opens once you finish its short course.
-            Here&apos;s the one for {track.title}.
-          </p>
-        </div>
-
-        {comingSoon ? (
-          <p className="text-body-md text-on-surface-variant bg-surface-container rounded-2xl px-5 py-4 text-center">
-            This course is still being written. The other three are ready now.
-          </p>
-        ) : (
-          <>
-            <LearningPath trackId={trackId} />
-
-            <Link
-              href={`/learning/${trackId}`}
-              className="btn-action items-center justify-center gap-1.5"
-            >
-              {started ? `Continue — ${done} of ${total} done` : 'Start the course'}
-              <ArrowRight size={16} />
-            </Link>
-
-            {track.finalQuiz.length > 0 && (
-              <Link
-                href={`/learning/${trackId}?step=final`}
-                className="-mt-3 text-label-lg font-medium text-on-surface-variant underline underline-offset-4 hover:text-on-surface transition-colors"
-              >
-                Skip the learning — take me to the final test
-              </Link>
-            )}
-          </>
-        )}
-
-        <DisclaimerBar className="justify-center" />
+    <div className="flex-1 flex items-center justify-center px-6 py-16">
+      <div className="max-w-sm w-full flex flex-col items-center text-center">
+        {/* eslint-disable-next-line @next/next/no-img-element -- static SVG, nothing to optimise */}
+        <img src="/onboarding/locked.svg" alt="" className="w-full max-w-[220px] aspect-square" />
+        <h1 className="mt-4 text-display-sm text-on-surface">
+          {comingSoon ? 'Coming soon.' : 'Learn it to unlock it.'}
+        </h1>
+        <p className="mt-3 text-title-lg text-on-surface-variant">
+          {comingSoon
+            ? `The ${track.title} track is still being written.`
+            : `Finish the ${track.title} track to open this.`}
+        </p>
+        <Link href="/learning" className="btn-action items-center justify-center mt-8">
+          Go to Learning
+        </Link>
       </div>
     </div>
   )
 }
 
-/** The steps of the course, in order, with what's already behind them ticked. */
-function LearningPath({ trackId }: { trackId: TrackId }) {
-  const { trackProgress } = useLearning()
-  const track = getTrack(trackId)
-  if (!track) return null
-
-  const p = trackProgress(trackId)
-  const steps = [
-    ...track.lessons.map(l => ({
-      key: l.id,
-      label: shortTitle(l.title),
-      done: !!p.lessons[l.id]?.answered,
-    })),
-    ...(track.action ? [{
-      key: 'action',
-      label: track.action.label
-        ? `${track.action.label} — enter your own numbers`
-        : 'Your turn — enter your own numbers',
-      done: p.actionDone,
-    }] : []),
-    ...(track.finalQuiz.length > 0 ? [{
-      key: 'final',
-      label: 'Final test',
-      done: p.final?.passed === true,
-    }] : []),
-  ]
-
-  return (
-    <ol className="w-full bg-surface-container-lowest rounded-3xl px-6 py-5 flex flex-col gap-3">
-      {steps.map((step, i) => (
-        <li key={step.key} className="flex items-center gap-3">
-          <span
-            className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-label-sm font-semibold tabular-nums"
-            style={
-              step.done
-                ? { background: '#1a6b3a', color: '#fff' }
-                : { background: 'rgba(0,0,0,0.06)', color: 'inherit' }
-            }
-          >
-            {step.done ? <Check size={13} /> : i + 1}
-          </span>
-          <span
-            className={`text-body-md leading-snug ${
-              step.done ? 'text-on-surface-variant line-through decoration-1' : 'text-on-surface'
-            }`}
-          >
-            {step.label}
-          </span>
-        </li>
-      ))}
-    </ol>
-  )
-}

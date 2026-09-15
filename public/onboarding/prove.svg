@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7c7ae8"/>
+      <stop offset="1" stop-color="#ff9817"/>
+    </linearGradient>
+  </defs>
+
+  <ellipse cx="200" cy="344" rx="130" ry="16" fill="#2d2f33" opacity="0.06"/>
+
+  <g stroke="#2d2f33" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Phone, tilted -->
+    <g transform="rotate(-8 150 200)">
+      <rect x="82" y="64" width="140" height="264" rx="26" fill="#2d2f33"/>
+      <rect x="93" y="78" width="118" height="236" rx="18" fill="url(#screen)" stroke="none"/>
+      <circle cx="152" cy="196" r="28" fill="#ffffff"/>
+      <path d="M143 180 L 168 196 L 143 212 Z" fill="#2d2f33"/>
+    </g>
+
+    <!-- Speech bubble with a written answer -->
+    <path d="M232 150 L 330 150 C 342 150, 348 156, 348 168 L 348 258 C 348 270, 342 276, 330 276 L 248 276 L 226 296 L 230 276 C 220 274, 214 268, 214 258 L 214 168 C 214 156, 220 150, 232 150 Z" fill="#ffffff"/>
+    <g stroke="#acadb1" stroke-width="2.5" fill="none">
+      <path d="M234 178 C 262 174, 296 175, 326 179"/>
+      <path d="M234 200 C 260 196, 292 197, 326 201"/>
+      <path d="M234 222 C 256 218, 276 219, 300 223"/>
+    </g>
+    <!-- The mark -->
+    <circle cx="316" cy="250" r="16" fill="#1a6b3a" stroke="#1a6b3a"/>
+    <path d="M308 250 L 314 256 L 325 243" stroke="#ffffff" fill="none"/>
+
+    <!-- Pencil -->
+    <g transform="rotate(38 318 108)">
+      <rect x="262" y="96" width="104" height="22" rx="4" fill="#ffd27a"/>
+      <path d="M366 96 L 390 107 L 366 118 Z" fill="#fdf6e6"/>
+    </g>
+  </g>
+
+  <g fill="#ff9817">
+    <path d="M60 110 l4 12 l12 4 l-12 4 l-4 12 l-4 -12 l-12 -4 l12 -4 z"/>
+  </g>
+</svg>

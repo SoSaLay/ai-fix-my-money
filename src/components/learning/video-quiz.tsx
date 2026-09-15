@@ -14,9 +14,10 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
-import { ArrowRight, Check, Loader2, RotateCcw, X } from 'lucide-react'
+import { ArrowRight, Check, Loader2, Mic, MicOff, RotateCcw, Square, Volume2, X } from 'lucide-react'
 
 import { VideoEmbed } from '@/components/learning/video-embed'
+import { useDictation } from '@/hooks/use-dictation'
 import { completeAttempt, reportVideoUnavailable } from '@/lib/learning/quiz/client'
 import { findLessonImage, type QuizQuestion, type Track } from '@/lib/learning/tracks'
 import type { PublicVideoQuestion } from '@/lib/learning/video-pool/types'
@@ -239,9 +240,37 @@ function VideoQuestion({
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [reported, setReported] = useState(false)
+  const dictation = useDictation(answer, setAnswer)
+  const stopDictation = dictation.stop
+  const [speaking, setSpeaking] = useState(false)
+  const [canSpeak, setCanSpeak] = useState(false)
+
+  // Checked after mount so the server render matches. Leaving the page
+  // mid-sentence should not keep reading.
+  useEffect(() => {
+    const available = 'speechSynthesis' in window
+    setCanSpeak(available)
+    return () => { if (available) window.speechSynthesis.cancel() }
+  }, [])
+
+  const toggleSpeak = useCallback(() => {
+    const synth = window.speechSynthesis
+    if (speaking) {
+      synth.cancel()
+      setSpeaking(false)
+      return
+    }
+    synth.cancel()
+    const utterance = new SpeechSynthesisUtterance(video.question)
+    utterance.onend = () => setSpeaking(false)
+    utterance.onerror = () => setSpeaking(false)
+    setSpeaking(true)
+    synth.speak(utterance)
+  }, [speaking, video.question])
 
   const send = useCallback(async () => {
     if (busy || grade) return
+    stopDictation()
     setBusy(true)
     setError(null)
     try {
@@ -263,7 +292,7 @@ function VideoQuestion({
     } finally {
       setBusy(false)
     }
-  }, [busy, grade, attemptId, video.id, answer, onGraded])
+  }, [busy, grade, stopDictation, attemptId, video.id, answer, onGraded])
 
   const report = useCallback(() => {
     setReported(true)
@@ -272,10 +301,23 @@ function VideoQuestion({
 
   return (
     <div className="bg-surface-container-lowest rounded-3xl px-7 py-6 flex flex-col gap-4">
-      <p className="text-body-lg text-on-surface font-medium leading-snug">
-        <span className="text-on-surface-variant tabular-nums mr-1.5">{index}.</span>
-        {video.question}
-      </p>
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-body-lg text-on-surface font-medium leading-snug">
+          <span className="text-on-surface-variant tabular-nums mr-1.5">{index}.</span>
+          {video.question}
+        </p>
+        {canSpeak && (
+          <button
+            type="button"
+            onClick={toggleSpeak}
+            aria-label={speaking ? 'Stop reading the question' : 'Read the question aloud'}
+            title={speaking ? 'Stop reading' : 'Read aloud'}
+            className="shrink-0 rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors"
+          >
+            {speaking ? <Square size={16} aria-hidden /> : <Volume2 size={18} aria-hidden />}
+          </button>
+        )}
+      </div>
 
       <div className="flex flex-col lg:flex-row gap-5 items-start">
         <VideoEmbed
@@ -291,8 +333,13 @@ function VideoQuestion({
             value={answer}
             onChange={event => setAnswer(event.target.value)}
             disabled={Boolean(grade) || busy}
+            readOnly={dictation.listening}
             rows={7}
-            placeholder="Answer in your own words. Spelling and grammar are not marked — what you understood is."
+            placeholder={
+              dictation.supported
+                ? 'Type or tap the mic and speak your answer. Spelling and grammar are not marked — what you understood is.'
+                : 'Answer in your own words. Spelling and grammar are not marked — what you understood is.'
+            }
             className="w-full resize-y rounded-2xl bg-surface-container-low px-4 py-3 text-body-md text-on-surface placeholder:text-on-surface-variant/70 focus:bg-surface-container focus:outline-none focus:ring-2 focus:ring-secondary/35 disabled:opacity-70"
           />
 
@@ -300,6 +347,42 @@ function VideoQuestion({
             <p className="text-label-sm text-on-surface-variant">
               Flagged for review. Answer what you can — a dead embed will not count against you.
             </p>
+          )}
+
+          {!grade && dictation.supported && (
+            <div className="flex items-center gap-3 flex-wrap">
+              <button
+                type="button"
+                onClick={dictation.listening ? dictation.stop : dictation.start}
+                disabled={busy}
+                aria-pressed={dictation.listening}
+                className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-label-md transition-colors disabled:opacity-30 ${
+                  dictation.listening
+                    ? 'bg-error/10 text-error'
+                    : 'bg-surface-container-low text-on-surface hover:bg-surface-container'
+                }`}
+              >
+                {dictation.listening ? (
+                  <>
+                    <MicOff size={15} aria-hidden /> Stop speaking
+                  </>
+                ) : (
+                  <>
+                    <Mic size={15} aria-hidden /> Speak your answer
+                  </>
+                )}
+              </button>
+              {dictation.listening && (
+                <span className="flex items-center gap-1.5 text-label-sm text-on-surface-variant">
+                  <span className="h-2 w-2 rounded-full bg-error animate-pulse" aria-hidden />
+                  Listening…
+                </span>
+              )}
+            </div>
+          )}
+
+          {dictation.error && !grade && (
+            <p className="text-label-sm text-error">{dictation.error}</p>
           )}
 
           {!grade && (

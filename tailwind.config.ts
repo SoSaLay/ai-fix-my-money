@@ -39,20 +39,33 @@ const config: Config = {
         success:                   '#1a6b3a',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['var(--font-sans)', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
       },
+      // A tight grotesk set big and at a regular weight, the way SuperHi sets
+      // it: size and tight tracking carry the emphasis, not heavy weights.
       fontSize: {
-        'display-lg': ['3.5rem',   { lineHeight: '1.1',  letterSpacing: '-0.02em', fontWeight: '700' }],
-        'display-md': ['2.5rem',   { lineHeight: '1.15', letterSpacing: '-0.02em', fontWeight: '700' }],
-        'display-sm': ['1.75rem',  { lineHeight: '1.2',  letterSpacing: '-0.02em', fontWeight: '700' }],
-        'headline-lg':['1.5rem',   { lineHeight: '1.25', letterSpacing: '-0.01em', fontWeight: '600' }],
-        'headline-md':['1.25rem',  { lineHeight: '1.3',  letterSpacing: '-0.01em', fontWeight: '600' }],
-        'headline-sm':['1.125rem', { lineHeight: '1.35', letterSpacing: '-0.01em', fontWeight: '600' }],
-        'body-lg':    ['1rem',     { lineHeight: '1.6',  fontWeight: '400' }],
-        'body-md':    ['0.875rem', { lineHeight: '1.6',  fontWeight: '400' }],
-        'label-lg':   ['0.875rem', { lineHeight: '1.4',  fontWeight: '500' }],
-        'label-md':   ['0.75rem',  { lineHeight: '1.4',  fontWeight: '500', letterSpacing: '0.02em' }],
-        'label-sm':   ['0.6875rem',{ lineHeight: '1.4',  fontWeight: '500', letterSpacing: '0.04em' }],
+        'display-xl': ['clamp(2.75rem, 5.2vw, 4.5rem)', { lineHeight: '1', letterSpacing: '-0.04em', fontWeight: '500' }],
+        'display-lg': ['3.5rem',   { lineHeight: '1.02', letterSpacing: '-0.04em',  fontWeight: '500' }],
+        'display-md': ['2.5rem',   { lineHeight: '1.05', letterSpacing: '-0.035em', fontWeight: '500' }],
+        'display-sm': ['1.75rem',  { lineHeight: '1.1',  letterSpacing: '-0.03em',  fontWeight: '500' }],
+        'headline-lg':['1.5rem',   { lineHeight: '1.2',  letterSpacing: '-0.025em', fontWeight: '500' }],
+        'headline-md':['1.25rem',  { lineHeight: '1.25', letterSpacing: '-0.02em',  fontWeight: '500' }],
+        'headline-sm':['1.125rem', { lineHeight: '1.3',  letterSpacing: '-0.02em',  fontWeight: '500' }],
+        'title-lg':   ['1.25rem',  { lineHeight: '1.35', letterSpacing: '-0.02em',  fontWeight: '400' }],
+        'title-md':   ['1.0625rem',{ lineHeight: '1.35', letterSpacing: '-0.015em', fontWeight: '500' }],
+        'title-sm':   ['0.9375rem',{ lineHeight: '1.35', letterSpacing: '-0.01em',  fontWeight: '500' }],
+        'body-lg':    ['1rem',     { lineHeight: '1.5',  letterSpacing: '-0.01em',  fontWeight: '400' }],
+        'body-md':    ['0.875rem', { lineHeight: '1.5',  letterSpacing: '-0.005em', fontWeight: '400' }],
+        'body-sm':    ['0.8125rem',{ lineHeight: '1.5',  fontWeight: '400' }],
+        'label-lg':   ['0.875rem', { lineHeight: '1.35', letterSpacing: '-0.01em',  fontWeight: '500' }],
+        'label-md':   ['0.75rem',  { lineHeight: '1.35', fontWeight: '500' }],
+        'label-sm':   ['0.6875rem',{ lineHeight: '1.35', letterSpacing: '0.02em',   fontWeight: '500' }],
+      },
+      // Heavier weights read as shouting in this face. Bold and semibold step
+      // down one notch so emphasis stays, without the weight.
+      fontWeight: {
+        semibold: '500',
+        bold: '600',
       },
       borderRadius: {
         sm:   '0.25rem',

@@ -17,19 +17,19 @@ type Section = 'income' | 'fixed' | 'variable'
 const COPY: Record<Section, { title: string; blurb: string; nameLabel: string; namePlaceholder: string }> = {
   income: {
     title: 'Income',
-    blurb: 'What actually lands in your account each month, after deductions.',
+    blurb: 'Take-home pay each month.',
     nameLabel: 'Source',
     namePlaceholder: 'Main job',
   },
   fixed: {
     title: 'Fixed costs',
-    blurb: 'Think recurring — the bills that come back every month for about the same amount, whether you use them or not.',
+    blurb: 'Bills that stay the same every month.',
     nameLabel: 'What is it',
     namePlaceholder: 'Rent',
   },
   variable: {
     title: 'Variable spending',
-    blurb: 'Category totals from last month — read them off a statement, not memory.',
+    blurb: 'Costs that change month to month.',
     nameLabel: 'Category',
     namePlaceholder: 'Groceries',
   },
@@ -165,7 +165,7 @@ export function ProfileEntry({ section }: { section: Section }) {
                 </span>
                 <button
                   onClick={() => remove(i)}
-                  className="text-on-surface-variant/50 hover:text-error transition-colors opacity-0 group-hover:opacity-100"
+                  className="text-on-surface-variant/50 hover:text-error transition-colors md:opacity-0 md:group-hover:opacity-100 focus:opacity-100"
                   aria-label={`Remove ${row.name}`}
                 >
                   <Trash2 size={14} />

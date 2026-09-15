@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <rect width="1200" height="900" fill="#e6e4fb"/>
+  <circle cx="160" cy="180" r="250" fill="#d6d3f7"/>
+  <circle cx="1070" cy="780" r="230" fill="#d9d6f8"/>
+
+  <g transform="translate(290 170)">
+    <rect width="620" height="560" rx="40" fill="#ffffff"/>
+    <text x="56" y="96" fill="#5a5b60" font-size="26" letter-spacing="-0.4">Investing each month</text>
+    <text x="56" y="168" fill="#17171c" font-size="64" letter-spacing="-2.5" font-weight="500">$630</text>
+
+    <!-- Share of the total held by each choice -->
+    <rect x="56" y="214" width="508" height="22" rx="11" fill="#f0f0f6"/>
+    <rect x="56" y="214" width="254" height="22" rx="11" fill="#d9a520"/>
+    <rect x="316" y="214" width="152" height="22" fill="#dd8b28"/>
+    <rect x="474" y="214" width="90" height="22" rx="11" fill="#d1662a"/>
+
+    <g font-size="26" letter-spacing="-0.4">
+      <circle cx="68" cy="310" r="10" fill="#d9a520"/>
+      <text x="96" y="319" fill="#17171c">Retirement account</text>
+      <text x="564" y="319" fill="#17171c" text-anchor="end">7%</text>
+      <rect x="56" y="352" width="508" height="1" fill="#e7e8ee"/>
+
+      <circle cx="68" cy="400" r="10" fill="#dd8b28"/>
+      <text x="96" y="409" fill="#17171c">ETFs</text>
+      <text x="564" y="409" fill="#17171c" text-anchor="end">5%</text>
+      <rect x="56" y="442" width="508" height="1" fill="#e7e8ee"/>
+
+      <circle cx="68" cy="490" r="10" fill="#d1662a"/>
+      <text x="96" y="499" fill="#17171c">Individual stocks</text>
+      <text x="564" y="499" fill="#17171c" text-anchor="end">3%</text>
+    </g>
+  </g>
+</svg>

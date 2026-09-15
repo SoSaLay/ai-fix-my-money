@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4c49c9"/>
+      <stop offset="1" stop-color="#ff9817"/>
+    </linearGradient>
+  </defs>
+
+  <ellipse cx="200" cy="340" rx="120" ry="15" fill="#2d2f33" opacity="0.06"/>
+
+  <g stroke="#2d2f33" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Shackle -->
+    <path d="M142 176 L 142 128 C 142 94, 168 70, 200 70 C 232 70, 258 94, 258 128 L 258 176" fill="none" stroke-width="22" stroke="#2d2f33"/>
+    <path d="M142 176 L 142 128 C 142 94, 168 70, 200 70 C 232 70, 258 94, 258 128 L 258 176" fill="none" stroke-width="15" stroke="#dbdde3"/>
+
+    <!-- Body -->
+    <rect x="106" y="166" width="188" height="152" rx="30" fill="url(#body)"/>
+    <path d="M128 190 C 170 184, 230 184, 272 190" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.35"/>
+
+    <!-- Keyhole shaped like a book -->
+    <path d="M200 222 C 188 214, 172 213, 158 217 L 158 258 C 172 254, 188 255, 200 263 Z" fill="#ffffff"/>
+    <path d="M200 222 C 212 214, 228 213, 242 217 L 242 258 C 228 254, 212 255, 200 263 Z" fill="#ffffff"/>
+    <path d="M200 222 L 200 263" fill="none"/>
+  </g>
+
+  <g fill="#ff9817">
+    <path d="M320 100 l4 12 l12 4 l-12 4 l-4 12 l-4 -12 l-12 -4 l12 -4 z"/>
+  </g>
+  <g fill="#4c49c9">
+    <path d="M80 232 l3 9 l9 3 l-9 3 l-3 9 l-3 -9 l-9 -3 l9 -3 z"/>
+  </g>
+</svg>

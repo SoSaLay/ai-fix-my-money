@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <rect width="1200" height="900" fill="#dcefe2"/>
+  <circle cx="1060" cy="140" r="240" fill="#c7e5d0"/>
+  <circle cx="120" cy="760" r="230" fill="#cae6d3"/>
+
+  <g transform="translate(320 130)">
+    <rect width="560" height="640" rx="40" fill="#ffffff"/>
+    <text x="280" y="92" fill="#5a5b60" font-size="26" letter-spacing="-0.4" text-anchor="middle">Saving each month</text>
+
+    <!-- 30% of the ring: circumference 2π·150 ≈ 942 -->
+    <circle cx="280" cy="300" r="150" fill="none" stroke="#e7e8ee" stroke-width="34"/>
+    <circle cx="280" cy="300" r="150" fill="none" stroke="#1a6b3a" stroke-width="34"
+            stroke-dasharray="283 942" stroke-linecap="round" transform="rotate(-90 280 300)"/>
+    <text x="280" y="312" fill="#17171c" font-size="60" letter-spacing="-2.4" font-weight="500" text-anchor="middle">$1,260</text>
+    <text x="280" y="354" fill="#5a5b60" font-size="24" text-anchor="middle">30% of income</text>
+
+    <g font-size="24" letter-spacing="-0.3">
+      <rect x="52" y="520" width="214" height="64" rx="32" fill="#e3f1e7"/>
+      <text x="159" y="560" fill="#1a6b3a" text-anchor="middle">Emergency fund</text>
+      <rect x="282" y="520" width="112" height="64" rx="32" fill="#f0f0f6"/>
+      <text x="338" y="560" fill="#2d2f33" text-anchor="middle">Travel</text>
+      <rect x="410" y="520" width="98" height="64" rx="32" fill="#f0f0f6"/>
+      <text x="459" y="560" fill="#2d2f33" text-anchor="middle">Car</text>
+    </g>
+  </g>
+</svg>

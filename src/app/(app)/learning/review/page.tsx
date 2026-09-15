@@ -3,10 +3,9 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowLeft, Check, X, RotateCcw, ArrowRight } from 'lucide-react'
+import { ArrowLeft, Check, X, ArrowRight } from 'lucide-react'
 import { useLearning, type ReviewItem } from '@/contexts/learning-context'
 import { getTrack, findLessonImage, type QuizQuestion } from '@/lib/learning/tracks'
-import { DisclaimerFooter } from '@/components/learning/disclaimer-footer'
 
 /**
  * Spaced review. Questions come back at 1 day, 3 days, then a week. Getting one
@@ -70,7 +69,7 @@ export default function ReviewPage() {
 
   return (
     <div className="flex flex-col">
-      <div className="flex flex-col gap-7 px-8 py-10 max-w-2xl w-full mx-auto">
+      <div className="flex flex-col gap-8 px-6 sm:px-8 py-10 max-w-2xl w-full mx-auto">
         <Link
           href="/learning"
           className="flex items-center gap-2 text-label-lg text-on-surface-variant hover:text-on-surface transition-colors w-fit"
@@ -78,34 +77,29 @@ export default function ReviewPage() {
           <ArrowLeft size={15} /> Learning
         </Link>
 
-        <header className="flex flex-col gap-2">
-          <div className="flex items-center gap-2.5">
-            <RotateCcw size={18} className="text-on-surface" />
-            <h1 className="text-headline-md text-on-surface font-bold">Review</h1>
-          </div>
-          <p className="text-body-md text-on-surface-variant leading-relaxed">
-            {practising
-              ? 'Nothing is due right now, so this is a practice round drawn from the lessons you have finished. Testing yourself is what moves this into long-term memory — re-reading does not.'
-              : 'Questions you have already seen, back at spaced intervals. Testing yourself is what moves this into long-term memory — re-reading does not.'}
-          </p>
-        </header>
-
-        {due.length === 0 ? (
+        {due.length === 0 || !question && !finished ? (
           <Empty />
         ) : finished ? (
           <Summary right={tally.right} wrong={tally.wrong} />
         ) : question ? (
-          <div className="bg-surface-container-lowest rounded-3xl px-7 py-7 flex flex-col gap-5">
-            <span className="text-label-sm text-on-surface-variant uppercase tracking-widest tabular-nums">
-              {index + 1} of {due.length}
-            </span>
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between gap-4 text-body-md text-on-surface-variant tabular-nums">
+                <span>{practising ? 'Practice round' : 'Review'}</span>
+                <span>{index + 1} of {due.length}</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-surface-container overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-[#17171c] transition-[width] duration-300"
+                  style={{ width: `${((index + (selected !== null ? 1 : 0)) / due.length) * 100}%` }}
+                />
+              </div>
+            </div>
 
-            <p className="text-title-lg text-on-surface font-medium leading-snug">
-              {question.question}
-            </p>
+            <h1 className="text-headline-lg text-on-surface">{question.question}</h1>
 
             {image && (
-              <figure className="w-full max-w-[380px] rounded-xl overflow-hidden bg-surface-container">
+              <figure className="w-full max-w-[380px] rounded-2xl overflow-hidden bg-surface-container-lowest">
                 <div className="relative w-full aspect-[4/3]">
                   <Image
                     src={image.src}
@@ -125,19 +119,19 @@ export default function ReviewPage() {
                 const isAnswer = i === question.answer
                 const isPicked = i === selected
 
-                let cls = 'border-outline-variant/60 hover:border-secondary/50 hover:bg-surface-container-low'
+                let cls = 'border-on-surface/15 hover:border-on-surface/40'
                 if (revealed && isAnswer) cls = 'border-transparent bg-tertiary-fixed/40'
                 else if (revealed && isPicked) cls = 'border-transparent bg-error/10'
-                else if (revealed) cls = 'border-outline-variant/30 opacity-55'
+                else if (revealed) cls = 'border-on-surface/10 opacity-55'
 
                 return (
                   <button
                     key={i}
                     onClick={() => choose(i)}
                     disabled={revealed}
-                    className={`flex items-center justify-between gap-3 text-left border rounded-2xl px-4 py-3.5 transition-all ${cls}`}
+                    className={`flex items-center justify-between gap-3 text-left border rounded-2xl px-5 py-4 transition-all ${cls}`}
                   >
-                    <span className="text-body-md text-on-surface">{opt}</span>
+                    <span className="text-body-lg text-on-surface">{opt}</span>
                     {revealed && isAnswer && <Check size={17} style={{ color: '#1a6b3a' }} className="shrink-0" />}
                     {revealed && isPicked && !isAnswer && <X size={17} className="text-error shrink-0" />}
                   </button>
@@ -146,27 +140,21 @@ export default function ReviewPage() {
             </div>
 
             {selected !== null && (
-              <div className="flex flex-col gap-4">
-                <div className="bg-surface-container rounded-2xl px-4 py-3.5">
-                  <p className="text-body-md text-on-surface-variant leading-relaxed">
-                    {question.why}
-                  </p>
-                </div>
-                <button
-                  onClick={next}
-                  className="btn-action items-center justify-center gap-1.5 self-start"
-                >
+              <div className="flex flex-col gap-5 animate-fade-in">
+                <p className="text-body-lg text-on-surface-variant">
+                  <span className="text-on-surface">
+                    {selected === question.answer ? 'Right.' : 'Not quite.'}
+                  </span>{' '}
+                  {question.why}
+                </p>
+                <button onClick={next} className="btn-action items-center justify-center gap-1.5 self-start">
                   {index === due.length - 1 ? 'Finish' : 'Next'} <ArrowRight size={16} />
                 </button>
               </div>
             )}
           </div>
-        ) : (
-          <Empty />
-        )}
+        ) : null}
       </div>
-
-      <DisclaimerFooter inner="max-w-2xl" />
     </div>
   )
 }
@@ -181,17 +169,15 @@ function findQuestion(item: ReviewItem): QuizQuestion | null {
 
 function Empty() {
   return (
-    <div className="bg-surface-container-lowest rounded-3xl px-7 py-10 flex flex-col gap-3 items-center text-center">
-      <Check size={22} style={{ color: '#1a6b3a' }} />
-      <p className="text-title-md text-on-surface font-semibold">Nothing due right now</p>
-      <p className="text-body-md text-on-surface-variant max-w-sm leading-relaxed">
-        Reviews appear a day after you cover something, then again three days later,
-        then after a week. Come back when something is due.
+    <div className="flex flex-col items-center text-center py-10">
+      <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center">
+        <Check size={26} style={{ color: '#1a6b3a' }} />
+      </div>
+      <h1 className="mt-5 text-display-sm text-on-surface">Nothing to review yet.</h1>
+      <p className="mt-3 text-title-lg text-on-surface-variant max-w-sm">
+        Finish a lesson and its questions come back here.
       </p>
-      <Link
-        href="/learning"
-        className="btn-action items-center justify-center gap-1.5 mt-2"
-      >
+      <Link href="/learning" className="btn-action items-center justify-center mt-8">
         Back to Learning
       </Link>
     </div>
@@ -200,21 +186,13 @@ function Empty() {
 
 function Summary({ right, wrong }: { right: number; wrong: number }) {
   return (
-    <div className="bg-surface-container-lowest rounded-3xl px-7 py-10 flex flex-col gap-4 items-center text-center">
-      <p className="text-headline-sm text-on-surface font-bold">Review done</p>
-      <p className="text-body-lg text-on-surface-variant">
-        {right} right, {wrong} to see again.
+    <div className="flex flex-col items-center text-center py-10">
+      <p className="text-display-lg text-on-surface tabular-nums">{right}/{right + wrong}</p>
+      <h1 className="mt-3 text-display-sm text-on-surface">Review done.</h1>
+      <p className="mt-3 text-title-lg text-on-surface-variant max-w-sm">
+        {wrong > 0 ? 'The ones you missed come back tomorrow.' : 'Every one right.'}
       </p>
-      {wrong > 0 && (
-        <p className="text-body-md text-on-surface-variant max-w-sm leading-relaxed">
-          The ones you missed come back tomorrow. That is the point — you are only
-          competing with your own last attempt.
-        </p>
-      )}
-      <Link
-        href="/learning"
-        className="btn-action items-center justify-center gap-1.5 mt-2"
-      >
+      <Link href="/learning" className="btn-action items-center justify-center mt-8">
         Back to Learning
       </Link>
     </div>

@@ -2,13 +2,16 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { TrendingUp, TrendingDown, RefreshCw, Upload, Calendar, Wallet, PiggyBank, RotateCcw, ChevronDown } from 'lucide-react'
+import { TrendingUp, TrendingDown, RefreshCw, Calendar, Wallet, PiggyBank, RotateCcw, ChevronDown } from 'lucide-react'
 import { TopNav } from '@/components/layout/top-nav'
+import { EmptyState } from '@/components/layout/empty-state'
 import { useDashboardSummary } from '@/hooks/use-data'
 import { useFinancialData } from '@/contexts/financial-data-context'
+import { INVESTMENT_CATEGORIES, knownAllocations } from '@/lib/investing/categories'
+import { RISK_LABEL, RISK_RAMP } from '@/lib/investing/risk-ramp'
 
 export default function DashboardPage() {
-  const { hasData, resetAllocations, financialData } = useFinancialData()
+  const { hasData, resetAllocations, financialData, investingGoal } = useFinancialData()
   const [showResetConfirm, setShowResetConfirm] = useState(false)
   const { data: summary, loading, error, refresh } = useDashboardSummary()
 
@@ -24,6 +27,26 @@ export default function DashboardPage() {
     [financialData],
   )
   const recurringTotal = recurringItems.reduce((sum, i) => sum + i.amount, 0)
+
+  // Each investment chosen on the Investing page, with the risk colour and word
+  // it wears there. Other entries have no tier, so they wear the brand colour.
+  const investments = useMemo(() => {
+    const named = INVESTMENT_CATEGORIES
+      .map(c => ({ category: c, pct: knownAllocations(investingGoal?.categories)[c.id] ?? 0 }))
+      .filter(({ pct }) => pct > 0)
+      .map(({ category, pct }) => ({
+        id: category.id as string,
+        name: category.name,
+        label: RISK_LABEL[category.tier],
+        color: RISK_RAMP[category.tier].stripe,
+        pct,
+      }))
+    const own = (investingGoal?.custom ?? [])
+      .filter(c => (Number(c.pct) || 0) > 0)
+      .map(c => ({ id: c.id, name: c.name, label: 'Your own', color: '#4c49c9', pct: Number(c.pct) }))
+    return [...named, ...own].sort((a, b) => b.pct - a.pct)
+  }, [investingGoal])
+  const investmentsPct = investments.reduce((sum, i) => sum + i.pct, 0)
 
   // Loading skeleton
   if (loading) {
@@ -45,25 +68,12 @@ export default function DashboardPage() {
     return (
       <div className="flex flex-col min-h-full">
         <TopNav title="Dashboard" />
-        <div className="flex-1 px-8 pb-10 flex items-center justify-center">
-          <div className="text-center max-w-sm">
-            <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center mx-auto mb-5">
-              <Upload size={28} className="text-secondary" />
-            </div>
-            <p className="text-headline-sm text-on-surface font-semibold mb-2">Nothing recorded yet</p>
-            <p className="text-body-md text-on-surface-variant mb-6 leading-relaxed">
-              Your dashboard fills in as you work through the tracks and record your own numbers.
-            </p>
-            <Link
-              href="/learning"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-label-lg transition-all hover:opacity-80"
-              style={{ background: '#4c49c9', color: '#fff' }}
-            >
-              <Upload size={16} />
-              Start learning
-            </Link>
-          </div>
-        </div>
+        <EmptyState
+          image="/onboarding/waiting.svg"
+          title="Nothing here yet."
+          body="Your dashboard fills in as you learn and add your own numbers."
+          action={{ href: '/learning', label: 'Go to Learning' }}
+        />
       </div>
     )
   }
@@ -72,6 +82,7 @@ export default function DashboardPage() {
   const monthlySpending = summary.spending.monthly_spending
   const netCashFlow = summary.spending.net_cash_flow
   const spendingLimit = summary.spending.spending_limit?.limit || 0
+  const investmentsAmount = Math.round((investmentsPct / 100) * monthlyIncome)
 
   // --- Allocation preview ---
   // All percentages are unified as share of monthly income (the strict 100% baseline)
@@ -218,20 +229,65 @@ export default function DashboardPage() {
         </div>
 
         {/* ── Investments ─────────────────────────────────────────────────────
-            Placeholder. The Investing track has no lessons yet and the tool it
-            unlocks has nothing to report, so this holds the slot rather than
-            inventing a figure. */}
+            The investments locked in on the Investing page, largest share first. */}
         <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6">
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp size={16} className="text-on-surface-variant" />
             <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">Investments</p>
           </div>
 
-          <div className="rounded-2xl border border-dashed border-outline-variant px-5 py-8 text-center">
-            <p className="text-body-md text-on-surface-variant">
-              Nothing here yet.
-            </p>
-          </div>
+          {investments.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-outline-variant px-5 py-8 text-center flex flex-col items-center gap-3">
+              <p className="text-body-md text-on-surface-variant">
+                You have not chosen any investments yet.
+              </p>
+              <Link href="/investing" className="text-label-md font-semibold text-secondary hover:underline">
+                Choose your investments
+              </Link>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-5">
+              <p className="text-headline-md font-bold text-on-surface">
+                ${investmentsAmount.toLocaleString()}
+                <span className="text-label-sm font-normal text-on-surface-variant ml-2">monthly</span>
+              </p>
+
+              {/* Share of the investing total held by each choice */}
+              <div className="flex h-3 rounded-full overflow-hidden gap-0.5">
+                {investments.map(inv => (
+                  <div
+                    key={inv.id}
+                    className="h-full"
+                    style={{ width: `${(inv.pct / investmentsPct) * 100}%`, backgroundColor: inv.color }}
+                    title={`${inv.name}: ${inv.pct}%`}
+                  />
+                ))}
+              </div>
+
+              <ul className="flex flex-col gap-2">
+                {investments.map(inv => (
+                  <li
+                    key={inv.id}
+                    className="flex items-center justify-between gap-3 rounded-xl bg-surface-container px-4 py-3"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: inv.color }} />
+                      <div className="min-w-0">
+                        <p className="text-body-md text-on-surface truncate">{inv.name}</p>
+                        <p className="text-label-sm text-on-surface-variant">{inv.label}</p>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-label-lg font-semibold text-on-surface tabular-nums">{inv.pct}%</p>
+                      <p className="text-label-sm text-on-surface-variant tabular-nums">
+                        ${Math.round((inv.pct / 100) * monthlyIncome).toLocaleString()}/mo
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         {/* Income Allocation Preview */}

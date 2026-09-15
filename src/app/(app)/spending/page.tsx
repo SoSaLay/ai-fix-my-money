@@ -43,7 +43,7 @@ function SpendingPageTool() {
     return (
       <div className="flex flex-col min-h-full">
         <TopNav title="Income vs. Spending" />
-        <div className="flex-1 px-8 pb-10 flex flex-col gap-6">
+        <div className="flex-1 px-4 sm:px-8 pb-10 flex flex-col gap-6">
           <div className="h-20 bg-surface-container-lowest rounded-2xl animate-pulse" />
           <div className="h-80 bg-surface-container-lowest rounded-2xl animate-pulse" />
           <div className="h-48 bg-surface-container-lowest rounded-2xl animate-pulse" />
@@ -57,7 +57,7 @@ function SpendingPageTool() {
     return (
       <div className="flex flex-col min-h-full">
         <TopNav title="Income vs. Spending" />
-        <div className="flex-1 px-8 pb-10 flex flex-col gap-5 max-w-2xl">
+        <div className="flex-1 px-4 sm:px-8 pb-10 flex flex-col gap-5 max-w-2xl">
           <p className="text-body-lg text-on-surface-variant leading-relaxed">
             Record what comes in and what goes out. The analytics below build
             themselves from what you enter here.
@@ -110,9 +110,10 @@ function SpendingPageTool() {
     <div className="flex flex-col min-h-full">
       <TopNav title="Income vs. Spending" />
 
-      <div className="flex-1 px-8 pb-10 flex flex-col gap-6">
-        {/* Entry panels — everything below is derived from these */}
-        <div className="grid gap-4 md:grid-cols-3">
+      <div className="flex-1 px-4 sm:px-8 pb-10 flex flex-col gap-6">
+        {/* Entry panels — everything below is derived from these. Stacked until
+            there is room for three readable columns. */}
+        <div className="grid gap-4 xl:grid-cols-3">
           <ProfileEntry section="income" />
           <ProfileEntry section="fixed" />
           <ProfileEntry section="variable" />
@@ -126,7 +127,7 @@ function SpendingPageTool() {
         />
 
         {/* Spending Limit Setter */}
-        <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6">
+        <div className="bg-surface-container-lowest rounded-2xl shadow-card p-5 sm:p-6">
           <div className="flex items-start justify-between mb-1">
             <div>
               <h3 className="text-headline-sm font-semibold text-on-surface">
@@ -209,67 +210,37 @@ function SpendingPageTool() {
 }
 
 /**
- * What the chosen cap leaves over each month, said in money and in plain
- * words: a figure on the left, what it means on the right.
+ * What the chosen limit leaves over, as a sentence with the figures inline.
+ * They follow the slider as it moves.
  */
 function ProjectedNet({ leftover }: { leftover: number }) {
   const short = leftover < 0
-  const color = short ? '#ba1a1a' : '#1a6b3a'
   const money = (n: number) =>
     `$${Math.abs(Math.round(n)).toLocaleString('en-US')}`
 
-  const rows = short
-    ? [
-        {
-          value: money(leftover),
-          unit: 'short each month',
-          text: 'This cap spends more than comes in. Lower it until the number turns positive, or the gap comes out of savings or onto a card.',
-        },
-        {
-          value: money(leftover * 12),
-          unit: 'over a year',
-          text: 'What that monthly gap adds up to if nothing changes.',
-        },
-      ]
-    : [
-        {
-          value: money(leftover),
-          unit: 'left each month',
-          text: 'Money that isn’t spoken for — what you could put toward savings, investments, travel, or paying down debt faster.',
-        },
-        {
-          value: money(leftover * 12),
-          unit: 'over a year',
-          text: 'The same amount, twelve months on, if you hold this cap.',
-        },
-      ]
+  const figure = (n: number) => (
+    <span
+      className="text-headline-md sm:text-display-sm font-bold tabular-nums whitespace-nowrap"
+      style={{ color: short ? '#ba1a1a' : '#1a6b3a' }}
+    >
+      {money(n)}
+    </span>
+  )
 
   return (
-    <div className="bg-surface-container rounded-2xl overflow-hidden">
-      <p className="text-label-sm text-on-surface-variant uppercase tracking-wider px-5 pt-4">
-        If you stay within this cap
-      </p>
-
-      <table className="w-full mt-2">
-        <tbody>
-          {rows.map(row => (
-            <tr key={row.unit} className="border-t border-outline-variant/25 first:border-0">
-              <td className="align-top px-5 py-3.5 w-[38%] min-w-[132px]">
-                <p className="text-headline-md font-bold leading-tight" style={{ color }}>
-                  {row.value}
-                </p>
-                <p className="text-label-sm text-on-surface-variant mt-0.5">{row.unit}</p>
-              </td>
-              <td className="align-top px-5 py-3.5">
-                <p className="text-body-sm text-on-surface-variant leading-relaxed">
-                  {row.text}
-                </p>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <p className="text-body-lg sm:text-title-lg text-on-surface-variant leading-loose">
+      {short ? (
+        <>
+          At this limit you would spend {figure(leftover)} more than you earn each month.
+          That is {figure(leftover * 12)} over a year.
+        </>
+      ) : (
+        <>
+          Stay within this limit and you will have {figure(leftover)} left each month to save,
+          invest, travel, or put toward anything else. That is {figure(leftover * 12)} over a year.
+        </>
+      )}
+    </p>
   )
 }
 

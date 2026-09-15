@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <defs>
+    <linearGradient id="track" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#1a6b3a"/>
+      <stop offset="0.3" stop-color="#4caf7d"/>
+      <stop offset="0.6" stop-color="#ff9817"/>
+      <stop offset="1" stop-color="#ba1a1a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="900" fill="#fbe8cf"/>
+  <circle cx="170" cy="160" r="230" fill="#f7d9b1"/>
+  <circle cx="1080" cy="800" r="240" fill="#f8dcb8"/>
+
+  <g transform="translate(260 190)">
+    <rect width="680" height="520" rx="40" fill="#ffffff"/>
+    <text x="56" y="96" fill="#5a5b60" font-size="26" letter-spacing="-0.4">Spending limit</text>
+    <text x="56" y="168" fill="#17171c" font-size="64" letter-spacing="-2.5" font-weight="500">$2,520</text>
+    <text x="300" y="168" fill="#ff9817" font-size="34" letter-spacing="-1" font-weight="500">60%</text>
+
+    <rect x="56" y="222" width="568" height="30" rx="15" fill="url(#track)"/>
+    <rect x="397" y="222" width="227" height="30" rx="15" fill="#ffffff" fill-opacity="0.65"/>
+    <circle cx="397" cy="237" r="24" fill="#ffffff" stroke="#ff9817" stroke-width="6"/>
+
+    <text x="56" y="344" fill="#5a5b60" font-size="28" letter-spacing="-0.5">Left each month</text>
+    <text x="56" y="420" fill="#1a6b3a" font-size="72" letter-spacing="-2.8" font-weight="500">$1,680</text>
+    <text x="624" y="420" fill="#5a5b60" font-size="28" letter-spacing="-0.5" text-anchor="end">$20,160 a year</text>
+  </g>
+</svg>

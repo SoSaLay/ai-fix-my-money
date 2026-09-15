@@ -8,7 +8,6 @@ import {
 import { useLearning } from '@/contexts/learning-context'
 import { TRACKS, readingMinutes, type Track } from '@/lib/learning/tracks'
 import { progressColor } from '@/lib/learning/progress-colors'
-import { AcknowledgmentGate } from '@/components/learning/acknowledgment-gate'
 import { DisclaimerFooter } from '@/components/learning/disclaimer-footer'
 import { RankButton } from '@/components/learning/rank-button'
 
@@ -31,18 +30,12 @@ export default function LearningPage() {
   const due = dueReviews()
 
   return (
-    <AcknowledgmentGate>
-      <div className="flex flex-col">
+    <div className="flex flex-col">
         <div className="flex flex-col gap-8 px-8 py-10 max-w-4xl w-full mx-auto">
           {/* Header. The review queue sits beside it rather than as its own band —
               it is a standing prompt, not news, and it should not push the tracks
               down the page every time something falls due. */}
-          <header className="flex items-start justify-between gap-6">
-            <h3 className="max-w-2xl text-body-lg font-normal leading-relaxed text-on-surface-variant">
-              Learn to manage and grow your money. Complete the lessons, unlock the
-              features, understand how your money works.
-            </h3>
-
+          <header className="flex items-start justify-end gap-6">
             <div className="flex items-center gap-3 shrink-0">
               <RankButton />
 
@@ -84,8 +77,7 @@ export default function LearningPage() {
         </div>
 
         <DisclaimerFooter />
-      </div>
-    </AcknowledgmentGate>
+    </div>
   )
 }
 

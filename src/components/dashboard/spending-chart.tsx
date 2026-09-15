@@ -60,7 +60,7 @@ export function SpendingChart({ data }: SpendingChartProps) {
             dataKey="day"
             axisLine={false}
             tickLine={false}
-            tick={{ fill: '#5a5b60', fontSize: 11, fontFamily: 'Inter' }}
+            tick={{ fill: '#5a5b60', fontSize: 11, fontFamily: 'inherit' }}
           />
           <Tooltip
             content={<CustomTooltip />}

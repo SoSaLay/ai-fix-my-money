@@ -10,7 +10,6 @@ import { useLearning, type Stage } from '@/contexts/learning-context'
 import { getTrack, shortTitle, type Track, type Lesson, type LessonSection } from '@/lib/learning/tracks'
 import { DISCLAIMER_INVESTING } from '@/lib/learning/disclaimer'
 import { DisclaimerFooter } from '@/components/learning/disclaimer-footer'
-import { AcknowledgmentGate } from '@/components/learning/acknowledgment-gate'
 import { LessonContent } from '@/components/learning/lesson-content'
 import { LessonAside } from '@/components/learning/lesson-aside'
 import { ReadTimer } from '@/components/learning/read-timer'
@@ -32,12 +31,10 @@ export default function TrackPage({ params }: { params: Promise<{ track: string 
   // rewinding their actual progress.
   const [view, setView] = useState<Stage | null>(null)
 
-  // `?step=final` is the test-out route off a locked section: it drops the
-  // learner straight on the final quiz, lessons and ordering set aside.
+  // Every track is taken in order, lessons first — there is no skipping to the final.
   useEffect(() => {
     if (!ready || !track) return
-    const testOut = new URLSearchParams(window.location.search).get('step') === 'final'
-    setView(testOut && track.finalQuiz.length > 0 ? { kind: 'final' } : stageFor(track.id))
+    setView(stageFor(track.id))
   }, [ready, track, stageFor])
 
   if (!ready || !track) {
@@ -48,10 +45,10 @@ export default function TrackPage({ params }: { params: Promise<{ track: string 
   }
   if (!view) return null
 
-  // Track order still holds for the lessons — but never for the final, or for
-  // a track already passed by way of it.
+  // A final passed before test-outs were removed still counts, so that learner
+  // is not locked out of a track they already have.
   const testedOut = trackProgress(track.id).final?.passed === true
-  if (!isTrackUnlocked(track.id) && view.kind !== 'final' && !testedOut) {
+  if (!isTrackUnlocked(track.id) && !testedOut) {
     return <Missing message="Finish the tracks before this one first — each builds on the last." />
   }
 
@@ -89,16 +86,13 @@ export default function TrackPage({ params }: { params: Promise<{ track: string 
   const furthest = liveIndex === -1 ? railItems.length - 1 : liveIndex
   const viewIndex = railItems.findIndex(r => sameStage(r.stage, view))
 
-  // Testing out of an order-locked track shows the final and nothing else —
-  // stepping back would land on lessons that aren't open to them yet.
   const canBrowseSteps = isTrackUnlocked(track.id) || testedOut
   const previous = canBrowseSteps && viewIndex > 0 ? railItems[viewIndex - 1] : null
 
   const advance = () => setView(stageFor(track.id))
 
   return (
-    <AcknowledgmentGate>
-      <div className="flex flex-col">
+    <div className="flex flex-col">
         <div className="flex flex-col gap-6 px-8 py-8 max-w-6xl w-full mx-auto">
           {/* Header */}
           <div className="flex flex-col gap-4">
@@ -180,8 +174,7 @@ export default function TrackPage({ params }: { params: Promise<{ track: string 
         </div>
 
         <DisclaimerFooter inner="max-w-6xl" />
-      </div>
-    </AcknowledgmentGate>
+    </div>
   )
 }
 

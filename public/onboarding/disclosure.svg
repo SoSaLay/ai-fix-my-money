@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="shield" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4c49c9"/>
+      <stop offset="1" stop-color="#7c7ae8"/>
+    </linearGradient>
+  </defs>
+
+  <ellipse cx="200" cy="344" rx="120" ry="15" fill="#2d2f33" opacity="0.06"/>
+
+  <g stroke="#2d2f33" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Shield -->
+    <path d="M200 58 C 236 82, 276 90, 312 88 C 314 186, 284 276, 200 322 C 116 276, 86 186, 88 88 C 124 90, 164 82, 200 58 Z" fill="url(#shield)"/>
+    <path d="M200 88 C 226 104, 256 110, 284 110 C 282 186, 258 256, 200 292" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.35"/>
+
+    <!-- Open book on the shield: learning, not advice -->
+    <path d="M200 176 C 182 164, 158 162, 136 168 L 136 226 C 158 220, 182 222, 200 234 Z" fill="#ffffff"/>
+    <path d="M200 176 C 218 164, 242 162, 264 168 L 264 226 C 242 220, 218 222, 200 234 Z" fill="#ffffff"/>
+    <path d="M200 176 L 200 234" fill="none"/>
+
+    <!-- Tick badge -->
+    <circle cx="296" cy="264" r="30" fill="#ffd27a"/>
+    <path d="M282 264 L 292 274 L 311 253" fill="none"/>
+  </g>
+
+  <g fill="#ff9817">
+    <path d="M78 72 l4 12 l12 4 l-12 4 l-4 12 l-4 -12 l-12 -4 l12 -4 z"/>
+    <path d="M336 144 l3 9 l9 3 l-9 3 l-3 9 l-3 -9 l-9 -3 l9 -3 z"/>
+  </g>
+</svg>

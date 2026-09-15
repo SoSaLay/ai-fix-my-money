@@ -16,12 +16,3 @@ export const DISCLAIMER_MEDIUM =
 /** Heavier language for the Investing track specifically. */
 export const DISCLAIMER_INVESTING =
   'Investing carries risk, including the possible loss of the money you put in. Past performance does not indicate future results.'
-
-/** Shown once, before the first track starts. Acknowledged explicitly. */
-export const ACKNOWLEDGMENT_POINTS = [
-  'This platform teaches how personal finance works. It does not give advice about your situation.',
-  'No one here is a licensed financial adviser, broker, or tax professional.',
-  'Nothing on this platform is a recommendation to buy, sell, or hold any financial product.',
-  'Everything you enter is stored locally in your own browser. It is never uploaded anywhere.',
-  'Decisions about your money are yours. For advice about your circumstances, speak with a licensed professional.',
-]

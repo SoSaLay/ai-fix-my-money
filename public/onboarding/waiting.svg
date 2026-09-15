@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <ellipse cx="200" cy="336" rx="140" ry="15" fill="#2d2f33" opacity="0.06"/>
+
+  <g stroke="#2d2f33" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- An empty dashboard card -->
+    <rect x="70" y="92" width="260" height="210" rx="26" fill="#ffffff"/>
+    <path d="M98 128 C 124 124, 148 125, 172 129" fill="none" stroke="#acadb1" stroke-width="3"/>
+
+    <!-- Bars still to be filled in, drawn dashed -->
+    <g stroke-dasharray="7 7" stroke="#acadb1" stroke-width="3" fill="none">
+      <rect x="104" y="218" width="34" height="52" rx="8"/>
+      <rect x="156" y="186" width="34" height="84" rx="8"/>
+      <rect x="208" y="202" width="34" height="68" rx="8"/>
+      <rect x="260" y="160" width="34" height="110" rx="8"/>
+    </g>
+    <!-- The first one, filled -->
+    <rect x="104" y="218" width="34" height="52" rx="8" fill="#ffd27a"/>
+
+    <!-- Pencil adding a number -->
+    <g transform="rotate(-40 300 90)">
+      <rect x="240" y="78" width="118" height="24" rx="5" fill="#4c49c9"/>
+      <path d="M240 78 L 212 90 L 240 102 Z" fill="#fdf6e6"/>
+      <path d="M358 78 L 358 102" fill="none"/>
+    </g>
+  </g>
+
+  <g fill="#ff9817">
+    <path d="M60 64 l4 12 l12 4 l-12 4 l-4 12 l-4 -12 l-12 -4 l12 -4 z"/>
+  </g>
+  <g fill="#4c49c9">
+    <path d="M346 240 l3 9 l9 3 l-9 3 l-3 9 l-3 -9 l-9 -3 l9 -3 z"/>
+  </g>
+</svg>

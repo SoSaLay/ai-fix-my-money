@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360">
+  <defs>
+    <radialGradient id="bg" cx="0.8" cy="0.2" r="1">
+      <stop offset="0" stop-color="#fde7b0"/>
+      <stop offset="1" stop-color="#fdf6e6"/>
+    </radialGradient>
+  </defs>
+  <rect width="480" height="360" fill="url(#bg)"/>
+
+  <g stroke="#2d2f33" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Open book -->
+    <path d="M240 118 C 205 100, 160 98, 118 108 L 118 262 C 160 252, 205 254, 240 272 Z" fill="#ffffff"/>
+    <path d="M240 118 C 275 100, 320 98, 362 108 L 362 262 C 320 252, 275 254, 240 272 Z" fill="#ffffff"/>
+    <path d="M240 118 L 240 272" fill="none"/>
+    <path d="M110 118 L 110 272 C 160 262, 205 264, 240 284 C 275 264, 320 262, 370 272 L 370 118" fill="none"/>
+
+    <!-- Lines of text, drawn a little unevenly -->
+    <g stroke-width="2.5" stroke="#acadb1">
+      <path d="M142 138 C 170 134, 196 136, 220 142"/>
+      <path d="M142 160 C 165 156, 190 157, 220 163"/>
+      <path d="M142 182 C 168 178, 186 180, 204 184"/>
+      <path d="M262 142 C 286 136, 312 134, 338 138"/>
+      <path d="M262 163 C 290 157, 314 156, 338 160"/>
+      <path d="M262 184 C 284 180, 300 179, 318 182"/>
+    </g>
+    <path d="M142 214 C 168 208, 196 210, 220 216" stroke="#ff9817" stroke-width="6" opacity="0.55"/>
+
+    <!-- Timer -->
+    <circle cx="372" cy="92" r="30" fill="#ffd27a"/>
+    <path d="M372 76 L 372 92 L 384 100" fill="none"/>
+    <path d="M364 56 L 380 56" fill="none"/>
+  </g>
+
+  <!-- Sparkles -->
+  <g fill="#ff9817">
+    <path d="M90 76 l4 12 l12 4 l-12 4 l-4 12 l-4 -12 l-12 -4 l12 -4 z"/>
+    <path d="M404 250 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3 z"/>
+  </g>
+</svg>

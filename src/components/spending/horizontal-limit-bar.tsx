@@ -78,8 +78,8 @@ export function HorizontalLimitBar({
   return (
     <div className="flex flex-col gap-5 w-full">
       {/* Value row */}
-      <div className="flex items-baseline gap-3">
-        <span className="text-display-sm font-bold text-on-surface">{formattedAmount}</span>
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <span className="text-headline-md sm:text-display-sm font-bold text-on-surface">{formattedAmount}</span>
         <span className="text-headline-sm font-semibold" style={{ color: thumbColor }}>
           {pct}%
         </span>

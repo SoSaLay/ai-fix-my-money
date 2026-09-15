@@ -6,8 +6,8 @@ interface TopNavProps {
 
 export function TopNav({ title }: TopNavProps) {
   return (
-    <header className="flex items-center justify-between px-8 py-5">
-      <h1 className="text-headline-lg text-on-surface">{title}</h1>
+    <header className="flex items-center justify-between px-4 sm:px-8 py-5">
+      <h1 className="text-headline-md sm:text-headline-lg text-on-surface">{title}</h1>
     </header>
   )
 }

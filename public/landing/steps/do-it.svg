@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360">
+  <defs>
+    <radialGradient id="bg" cx="0.2" cy="0.85" r="1">
+      <stop offset="0" stop-color="#bfe6cc"/>
+      <stop offset="1" stop-color="#eef8f1"/>
+    </radialGradient>
+  </defs>
+  <rect width="480" height="360" fill="url(#bg)"/>
+
+  <g stroke="#2d2f33" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Tool card -->
+    <rect x="104" y="64" width="272" height="200" rx="22" fill="#ffffff"/>
+    <text x="132" y="126" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="36" font-weight="600" letter-spacing="-1.2" fill="#2d2f33" stroke="none">$1,680</text>
+    <path d="M132 146 C 160 142, 186 143, 212 146" stroke="#acadb1" stroke-width="2.5"/>
+
+    <!-- Slider -->
+    <path d="M132 206 L 348 206" stroke="#e7e8ee" stroke-width="12"/>
+    <path d="M132 206 L 262 206" stroke="#1a6b3a" stroke-width="12"/>
+    <circle cx="262" cy="206" r="15" fill="#ffffff"/>
+
+    <!-- Coins -->
+    <g fill="#ffd27a">
+      <ellipse cx="366" cy="302" rx="36" ry="12"/>
+      <path d="M330 302 L 330 288 C 330 281, 346 276, 366 276 C 386 276, 402 281, 402 288 L 402 302" />
+      <ellipse cx="366" cy="288" rx="36" ry="12"/>
+      <path d="M330 288 L 330 274 C 330 267, 346 262, 366 262 C 386 262, 402 267, 402 274 L 402 288" />
+      <ellipse cx="366" cy="274" rx="36" ry="12"/>
+    </g>
+
+    <!-- Pencil -->
+    <g transform="rotate(-35 120 300)">
+      <rect x="60" y="290" width="110" height="22" rx="4" fill="#ff9817"/>
+      <path d="M170 290 L 196 301 L 170 312 Z" fill="#fdf6e6"/>
+      <path d="M60 290 L 60 312" />
+    </g>
+  </g>
+</svg>

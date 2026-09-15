@@ -11,41 +11,36 @@ function formatDollars(n: number): string {
 export function SummaryBar({ income, spending, netIncome }: SummaryBarProps) {
   const negative = netIncome < 0
 
+  // Stacked rows on narrow screens, three columns side by side from lg up.
   return (
-    <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6 flex items-stretch gap-0">
+    <div className="bg-surface-container-lowest rounded-2xl shadow-card px-5 py-2 lg:p-6 flex flex-col lg:flex-row lg:items-stretch divide-y lg:divide-y-0 lg:divide-x divide-surface-container-low">
       {/* Monthly Income */}
-      <div className="flex-1 flex flex-col gap-1 px-6 first:pl-0">
+      <div className="flex-1 flex items-baseline justify-between gap-3 py-3 lg:flex-col lg:justify-start lg:gap-1 lg:py-0 lg:px-6 lg:first:pl-0">
         <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">
           Monthly Income
         </p>
-        <p className="text-display-sm font-bold text-on-surface">
+        <p className="text-headline-sm lg:text-display-sm font-bold text-on-surface tabular-nums">
           {formatDollars(income)}
         </p>
       </div>
 
-      {/* Divider */}
-      <div className="w-px bg-surface-container-low self-stretch mx-2" />
-
       {/* Monthly Spending */}
-      <div className="flex-1 flex flex-col gap-1 px-6">
+      <div className="flex-1 flex items-baseline justify-between gap-3 py-3 lg:flex-col lg:justify-start lg:gap-1 lg:py-0 lg:px-6">
         <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">
           Monthly Spending
         </p>
-        <p className="text-display-sm font-bold text-on-surface">
+        <p className="text-headline-sm lg:text-display-sm font-bold text-on-surface tabular-nums">
           {formatDollars(spending)}
         </p>
       </div>
 
-      {/* Divider */}
-      <div className="w-px bg-surface-container-low self-stretch mx-2" />
-
       {/* Monthly Net Income — highlighted, and negative when it is negative */}
-      <div className="flex-1 flex flex-col gap-1 px-6 last:pr-0">
+      <div className="flex-1 flex items-baseline justify-between gap-3 py-3 lg:flex-col lg:justify-start lg:gap-1 lg:py-0 lg:px-6 lg:last:pr-0">
         <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">
           Monthly Net Income
         </p>
         <p
-          className="text-display-sm font-bold"
+          className="text-headline-sm lg:text-display-sm font-bold tabular-nums"
           style={negative ? { color: '#ba1a1a' } : undefined}
         >
           <span className={negative ? undefined : 'text-secondary'}>

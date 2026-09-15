@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="cover" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4c49c9"/>
+      <stop offset="1" stop-color="#ff9817"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Soft ground shadow -->
+  <ellipse cx="200" cy="336" rx="130" ry="16" fill="#2d2f33" opacity="0.06"/>
+
+  <g stroke="#2d2f33" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Stack of books -->
+    <rect x="96" y="268" width="208" height="46" rx="10" fill="#ffd27a"/>
+    <path d="M112 291 L 288 291" fill="none" stroke-width="2.5" opacity="0.35"/>
+    <rect x="112" y="224" width="180" height="44" rx="10" fill="url(#cover)"/>
+    <path d="M128 246 L 276 246" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0.6"/>
+
+    <!-- Open book on top -->
+    <path d="M200 150 C 170 132, 130 130, 96 140 L 96 216 C 130 206, 170 208, 200 224 Z" fill="#ffffff"/>
+    <path d="M200 150 C 230 132, 270 130, 304 140 L 304 216 C 270 206, 230 208, 200 224 Z" fill="#ffffff"/>
+    <path d="M200 150 L 200 224" fill="none"/>
+    <g stroke="#acadb1" stroke-width="2.5" fill="none">
+      <path d="M118 158 C 140 153, 160 154, 182 159"/>
+      <path d="M118 178 C 138 174, 158 175, 182 180"/>
+      <path d="M218 159 C 240 154, 260 153, 282 158"/>
+      <path d="M218 180 C 242 175, 262 174, 282 178"/>
+    </g>
+  </g>
+
+  <!-- Floating coins -->
+  <g stroke="#2d2f33" stroke-width="3.5">
+    <circle cx="96" cy="84" r="24" fill="#ffd27a"/>
+    <circle cx="316" cy="70" r="18" fill="#ffd27a"/>
+    <circle cx="332" cy="170" r="14" fill="#ffd27a"/>
+  </g>
+  <g font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-weight="700" fill="#2d2f33" text-anchor="middle">
+    <text x="96" y="93" font-size="24">$</text>
+    <text x="316" y="77" font-size="18">$</text>
+    <text x="332" y="176" font-size="14">$</text>
+  </g>
+
+  <!-- Sparkles -->
+  <g fill="#4c49c9">
+    <path d="M200 52 l5 15 l15 5 l-15 5 l-5 15 l-5 -15 l-15 -5 l15 -5 z"/>
+    <path d="M58 196 l3 9 l9 3 l-9 3 l-3 9 l-3 -9 l-9 -3 l9 -3 z"/>
+  </g>
+</svg>

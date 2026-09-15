@@ -1,11 +1,9 @@
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { VideoReel, type ReelVideo } from '@/components/marketing/video-reel'
 import { ArrowRight } from 'lucide-react'
-import { PathFinder, type TrackSummary } from '@/components/marketing/path-finder'
+import { VideoReel, type ReelVideo } from '@/components/marketing/video-reel'
+import { TrackTabs, type TrackSummary } from '@/components/marketing/track-tabs'
 import {
-  Comparison, Faq, Features, FinalCta, Footer, HowItWorks, Offer, RankSection, StatsStrip, Trust,
-  type LandingStats, type SampleQuestion,
+  CTA_CLASS, CTA_SMALL_CLASS, Faq, FinalCta, Footer, HowItWorks, StatsStrip, Why, type LandingStats,
 } from '@/components/marketing/landing-sections'
 import { PASS_THRESHOLD, TRACKS, readingMinutes } from '@/lib/learning/tracks'
 import { liveVideos, quizMix } from '@/lib/learning/video-pool/pool'
@@ -65,10 +63,6 @@ const TRACK_SUMMARIES: TrackSummary[] = LIVE_TRACKS.map((track, i) => ({
   id: track.id,
   number: i + 1,
   title: track.title,
-  outcome: track.outcome,
-  lessons: track.lessons.map(l => l.title),
-  minutes: readingMinutes(track),
-  finalVideos: quizMix(track.id).videos,
 }))
 
 const STATS: LandingStats = {
@@ -76,15 +70,24 @@ const STATS: LandingStats = {
   lessons: LIVE_TRACKS.reduce((sum, t) => sum + t.lessons.length, 0),
   practiceQuestions: LIVE_TRACKS.reduce((sum, t) => sum + t.lessons.reduce((n, l) => n + l.questions.length, 0), 0),
   reviewedVideos: LIVE_TRACKS.reduce((sum, t) => sum + liveVideos(t.id).length, 0),
-  minutes: LIVE_TRACKS.reduce((sum, t) => sum + readingMinutes(t), 0),
 }
 
-const SAMPLE_QUESTION: SampleQuestion | null = (() => {
-  const track = LIVE_TRACKS[0]
-  const question = track?.lessons[0]?.questions.find(q => !q.imageSrc)
-  return track && question
-    ? { track: track.title, question: question.question, options: question.options, answer: question.answer, why: question.why }
-    : null
+/**
+ * One track, start to finish, averaged across tracks: the lessons' own reading
+ * time, about half a minute per practice question, and the final test at about
+ * three minutes per video (watch, then write) and half a minute per multiple
+ * choice. Rounded up to the nearest five so it reads as the estimate it is.
+ */
+const MINUTES_PER_TRACK = (() => {
+  const total = LIVE_TRACKS.reduce((sum, t) => {
+    const mix = quizMix(t.id)
+    return sum
+      + readingMinutes(t)
+      + t.lessons.reduce((n, l) => n + l.questions.length, 0) * 0.5
+      + mix.videos * 3
+      + mix.choices * 0.5
+  }, 0)
+  return Math.ceil(total / Math.max(1, LIVE_TRACKS.length) / 5) * 5
 })()
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -96,45 +99,29 @@ export default function MarketingPage() {
     <main className="min-h-screen bg-surface flex flex-col">
 
       {/* ── Nav ── */}
-      <nav className="flex items-center justify-between px-8 py-5 max-w-5xl mx-auto w-full">
-        <div>
-          <p className="text-headline-sm text-on-surface font-bold">AI Fix My Money</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link href="/dashboard">
-            <Button variant="secondary" className="px-5 py-2.5 text-label-lg">Open App</Button>
-          </Link>
-          <Link href="/learning">
-            <Button variant="primary" className="px-5 py-2.5 text-label-lg">Get Started</Button>
-          </Link>
-        </div>
+      <nav className="flex items-center justify-between px-6 py-5 max-w-6xl mx-auto w-full">
+        <Link href="/" className="text-headline-lg text-on-surface">AI Fix My Money</Link>
+        <Link href="/learning" className={CTA_SMALL_CLASS}>Get started</Link>
       </nav>
 
       {/* ── Hero ── */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 px-6 pt-16 pb-32 max-w-5xl mx-auto w-full">
+      <section className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 px-6 pt-12 sm:pt-16 pb-24 sm:pb-32 max-w-6xl mx-auto w-full">
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left gap-8">
-          <h1 className="text-display-lg text-on-surface">
+          <h1 className="text-display-xl text-on-surface">
             You and your money,{' '}
             <span style={{ background: 'linear-gradient(135deg, #4c49c9, #ff9817)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               finally intelligent.
             </span>
           </h1>
 
-          <p className="text-body-lg text-on-surface-variant max-w-lg">
+          <p className="text-title-lg text-on-surface-variant max-w-lg">
             Actionable learning platform to manage and grow your money. Then test your knowledge
             with finance content, see what you really know?
           </p>
 
-          <div className="flex items-center gap-4">
-            <Link href="/learning">
-              <Button variant="primary" className="px-8 py-3.5 text-body-md flex items-center gap-2">
-                Get Started <ArrowRight size={16} />
-              </Button>
-            </Link>
-            <Link href="/dashboard">
-              <Button variant="secondary" className="px-8 py-3.5 text-body-md">Open App</Button>
-            </Link>
-          </div>
+          <Link href="/learning" className={CTA_CLASS}>
+            Get started <ArrowRight size={16} aria-hidden />
+          </Link>
         </div>
 
         <VideoReel videos={REJECTED_VIDEOS} />
@@ -142,24 +129,12 @@ export default function MarketingPage() {
 
       <StatsStrip stats={STATS} />
 
-      {/* ── Find your starting point ── */}
-      <section id="tracks" className="px-6 pb-28 max-w-5xl mx-auto w-full scroll-mt-8">
-        <div className="flex flex-col gap-3 mb-12 max-w-2xl">
-          <p className="text-label-sm text-secondary uppercase tracking-widest">Find your starting point</p>
-          <h2 className="text-display-md text-on-surface">Where are you with your money right now?</h2>
-          <p className="text-body-lg text-on-surface-variant">
-            Four tracks, each ending in a tool you unlock. Pick what sounds like you.
-          </p>
-        </div>
-        <PathFinder tracks={TRACK_SUMMARIES} />
+      <section id="tracks" className="px-6 pb-24 sm:pb-32 max-w-6xl mx-auto w-full scroll-mt-8">
+        <TrackTabs tracks={TRACK_SUMMARIES} />
       </section>
 
-      <HowItWorks />
-      <Features sample={SAMPLE_QUESTION} minutes={STATS.minutes} />
-      <RankSection />
-      <Trust />
-      <Comparison />
-      <Offer tracks={TRACK_SUMMARIES.map(t => t.title)} />
+      <HowItWorks minutesPerTrack={MINUTES_PER_TRACK} />
+      <Why />
       <Faq passPercent={Math.round(PASS_THRESHOLD * 100)} />
       <FinalCta />
       <Footer tracks={TRACK_SUMMARIES} />

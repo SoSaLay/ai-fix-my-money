@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <rect width="1200" height="900" fill="#dfe6f7"/>
+  <circle cx="1040" cy="170" r="260" fill="#c9d4f2"/>
+  <circle cx="140" cy="820" r="200" fill="#ccd6f3"/>
+
+  <g transform="translate(300 150)">
+    <rect width="600" height="600" rx="40" fill="#ffffff"/>
+    <text x="52" y="92" fill="#5a5b60" font-size="26" letter-spacing="-0.4">Your accounts</text>
+    <text x="52" y="160" fill="#17171c" font-size="64" letter-spacing="-2.5" font-weight="500">$7,460</text>
+    <text x="52" y="198" fill="#5a5b60" font-size="22">in 4 places</text>
+
+    <g font-size="26" letter-spacing="-0.4">
+      <rect x="52" y="250" width="496" height="1" fill="#e7e8ee"/>
+      <circle cx="72" cy="292" r="10" fill="#4c49c9"/>
+      <text x="100" y="301" fill="#17171c">Checking</text>
+      <text x="548" y="301" fill="#17171c" text-anchor="end">$2,340</text>
+
+      <rect x="52" y="334" width="496" height="1" fill="#e7e8ee"/>
+      <circle cx="72" cy="376" r="10" fill="#1a6b3a"/>
+      <text x="100" y="385" fill="#17171c">Savings</text>
+      <text x="548" y="385" fill="#17171c" text-anchor="end">$6,120</text>
+
+      <rect x="52" y="418" width="496" height="1" fill="#e7e8ee"/>
+      <circle cx="72" cy="460" r="10" fill="#ff9817"/>
+      <text x="100" y="469" fill="#17171c">Credit card</text>
+      <text x="548" y="469" fill="#ba1a1a" text-anchor="end">−$640</text>
+
+      <rect x="52" y="502" width="496" height="1" fill="#e7e8ee"/>
+      <circle cx="72" cy="544" r="10" fill="#acadb1"/>
+      <text x="100" y="553" fill="#17171c">Car loan</text>
+      <text x="548" y="553" fill="#ba1a1a" text-anchor="end">−$360</text>
+    </g>
+  </g>
+</svg>

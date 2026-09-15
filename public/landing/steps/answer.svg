@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360">
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <rect width="40" height="40" fill="#fbf3de"/>
+      <path d="M40 0 L0 0 0 40" fill="none" stroke="#f0e3bf" stroke-width="1.5"/>
+    </pattern>
+  </defs>
+  <rect width="480" height="360" fill="url(#grid)"/>
+
+  <g stroke="#2d2f33" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Question bubble -->
+    <path d="M110 58 L 370 58 C 380 58, 386 64, 386 74 L 386 102 C 386 112, 380 118, 370 118 L 150 118 L 128 136 L 132 118 L 110 118 C 100 118, 94 112, 94 102 L 94 74 C 94 64, 100 58, 110 58 Z" fill="#ffffff"/>
+    <text x="240" y="98" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="30" font-weight="600" fill="#2d2f33" stroke="none">?</text>
+
+    <!-- Options -->
+    <rect x="94" y="156" width="292" height="44" rx="22" fill="#ffffff"/>
+    <rect x="94" y="212" width="292" height="44" rx="22" fill="#cfeedd"/>
+    <rect x="94" y="268" width="292" height="44" rx="22" fill="#ffffff"/>
+
+    <g stroke-width="2.5" stroke="#acadb1">
+      <path d="M122 178 C 160 174, 200 176, 250 180"/>
+      <path d="M122 290 C 150 286, 180 287, 222 291"/>
+    </g>
+    <path d="M122 234 C 160 230, 196 232, 232 236" stroke="#1a6b3a" stroke-width="2.5"/>
+
+    <!-- The tick -->
+    <circle cx="356" cy="234" r="16" fill="#1a6b3a" stroke="#1a6b3a"/>
+    <path d="M348 234 L 354 240 L 365 227" stroke="#ffffff" fill="none"/>
+
+    <!-- Pointer -->
+    <path d="M392 250 L 420 312 L 406 306 L 398 326 L 388 322 L 396 302 L 382 300 Z" fill="#ffffff"/>
+  </g>
+</svg>
