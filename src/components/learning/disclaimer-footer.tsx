@@ -31,7 +31,7 @@ export function DisclaimerFooter({
 
   return (
     <footer className="mt-20 border-t border-outline-variant/40">
-      <div className={`${inner} w-full mx-auto px-8 pt-5 pb-12 flex flex-col items-start`}>
+      <div className={`${inner} w-full mx-auto px-4 sm:px-8 pt-5 pb-12 flex flex-col items-start`}>
         <button
           type="button"
           onClick={() => setOpen(o => !o)}

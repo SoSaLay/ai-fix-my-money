@@ -6,7 +6,6 @@ import {
   useState,
   useEffect,
   useCallback,
-  useRef,
   type ReactNode,
 } from 'react'
 import {
@@ -27,17 +26,7 @@ import type {
   InvestingGoal,
 } from '@/hooks/use-data'
 import type { CategoryAllocations, CustomAllocation } from '@/lib/investing/categories'
-import { useAuth } from '@/contexts/auth-context'
-import {
-  legacyAdopted,
-  markLegacyAdopted,
-  readLocal,
-  removeLocal,
-  scopedKey,
-  writeLocal,
-} from '@/lib/sync/local'
-import { loadRemoteState, queueRemoteWrite, reconcile } from '@/lib/sync/user-state'
-import type { UserStateKey } from '@/types/supabase'
+import { readLocal, removeLocal, writeLocal } from '@/lib/storage/local'
 
 // ============================================================================
 // Storage Keys
@@ -390,8 +379,6 @@ function ledgerTxToTransaction(tx: LedgerTransaction): Transaction {
 }
 
 export function FinancialDataProvider({ children }: { children: ReactNode }) {
-  const { userId, ready: authReady } = useAuth()
-
   const [financialData, setFinancialData] = useState<FinancialProfile | null>(null)
   const [spendingLimit, setSpendingLimitState] = useState<StoredSpendingLimit | null>(null)
   const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([])
@@ -401,29 +388,16 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
   const [manualAccounts, setManualAccounts] = useState<ManualAccount[]>([])
 
   // ── Persistence ───────────────────────────────────────────────────────────
-  // Cache first, server second. Both take the unscoped key: the cache scopes it
-  // by user, and the server row already belongs to one.
-  //
-  // The id is read through a ref so these two stay referentially stable. Every
-  // setter below closes over them with an empty dependency list; if they were
-  // rebuilt on sign-in, those setters would keep writing to the signed-out key.
+  // Local storage is the store, not a cache: there is nowhere else for this to
+  // go. Every setter below writes through synchronously, so a reload shows what
+  // the screen showed.
 
-  const userIdRef = useRef<string | null>(userId)
-  userIdRef.current = userId
-
-  const persist = useCallback((base: string, value: unknown) => {
-    writeLocal(scopedKey(base, userIdRef.current), value)
-    queueRemoteWrite(base, value)
+  const persist = useCallback((key: string, value: unknown) => {
+    writeLocal(key, value)
   }, [])
 
-  /**
-   * A cleared key is stored as JSON null rather than deleted, so the clearing
-   * itself syncs. A missing row would be indistinguishable from a row that had
-   * never been written, and the other device would helpfully restore it.
-   */
-  const forget = useCallback((base: string) => {
-    removeLocal(scopedKey(base, userIdRef.current))
-    queueRemoteWrite(base, null)
+  const forget = useCallback((key: string) => {
+    removeLocal(key)
   }, [])
 
   // ── Hydration ─────────────────────────────────────────────────────────────
@@ -455,54 +429,16 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  // Read once on mount. localStorage is not available during the server render,
+  // so the first paint is empty and this is what fills it.
   useEffect(() => {
-    if (!authReady) return
-    let active = true
-
-    // 1. The cache. This is the frame the user actually sees.
-    const local: Partial<Record<string, unknown>> = {}
+    const stored: Partial<Record<string, unknown>> = {}
     for (const key of OWNED_KEYS) {
-      const value = readLocal<unknown>(scopedKey(key, userId))
-      if (value !== null) local[key] = value
+      const value = readLocal<unknown>(key)
+      if (value !== null) stored[key] = value
     }
-
-    // 2. Work entered before signing up belongs to the account that just
-    //    appeared, so it is adopted once and then left alone.
-    if (userId && !legacyAdopted(userId)) {
-      for (const key of OWNED_KEYS) {
-        if (local[key] !== undefined) continue
-        const legacy = readLocal<unknown>(key)
-        if (legacy !== null) {
-          local[key] = legacy
-          writeLocal(scopedKey(key, userId), legacy)
-        }
-      }
-      markLegacyAdopted(userId)
-    }
-
-    applyValues(local)
-
-    if (!userId) return
-
-    // 3. The server. Whichever side wrote last wins, key by key.
-    void loadRemoteState().then(remote => {
-      if (!active || !remote) return
-
-      const { fromRemote, toRemote } = reconcile(userId, remote, local as Partial<Record<UserStateKey, unknown>>)
-
-      for (const [key, value] of Object.entries(fromRemote)) {
-        writeLocal(scopedKey(key, userId), value)
-      }
-      applyValues(fromRemote)
-
-      for (const key of toRemote) {
-        if (!(OWNED_KEYS as readonly string[]).includes(key)) continue
-        queueRemoteWrite(key, local[key] ?? null)
-      }
-    })
-
-    return () => { active = false }
-  }, [authReady, userId, applyValues])
+    applyValues(stored)
+  }, [applyValues])
 
   // ── Profile ───────────────────────────────────────────────────────────────
   // The profile is built up by hand as the user works through a learning track.

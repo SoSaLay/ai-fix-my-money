@@ -10,17 +10,20 @@
 // goal amount, not an income, not an email. This app holds people's finances,
 // and none of that belongs in a third-party analytics store. Learning behaviour
 // is what is useful here, and it is all that is collected.
+//
+// Nobody is identified, so these describe an anonymous browser rather than a
+// person. `video_reported_unavailable` is the one that is not just curiosity:
+// with no database it is the only way a learner can tell us an embed has died
+// between weekly health checks, so it is worth watching.
 // ============================================================================
 
 import type { TrackId } from '@/lib/learning/tracks'
 
 export type AnalyticsEvent =
-  | { name: 'signed_up'; props: { method: 'password' | 'oauth' } }
-  | { name: 'signed_in'; props: { method: 'password' | 'oauth' } }
   | { name: 'track_started'; props: { track_id: TrackId } }
   | { name: 'lesson_completed'; props: { track_id: TrackId; lesson_id: string; missed_count: number } }
   | { name: 'action_step_completed'; props: { track_id: TrackId } }
-  | { name: 'quiz_started'; props: { track_id: TrackId; attempt_id?: string } }
+  | { name: 'quiz_started'; props: { track_id: TrackId } }
   | {
       name: 'quiz_answer_graded'
       props: {

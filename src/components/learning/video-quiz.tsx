@@ -20,7 +20,7 @@ import { VideoEmbed } from '@/components/learning/video-embed'
 import { AnswerOption, WhyPanel } from '@/components/learning/answer-option'
 import { Calculator } from '@/components/learning/calculator'
 import { useDictation } from '@/hooks/use-dictation'
-import { completeAttempt, reportVideoUnavailable } from '@/lib/learning/quiz/client'
+import { track as capture } from '@/lib/analytics/posthog'
 import { findLessonImage, type QuizQuestion, type Track } from '@/lib/learning/tracks'
 import { shuffleOptions } from '@/lib/learning/shuffle-options'
 import type { PublicVideoQuestion } from '@/lib/learning/video-pool/types'
@@ -85,6 +85,7 @@ export function VideoQuiz({ track, onSubmit, onDone, attemptKey }: VideoQuizProp
           return
         }
         setPaper(body as Paper)
+        capture('quiz_started', { track_id: track.id })
       } catch {
         if (active) setLoadError({ message: 'Could not reach the quiz. Check your connection.' })
       }
@@ -131,11 +132,12 @@ export function VideoQuiz({ track, onSubmit, onDone, attemptKey }: VideoQuizProp
     )
     const passed = onSubmit(points, totalPoints, missed, rankPoints)
     setResult({ points, passed })
-    void completeAttempt({
-      attemptId: paper.attemptId,
+    capture('quiz_completed', {
+      track_id: track.id,
       correct: points,
       total: totalPoints,
       passed,
+      attempt_number: attemptKey + 1,
     })
   }, [paper, grades, picks, choices, points, totalPoints, onSubmit])
 
@@ -301,17 +303,27 @@ function VideoQuestion({
         setError(body.error ?? 'Could not grade that answer.')
         return
       }
-      onGraded(body as Grade)
+      const grade = body as Grade
+      // Which questions everybody fails is the main thing this data is for.
+      capture('quiz_answer_graded', {
+        track_id: trackId,
+        question_id: video.id,
+        score: grade.score,
+        verdict: grade.verdict,
+      })
+      onGraded(grade)
     } catch {
       setError('Could not reach the grader. Try again in a moment.')
     } finally {
       setBusy(false)
     }
-  }, [busy, grade, stopDictation, attemptId, video.id, answer, onGraded])
+  }, [busy, grade, stopDictation, attemptId, trackId, video.id, answer, onGraded])
 
   const report = useCallback(() => {
     setReported(true)
-    void reportVideoUnavailable({ trackId, videoId: video.id })
+    // With no database this event is the only report of a dead embed between
+    // the weekly health checks. The learner walks away either way.
+    capture('video_reported_unavailable', { track_id: trackId, video_id: video.id })
   }, [trackId, video.id])
 
   return (

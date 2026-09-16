@@ -53,7 +53,7 @@ function InvestingPageTool() {
     return (
       <div className="flex flex-col min-h-full">
         <TopNav title="Investing" />
-        <div className="flex-1 px-8 pb-10 flex flex-col gap-6">
+        <div className="flex-1 px-4 sm:px-8 pb-10 flex flex-col gap-6">
           <div className="grid grid-cols-2 gap-6">
             <div className="h-96 bg-surface-container-lowest rounded-2xl animate-pulse" />
             <div className="h-96 bg-surface-container-lowest rounded-2xl animate-pulse" />
@@ -129,7 +129,7 @@ function InvestingPageTool() {
     <div className="flex flex-col min-h-full">
       <TopNav title="Investing" />
 
-      <div className="flex-1 px-8 pb-10 flex flex-col gap-6">
+      <div className="flex-1 px-4 sm:px-8 pb-10 flex flex-col gap-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
           {/* Left: the allocation panel */}
           <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6 flex flex-col items-center gap-6">

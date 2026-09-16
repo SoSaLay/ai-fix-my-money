@@ -140,4 +140,47 @@
   @media (prefers-reduced-motion: reduce) {
     .flip-inner { transition-duration: 1ms; }
   }
+
+  /* ── The dark band behind "The why" ────────────────────────────────────────
+     Two soft lights drift across a near-black ground, one brand indigo and one
+     brand orange — the same pairing as the hero's gradient text. Never pure
+     black: #000 smears on OLED and reads as a hole in the page rather than a
+     deliberate change of ground.
+
+     Only `transform` and `opacity` are animated, so the whole thing stays on
+     the compositor and never triggers layout. The periods are deliberately
+     long and coprime-ish (23s / 31s) so the two lights do not visibly fall
+     back into the same relative position. */
+  .why-band {
+    background-color: #15141c;
+  }
+  .why-glow {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(72px);
+    will-change: transform;
+  }
+  .why-glow-indigo {
+    background: radial-gradient(circle, rgba(76, 73, 201, 0.55), rgba(76, 73, 201, 0) 70%);
+    animation: why-drift-a 23s ease-in-out infinite alternate;
+  }
+  .why-glow-amber {
+    background: radial-gradient(circle, rgba(255, 152, 23, 0.32), rgba(255, 152, 23, 0) 70%);
+    animation: why-drift-b 31s ease-in-out infinite alternate;
+  }
+  @keyframes why-drift-a {
+    from { transform: translate3d(-6%, -4%, 0) scale(1); }
+    to   { transform: translate3d(8%, 6%, 0) scale(1.15); }
+  }
+  @keyframes why-drift-b {
+    from { transform: translate3d(5%, 6%, 0) scale(1.1); }
+    to   { transform: translate3d(-7%, -5%, 0) scale(0.95); }
+  }
+
+  /* The lights still sit there and still give the band its colour — they just
+     stop moving. */
+  @media (prefers-reduced-motion: reduce) {
+    .why-glow-indigo,
+    .why-glow-amber { animation: none; }
+  }
 }

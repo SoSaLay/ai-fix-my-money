@@ -6,7 +6,6 @@ import {
   useState,
   useEffect,
   useCallback,
-  useRef,
   type ReactNode,
 } from 'react'
 import {
@@ -16,17 +15,8 @@ import {
   getTrack,
   type TrackId,
 } from '@/lib/learning/tracks'
-import { useAuth } from '@/contexts/auth-context'
-import {
-  legacyAdopted,
-  markLegacyAdopted,
-  readLocal,
-  removeLocal,
-  scopedKey,
-  writeLocal,
-} from '@/lib/sync/local'
-import { loadRemoteState, queueRemoteWrite, reconcile } from '@/lib/sync/user-state'
-import type { UserStateKey } from '@/types/supabase'
+import { readLocal, removeLocal, writeLocal } from '@/lib/storage/local'
+import { track } from '@/lib/analytics/posthog'
 
 // ============================================================================
 // Storage
@@ -168,10 +158,10 @@ interface LearningContextValue {
  * Guarded by NODE_ENV at both the call site and here, so a production build
  * cannot reach it.
  */
-function devUnlockAll(userId: string | null) {
+function devUnlockAll() {
   if (process.env.NODE_ENV !== 'development' || typeof window === 'undefined') return
 
-  const key = (base: string) => scopedKey(base, userId)
+  const key = (base: string) => base
 
   const mode = new URLSearchParams(window.location.search).get('unlock')
   if (mode !== 'all' && mode !== 'reset') return
@@ -248,27 +238,18 @@ const OWNED_KEYS = [
 ] as const
 
 export function LearningProvider({ children }: { children: ReactNode }) {
-  const { userId, ready: authReady } = useAuth()
-
   const [ready, setReady] = useState(false)
   const [progress, setProgress] = useState<ProgressMap>({})
   const [reviewQueue, setReviewQueue] = useState<ReviewItem[]>([])
   const [acknowledged, setAcknowledged] = useState(false)
   const [guided, setGuided] = useState<GuidedSession | null>(null)
 
-  // Stable across renders, so the setters below can close over them with an
-  // empty dependency list and still write to the right account's key.
-  const userIdRef = useRef<string | null>(userId)
-  userIdRef.current = userId
-
-  const persist = useCallback((base: string, value: unknown) => {
-    writeLocal(scopedKey(base, userIdRef.current), value)
-    queueRemoteWrite(base, value)
+  const persist = useCallback((key: string, value: unknown) => {
+    writeLocal(key, value)
   }, [])
 
-  const forget = useCallback((base: string) => {
-    removeLocal(scopedKey(base, userIdRef.current))
-    queueRemoteWrite(base, null)
+  const forget = useCallback((key: string) => {
+    removeLocal(key)
   }, [])
 
   const applyValues = useCallback((values: Partial<Record<string, unknown>>) => {
@@ -279,62 +260,24 @@ export function LearningProvider({ children }: { children: ReactNode }) {
     if (has(STORAGE_KEY_GUIDED)) setGuided((values[STORAGE_KEY_GUIDED] as GuidedSession) ?? null)
   }, [])
 
+  // `ready` gates the whole app: the onboarding gate reads `acknowledged`, and
+  // until storage has been read that is false for everyone, including people
+  // who finished onboarding months ago.
   useEffect(() => {
-    if (!authReady) return
-    let active = true
-
     // Authoring escape hatch: `?unlock=all` in development marks every track
     // finished so the whole curriculum can be read through without sitting the
     // quizzes. Stripped from production builds — see devUnlockAll.
-    if (process.env.NODE_ENV === 'development') devUnlockAll(userId)
+    if (process.env.NODE_ENV === 'development') devUnlockAll()
 
-    const local: Partial<Record<string, unknown>> = {}
+    const stored: Partial<Record<string, unknown>> = {}
     for (const key of OWNED_KEYS) {
-      const value = readLocal<unknown>(scopedKey(key, userId))
-      if (value !== null) local[key] = value
+      const value = readLocal<unknown>(key)
+      if (value !== null) stored[key] = value
     }
 
-    // Progress earned before signing up belongs to the account that just
-    // appeared. Adopted once, then never again for this user.
-    if (userId && !legacyAdopted(userId)) {
-      for (const key of OWNED_KEYS) {
-        if (local[key] !== undefined) continue
-        const legacy = readLocal<unknown>(key)
-        if (legacy !== null) {
-          local[key] = legacy
-          writeLocal(scopedKey(key, userId), legacy)
-        }
-      }
-      markLegacyAdopted(userId)
-    }
-
-    applyValues(local)
+    applyValues(stored)
     setReady(true)
-
-    if (!userId) return
-
-    void loadRemoteState().then(remote => {
-      if (!active || !remote) return
-
-      const { fromRemote, toRemote } = reconcile(
-        userId,
-        remote,
-        local as Partial<Record<UserStateKey, unknown>>,
-      )
-
-      for (const [key, value] of Object.entries(fromRemote)) {
-        writeLocal(scopedKey(key, userId), value)
-      }
-      applyValues(fromRemote)
-
-      for (const key of toRemote) {
-        if (!(OWNED_KEYS as readonly string[]).includes(key)) continue
-        queueRemoteWrite(key, local[key] ?? null)
-      }
-    })
-
-    return () => { active = false }
-  }, [authReady, userId, applyValues])
+  }, [applyValues])
 
   const trackProgress = useCallback(
     (trackId: TrackId): TrackProgress => progress[trackId] ?? emptyTrack(),
@@ -361,6 +304,12 @@ export function LearningProvider({ children }: { children: ReactNode }) {
   const recordLesson = useCallback(
     (trackId: TrackId, lessonId: string, missed: string[]) => {
       const lesson = getTrack(trackId)?.lessons.find(l => l.id === lessonId)
+
+      track('lesson_completed', {
+        track_id: trackId,
+        lesson_id: lessonId,
+        missed_count: missed.length,
+      })
 
       mutate(trackId, current => {
         const prior = current.lessons[lessonId]
@@ -403,7 +352,10 @@ export function LearningProvider({ children }: { children: ReactNode }) {
   )
 
   const recordAction = useCallback(
-    (trackId: TrackId) => mutate(trackId, current => ({ ...current, actionDone: true })),
+    (trackId: TrackId) => {
+      track('action_step_completed', { track_id: trackId })
+      mutate(trackId, current => ({ ...current, actionDone: true }))
+    },
     [mutate],
   )
 
@@ -414,6 +366,13 @@ export function LearningProvider({ children }: { children: ReactNode }) {
       // threshold. For a choice-only quiz this is exactly passMark(track).
       const needed = Math.ceil(total * PASS_THRESHOLD)
       const passed = correct >= needed
+
+      // Passing for the first time is what opens this track's tool. Read before
+      // the update and fired outside it: a state updater can be re-invoked by
+      // React, and an event sent from inside one would count twice.
+      if (passed && !progress[trackId]?.final?.passed) {
+        track('tool_unlocked', { track_id: trackId })
+      }
 
       mutate(trackId, current => {
         const prior = current.final
@@ -447,7 +406,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
 
       return passed
     },
-    [mutate],
+    [mutate, progress],
   )
 
   const isLessonComplete = useCallback(
@@ -580,6 +539,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
   )
 
   const completeReview = useCallback((item: ReviewItem, correct: boolean) => {
+    track('review_completed', { track_id: item.trackId, correct })
     setReviewQueue(prev => {
       const rest = prev.filter(
         r => !(r.trackId === item.trackId && r.questionId === item.questionId),

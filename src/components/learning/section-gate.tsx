@@ -32,7 +32,7 @@ export function SectionGate({
   if (pass && track.action) {
     return (
       <>
-        <div className="px-8 pt-6">
+        <div className="px-4 sm:px-8 pt-6">
           <div className="bg-secondary-fixed/25 rounded-3xl px-6 py-5 flex flex-col gap-3">
             <p className="text-title-md text-on-surface font-semibold">{track.action.title}</p>
 

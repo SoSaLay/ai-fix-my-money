@@ -4,21 +4,19 @@
 // Grading is the only route a visitor can trigger that costs money, so it is
 // the only one worth limiting.
 //
-// The limit is a count of that user's own grades in the last hour, read from
-// the table those grades are already written to. No second store, and — unlike
-// the in-memory version this replaces — it survives the Lambda recycling that
-// Amplify does constantly, and it counts a person rather than an IP, so testers
-// behind one office connection do not throttle each other.
+// Be clear about how much this is worth. The window is a `Map` in one Node
+// process, and Amplify runs the app on Lambda: there are several instances,
+// they are recycled constantly, and each starts with an empty map. The key is
+// the forwarded IP, which the client sets and can therefore change at will.
 //
-// The in-memory window is still here as the fallback for local development,
-// where there is no database configured. It is per-process and resets on
-// restart; that is fine for one developer and useless in production, which is
-// exactly the shape of a fallback.
+// So this stops a runaway loop and an unsophisticated hammering. It does not
+// stop anyone who is trying. With no accounts there is nobody to attribute a
+// request to, so a real limit is not available from inside the app — the thing
+// that actually bounds the bill is the monthly spend cap on the Anthropic key.
+// Set one.
 // ============================================================================
 
 import 'server-only'
-
-import { adminConfigured, createAdminClient } from '@/lib/supabase/admin'
 
 const WINDOW_MS = 60 * 60 * 1000
 
@@ -31,42 +29,6 @@ export interface RateLimitResult {
   /** Seconds until the window resets. For the Retry-After header. */
   retryAfter: number
 }
-
-// ─── The real limit ──────────────────────────────────────────────────────────
-
-export async function checkUserRateLimit(userId: string): Promise<RateLimitResult> {
-  if (!adminConfigured()) return checkRateLimit(`user:${userId}`)
-
-  const since = new Date(Date.now() - WINDOW_MS).toISOString()
-
-  try {
-    const supabase = createAdminClient()
-    const { count, error } = await supabase
-      .from('graded_answers')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', userId)
-      .gte('created_at', since)
-
-    if (error || count === null) {
-      // A limiter that cannot read its own counter must not become a wall in
-      // front of paying learners. Fall back to the per-process window, which
-      // still stops a runaway loop inside one instance.
-      return checkRateLimit(`user:${userId}`)
-    }
-
-    return {
-      allowed: count < MAX_PER_WINDOW,
-      remaining: Math.max(0, MAX_PER_WINDOW - count),
-      // The window slides, so the honest answer to "when may I retry" without a
-      // second query is "within the hour".
-      retryAfter: Math.ceil(WINDOW_MS / 1000),
-    }
-  } catch {
-    return checkRateLimit(`user:${userId}`)
-  }
-}
-
-// ─── The fallback ────────────────────────────────────────────────────────────
 
 interface Window {
   count: number
@@ -105,8 +67,7 @@ export function checkRateLimit(key: string): RateLimitResult {
 /**
  * Behind a proxy the socket address is the proxy, so the forwarded header is
  * the only signal available. It is client-controlled and therefore spoofable —
- * acceptable for cost control on an anonymous route, never for anything
- * security-bearing.
+ * acceptable for cost control, never for anything security-bearing.
  */
 export function clientKey(request: Request): string {
   const forwarded = request.headers.get('x-forwarded-for')

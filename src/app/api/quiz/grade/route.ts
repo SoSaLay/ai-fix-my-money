@@ -7,12 +7,9 @@
 import { NextResponse } from 'next/server'
 
 import { readAttempt } from '@/lib/learning/quiz/attempt'
-import { checkRateLimit, checkUserRateLimit, clientKey } from '@/lib/learning/quiz/rate-limit'
-import { recordGrade } from '@/lib/learning/quiz/record'
+import { checkRateLimit, clientKey } from '@/lib/learning/quiz/rate-limit'
 import { gradeAnswer } from '@/lib/learning/grading/grader'
 import { allVideos } from '@/lib/learning/video-pool/pool'
-import { authConfigured } from '@/lib/supabase/env'
-import { currentUser } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,17 +23,10 @@ interface Body {
 }
 
 export async function POST(request: Request) {
-  const user = authConfigured() ? await currentUser() : null
-  if (authConfigured() && !user) {
-    return NextResponse.json({ error: 'Sign in to continue.' }, { status: 401 })
-  }
-
   // Grading is the only paid path a visitor can trigger, so it is checked
-  // before anything else happens. Per person where there is one; per IP only in
-  // the local-development case, where there are no accounts.
-  const limit = user
-    ? await checkUserRateLimit(user.id)
-    : checkRateLimit(clientKey(request))
+  // before anything else happens. See rate-limit.ts for how little this is
+  // worth on its own — the spend cap on the API key is the real bound.
+  const limit = checkRateLimit(clientKey(request))
 
   if (!limit.allowed) {
     return NextResponse.json(
@@ -102,22 +92,6 @@ export async function POST(request: Request) {
       rubric: video.rubric,
       learnerAnswer: trimmed,
     })
-
-    // Written after the grade exists, so a failed model call never leaves a
-    // phantom row. This is also what the rate limiter counts.
-    if (user) {
-      await recordGrade({
-        attemptId: attempt.recordId ?? null,
-        userId: user.id,
-        trackId: attempt.trackId,
-        questionId,
-        answer: trimmed,
-        score: result.score,
-        verdict: result.verdict,
-        reasoning: result.reasoning,
-        missed: result.missed,
-      })
-    }
 
     return NextResponse.json(result)
   } catch (error) {

@@ -31,7 +31,7 @@ export default function LearningPage() {
 
   return (
     <div className="flex flex-col">
-        <div className="flex flex-col gap-8 px-8 py-10 max-w-4xl w-full mx-auto">
+        <div className="flex flex-col gap-8 px-4 sm:px-8 py-10 max-w-4xl w-full mx-auto">
           {/* Header. The review queue sits beside it rather than as its own band —
               it is a standing prompt, not news, and it should not push the tracks
               down the page every time something falls due. */}

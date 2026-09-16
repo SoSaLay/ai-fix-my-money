@@ -17,6 +17,7 @@ import { QuestionStack } from '@/components/learning/question-stack'
 import { VideoQuiz } from '@/components/learning/video-quiz'
 import { StepRail, type RailItem } from '@/components/learning/step-rail'
 import { Confetti } from '@/components/learning/celebration'
+import { track as capture } from '@/lib/analytics/posthog'
 
 export default function TrackPage({ params }: { params: Promise<{ track: string }> }) {
   const { track: trackParam } = use(params)
@@ -37,6 +38,16 @@ export default function TrackPage({ params }: { params: Promise<{ track: string 
     if (!ready || !track) return
     setView(stageFor(track.id))
   }, [ready, track, stageFor])
+
+  // Once per visit to a track, and only after storage has been read — firing
+  // before `ready` would count a track start for everyone mid-hydration.
+  const startedTrack = useRef<string | null>(null)
+  useEffect(() => {
+    if (!ready || !track) return
+    if (startedTrack.current === track.id) return
+    startedTrack.current = track.id
+    capture('track_started', { track_id: track.id })
+  }, [ready, track])
 
   // A new step starts at the top. Without this, pressing Next at the bottom of
   // one lesson drops the learner at the bottom of the next.
@@ -445,7 +456,7 @@ function Congratulations({
 
 function ComingSoon({ track }: { track: Track }) {
   return (
-    <div className="flex-1 flex items-center justify-center px-8 py-20">
+    <div className="flex-1 flex items-center justify-center px-4 sm:px-8 py-20">
       <div className="max-w-md flex flex-col gap-5 text-center items-center">
         <Sparkles size={22} className="text-on-surface-variant" />
         <h1 className="text-display-sm text-on-surface">
@@ -468,7 +479,7 @@ function ComingSoon({ track }: { track: Track }) {
 
 function Missing({ message }: { message: string }) {
   return (
-    <div className="flex-1 flex items-center justify-center px-8 py-20">
+    <div className="flex-1 flex items-center justify-center px-4 sm:px-8 py-20">
       <div className="max-w-sm flex flex-col gap-5 text-center items-center">
         <p className="text-title-lg text-on-surface-variant">{message}</p>
         <Link

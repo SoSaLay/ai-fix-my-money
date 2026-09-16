@@ -53,7 +53,7 @@ export default function DashboardPage() {
     return (
       <div className="flex flex-col min-h-full">
         <TopNav title="Dashboard" />
-        <div className="flex-1 px-8 pb-10 flex flex-col gap-6">
+        <div className="flex-1 px-4 sm:px-8 pb-10 flex flex-col gap-6">
           <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6 h-64 animate-pulse" />
           <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6 h-14 animate-pulse" />
           <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6 h-40 animate-pulse" />
@@ -116,7 +116,7 @@ export default function DashboardPage() {
     <div className="flex flex-col min-h-full">
       <TopNav title="Dashboard" />
 
-      <div className="flex-1 px-8 pb-10 flex flex-col gap-6">
+      <div className="flex-1 px-4 sm:px-8 pb-10 flex flex-col gap-6">
         {/* ── This Month ──────────────────────────────────────────────────── */}
         <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6">
           <div className="flex items-center gap-2 mb-5">

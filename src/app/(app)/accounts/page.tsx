@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useCallback, useId, useState } from 'react'
 import { CreditCard, AlertCircle, Upload, Trash2, Pencil, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import { TopNav } from '@/components/layout/top-nav'
@@ -32,6 +32,8 @@ function EditForm({
   const [name, setName] = useState(initial.name)
   const [balance, setBalance] = useState(initial.balance)
   const [error, setError] = useState('')
+  // Several of these forms can be open at once, so the ids have to be per-form.
+  const fieldId = useId()
 
   const handleSave = () => {
     const amt = parseFloat(balance.replace(/[$,]/g, ''))
@@ -43,8 +45,9 @@ function EditForm({
     <div className="flex flex-col gap-3 pt-3 border-t border-outline-variant/20 mt-3">
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-1">
-          <label className="text-label-sm text-on-surface-variant uppercase tracking-wider">Name</label>
+          <label htmlFor={`${fieldId}-name`} className="text-label-sm text-on-surface-variant uppercase tracking-wider">Name</label>
           <input
+            id={`${fieldId}-name`}
             type="text"
             value={name}
             onChange={e => setName(e.target.value)}
@@ -53,7 +56,7 @@ function EditForm({
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-label-sm text-on-surface-variant uppercase tracking-wider">{balanceLabel}</label>
+          <label htmlFor={`${fieldId}-balance`} className="text-label-sm text-on-surface-variant uppercase tracking-wider">{balanceLabel}</label>
           {balanceReadOnly ? (
             <p className="text-body-sm text-on-surface-variant px-3 py-2">
               Auto-calculated from uploaded transactions — re-upload to update.
@@ -62,6 +65,7 @@ function EditForm({
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">$</span>
               <input
+                id={`${fieldId}-balance`}
                 type="text"
                 inputMode="decimal"
                 value={balance}
@@ -114,7 +118,7 @@ function AccountCard({
 }) {
   return (
     <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6">
-      <div className="flex items-center gap-5">
+      <div className="flex flex-wrap items-center gap-3 sm:flex-nowrap sm:gap-5">
         <div className="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant flex-shrink-0">
           <CreditCard size={22} />
         </div>
@@ -153,14 +157,14 @@ function AccountCard({
         <div className="flex gap-1 flex-shrink-0">
           <button
             onClick={onEdit}
-            className="p-2 rounded-xl text-on-surface-variant hover:text-secondary hover:bg-secondary/8 transition-colors"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-on-surface-variant hover:text-secondary hover:bg-secondary/8 transition-colors"
             title="Edit account"
           >
             <Pencil size={15} />
           </button>
           <button
             onClick={onRemove}
-            className="p-2 rounded-xl text-on-surface-variant hover:text-error hover:bg-error/8 transition-colors"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-on-surface-variant hover:text-error hover:bg-error/8 transition-colors"
             title="Remove account"
           >
             <Trash2 size={15} />
@@ -202,7 +206,7 @@ function DebtCard({
 }) {
   return (
     <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6">
-      <div className="flex items-center gap-5">
+      <div className="flex flex-wrap items-center gap-3 sm:flex-nowrap sm:gap-5">
         <div className="w-12 h-12 rounded-full bg-sunset/12 flex items-center justify-center text-sunset flex-shrink-0">
           <AlertCircle size={22} />
         </div>
@@ -220,7 +224,7 @@ function DebtCard({
           </p>
         </div>
 
-        <div className="text-right flex-shrink-0 min-w-[200px]">
+        <div className="text-right flex-shrink-0 sm:min-w-[200px]">
           <p className="text-label-sm text-on-surface-variant">Amount Owed</p>
           <p className="text-headline-sm font-bold text-sunset mt-0.5">
             ${Math.abs(Number(debt.current_balance)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -237,14 +241,14 @@ function DebtCard({
         <div className="flex gap-1 flex-shrink-0">
           <button
             onClick={onEdit}
-            className="p-2 rounded-xl text-on-surface-variant hover:text-secondary hover:bg-secondary/8 transition-colors"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-on-surface-variant hover:text-secondary hover:bg-secondary/8 transition-colors"
             title="Edit account"
           >
             <Pencil size={15} />
           </button>
           <button
             onClick={onRemove}
-            className="p-2 rounded-xl text-on-surface-variant hover:text-error hover:bg-error/8 transition-colors"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-on-surface-variant hover:text-error hover:bg-error/8 transition-colors"
             title="Remove account"
           >
             <Trash2 size={15} />
@@ -307,7 +311,7 @@ function AccountsPageTool() {
     return (
       <div className="flex flex-col min-h-full">
         <TopNav title="Accounts" />
-        <div className="flex-1 px-8 pb-10 flex flex-col gap-6">
+        <div className="flex-1 px-4 sm:px-8 pb-10 flex flex-col gap-6">
           <div className="h-12 bg-surface-container-lowest rounded-lg animate-pulse" />
           <div className="h-32 bg-surface-container-lowest rounded-2xl animate-pulse" />
           <div className="h-32 bg-surface-container-lowest rounded-2xl animate-pulse" />
@@ -320,7 +324,7 @@ function AccountsPageTool() {
     return (
       <div className="flex flex-col min-h-full">
         <TopNav title="Accounts" />
-        <div className="flex-1 px-8 pb-10 flex items-center justify-center">
+        <div className="flex-1 px-4 sm:px-8 pb-10 flex items-center justify-center">
           <div className="text-center">
             <p className="text-headline-sm text-on-surface mb-4">Failed to load accounts</p>
             <p className="text-body-md text-on-surface-variant mb-6">
@@ -348,7 +352,7 @@ function AccountsPageTool() {
     <div className="flex flex-col min-h-full">
       <TopNav title="Accounts" />
 
-      <div className="flex-1 px-8 pb-10 flex flex-col gap-6">
+      <div className="flex-1 px-4 sm:px-8 pb-10 flex flex-col gap-6">
         {/* Header row */}
         <div className="flex items-center justify-between">
           <p className="text-body-md text-on-surface-variant">

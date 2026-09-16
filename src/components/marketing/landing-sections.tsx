@@ -63,7 +63,7 @@ const STEPS = [
   { title: 'Prove it', body: 'Explain real finance videos in your own words.', image: '/landing/steps/prove-it.svg' },
 ]
 
-/** `minutesPerTrack` is estimated from the curriculum itself, not typed in. */
+/** `minutesPerTrack` is a stated figure, set where it is passed in. */
 export function HowItWorks({ minutesPerTrack }: { minutesPerTrack: number }) {
   return (
     <section id="how-it-works" className="px-6 pb-24 sm:pb-32 max-w-6xl mx-auto w-full scroll-mt-8">
@@ -99,26 +99,70 @@ export function HowItWorks({ minutesPerTrack }: { minutesPerTrack: number }) {
 // ─── The why ─────────────────────────────────────────────────────────────────
 
 const WHY = [
-  { lead: 'Feel at home with your money.', rest: 'Know how to manage it, and how to grow it over the long run.' },
-  { lead: 'Most money advice now comes from a feed.', rest: 'That isn’t changing, so we don’t pretend it will.' },
-  { lead: 'So we test you on it.', rest: 'Real short-form finance videos, explained in your own words.' },
-  { lead: 'The next one that comes up, you’ll know.', rest: 'Worth your time, or worth a swipe.' },
+  { lead: 'Feel at home with your money.', rest: 'Manage it, grow it.' },
+  { lead: 'Most people learn money online.', rest: 'That won’t change.' },
+  { lead: 'So that’s what we test you on.', rest: 'Real videos, your own words.' },
+  { lead: 'Then you actually understand money.', rest: 'Long after you’ve finished.' },
 ]
 
 export function Why() {
   return (
-    <section id="why" className="px-6 pb-24 sm:pb-32 max-w-6xl mx-auto w-full scroll-mt-8">
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-8 lg:gap-16">
-        <h2 className="text-display-md text-on-surface">The why.</h2>
-        <ul className="flex flex-col">
-          {WHY.map(item => (
-            <li key={item.lead} className="border-t border-on-surface/10 last:border-b py-6">
-              <p className="text-headline-lg sm:text-display-sm text-on-surface-variant">
-                <span className="text-on-surface">{item.lead}</span> {item.rest}
-              </p>
-            </li>
-          ))}
-        </ul>
+    /*
+      The one dark section on the page. Everything above and below it sits on
+      the light surface, so this is what separates the pitch from the detail —
+      and it is why the section carries its own generous padding rather than
+      borrowing the rhythm of the sections around it.
+
+      Full-bleed: the band spans the viewport while its contents keep the same
+      max-w-6xl measure as every other section, so the type stays aligned with
+      the page even though the background does not.
+    */
+    <section
+      id="why"
+      className="why-band relative isolate overflow-hidden w-full my-12 sm:my-20 py-24 sm:py-32 scroll-mt-8"
+    >
+      {/* Decorative only — never announced, never interactive. */}
+      <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden>
+        <div className="why-glow why-glow-indigo left-[-10%] top-[-30%] h-[70%] w-[55%]" />
+        <div className="why-glow why-glow-amber right-[-15%] bottom-[-35%] h-[65%] w-[50%]" />
+        {/* A fine grid, barely there — it gives the light something to fall on
+            so the band reads as a surface rather than a gradient. */}
+        <div
+          className="absolute inset-0 opacity-[0.18]"
+          style={{
+            backgroundImage:
+              'linear-gradient(rgba(255,255,255,0.07) 1px, transparent 1px),' +
+              'linear-gradient(90deg, rgba(255,255,255,0.07) 1px, transparent 1px)',
+            backgroundSize: '64px 64px',
+            maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 78%)',
+            WebkitMaskImage: 'radial-gradient(ellipse at center, black 40%, transparent 78%)',
+          }}
+        />
+      </div>
+
+      <div className="px-6 max-w-6xl mx-auto w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-10 lg:gap-16">
+          {/* Heading and picture travel together; on a phone they stack above the list. */}
+          <div className="flex flex-col gap-8">
+            <h2 className="text-display-md text-white">The why.</h2>
+            {/* eslint-disable-next-line @next/next/no-img-element -- static SVG, nothing to optimise */}
+            <img
+              src="/landing/why.svg"
+              alt=""
+              className="w-full max-w-[340px] aspect-square object-contain"
+            />
+          </div>
+
+          <ul className="flex flex-col">
+            {WHY.map(item => (
+              <li key={item.lead} className="border-t border-white/15 last:border-b py-6">
+                <p className="text-headline-lg sm:text-display-sm text-white/65">
+                  <span className="text-white">{item.lead}</span> {item.rest}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   )

@@ -1,10 +1,9 @@
 'use client'
 
-import { Suspense, useEffect, useRef } from 'react'
+import { Suspense, useEffect } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 
-import { useAuth } from '@/contexts/auth-context'
-import { capturePageview, identify, initAnalytics, resetAnalytics } from '@/lib/analytics/posthog'
+import { capturePageview, initAnalytics } from '@/lib/analytics/posthog'
 
 /**
  * App Router does not fire a page load between routes, so pageviews are sent
@@ -23,30 +22,18 @@ function PageviewTracker() {
   return null
 }
 
+/**
+ * There are no accounts, so nobody is ever identified: every visitor is one of
+ * PostHog's own anonymous ids, which lives in this browser and nowhere else.
+ * That is enough for the questions this product actually asks — where learners
+ * stall, which questions everybody fails, whether the final test motivates or
+ * blocks — and it is not enough to follow a person between their phone and
+ * their laptop. Those are two visitors here.
+ */
 export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
-  const { userId, ready } = useAuth()
-  const identified = useRef<string | null>(null)
-
   useEffect(() => {
     initAnalytics()
   }, [])
-
-  useEffect(() => {
-    if (!ready) return
-
-    if (userId && identified.current !== userId) {
-      identify(userId)
-      identified.current = userId
-      return
-    }
-
-    // Signed out after having been signed in: clear the id so the next person
-    // on this browser is a different person.
-    if (!userId && identified.current) {
-      resetAnalytics()
-      identified.current = null
-    }
-  }, [ready, userId])
 
   return (
     <>

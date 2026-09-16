@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useId, useRef } from 'react'
 import {
   Pencil, Trash2, Check, X, Plus,
   ChevronDown, ChevronRight, Target,
@@ -72,6 +72,8 @@ function GoalRow({
     target_amount: String(goal.target_amount),
     allocation_pct: String(goal.allocation_pct),
   })
+  // Unique per row, so each edit form's labels point at their own fields.
+  const fieldId = useId()
 
   const pct =
     goal.target_amount > 0
@@ -116,8 +118,9 @@ function GoalRow({
     return (
       <div className="flex flex-col gap-5 bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] shadow-card p-5 sm:p-6">
         <div className="flex flex-col gap-1.5">
-          <label className="text-label-md text-on-surface-variant">Goal name</label>
+          <label htmlFor={`${fieldId}-name`} className="text-label-md text-on-surface-variant">Goal name</label>
           <input
+            id={`${fieldId}-name`}
             className="w-full rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-4 py-3 text-body-lg text-on-surface outline-none transition-colors focus:border-on-surface/40"
             value={form.name}
             onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
@@ -127,10 +130,11 @@ function GoalRow({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-label-md text-on-surface-variant">Target amount</label>
+            <label htmlFor={`${fieldId}-target`} className="text-label-md text-on-surface-variant">Target amount</label>
             <div className="flex items-center gap-1 rounded-2xl border border-on-surface/15 px-4 py-3 focus-within:border-on-surface/40 transition-colors">
               <span className="text-body-lg text-on-surface-variant">$</span>
               <input
+                id={`${fieldId}-target`}
                 type="number"
                 min="1"
                 className="w-full bg-transparent text-body-lg text-on-surface tabular-nums outline-none"
@@ -141,9 +145,10 @@ function GoalRow({
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-label-md text-on-surface-variant">Share of monthly income</label>
+            <label htmlFor={`${fieldId}-share`} className="text-label-md text-on-surface-variant">Share of monthly income</label>
             <div className="flex items-center gap-1 rounded-2xl border border-on-surface/15 px-4 py-3 focus-within:border-on-surface/40 transition-colors">
               <input
+                id={`${fieldId}-share`}
                 type="number"
                 min="0"
                 max="100"
@@ -260,6 +265,7 @@ function NewGoalForm({
 }) {
   const [form, setForm] = useState({ name: '', target_amount: '', allocation_pct: '0' })
   const [saving, setSaving] = useState(false)
+  const fieldId = useId()
 
   const monthlyContrib = Math.round((parseFloat(form.allocation_pct || '0') / 100) * monthlyIncome)
 
@@ -282,8 +288,9 @@ function NewGoalForm({
       <p className="text-title-md text-on-surface">{label}</p>
 
       <div className="flex flex-col gap-1.5">
-        <label className="text-label-md text-on-surface-variant">Goal name</label>
+        <label htmlFor={`${fieldId}-name`} className="text-label-md text-on-surface-variant">Goal name</label>
         <input
+          id={`${fieldId}-name`}
           className="w-full rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-4 py-3 text-body-lg text-on-surface outline-none transition-colors focus:border-on-surface/40"
           value={form.name}
           onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
@@ -294,10 +301,11 @@ function NewGoalForm({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
-          <label className="text-label-md text-on-surface-variant">Target amount</label>
+          <label htmlFor={`${fieldId}-target`} className="text-label-md text-on-surface-variant">Target amount</label>
           <div className="flex items-center gap-1 rounded-2xl border border-on-surface/15 px-4 py-3 focus-within:border-on-surface/40 transition-colors">
             <span className="text-body-lg text-on-surface-variant">$</span>
             <input
+              id={`${fieldId}-target`}
               type="number"
               min="1"
               className="w-full bg-transparent text-body-lg text-on-surface tabular-nums outline-none"
@@ -308,9 +316,10 @@ function NewGoalForm({
           </div>
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-label-md text-on-surface-variant">Share of monthly income</label>
+          <label htmlFor={`${fieldId}-share`} className="text-label-md text-on-surface-variant">Share of monthly income</label>
           <div className="flex items-center gap-1 rounded-2xl border border-on-surface/15 px-4 py-3 focus-within:border-on-surface/40 transition-colors">
             <input
+              id={`${fieldId}-share`}
               type="number"
               min="0"
               max="100"
@@ -474,7 +483,7 @@ function FolderSection({
         )}
         <button
           onClick={() => setConfirmingDelete(true)}
-          className="p-2 rounded-full text-on-surface-variant hover:text-error hover:bg-error/[0.08] transition-colors shrink-0"
+          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-on-surface-variant hover:text-error hover:bg-error/[0.08] transition-colors"
           title="Remove project"
         >
           <Trash2 size={15} />

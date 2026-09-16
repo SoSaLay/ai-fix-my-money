@@ -11,6 +11,10 @@
 //    is not a trade worth making for funnel data.
 // 3. Autocapture is off. It records the text of what was clicked, which on
 //    these screens is account names and amounts.
+//
+// Nobody is identified — there are no accounts — so every visitor is one of
+// PostHog's anonymous browser ids. See `events.ts` for the rule that keeps
+// money out of the properties.
 // ============================================================================
 
 'use client'
@@ -45,17 +49,6 @@ export function initAnalytics(): void {
 export function track<E extends AnalyticsEvent>(name: E['name'], props: E['props']): void {
   if (!started) return
   posthog.capture(name, props)
-}
-
-export function identify(userId: string): void {
-  if (!started) return
-  posthog.identify(userId)
-}
-
-/** On sign-out, so the next person on this browser is not the last one. */
-export function resetAnalytics(): void {
-  if (!started) return
-  posthog.reset()
 }
 
 export function capturePageview(url: string): void {

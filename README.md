@@ -1,168 +1,110 @@
-<!-- HEADER -->
-<div align="center">
+# AI Fix My Money
 
-```
- █████╗ ██╗    ███████╗██╗██╗  ██╗    ███╗   ███╗██╗   ██╗
-██╔══██╗██║    ██╔════╝██║╚██╗██╔╝    ████╗ ████║╚██╗ ██╔╝
-███████║██║    █████╗  ██║ ╚███╔╝     ██╔████╔██║ ╚████╔╝ 
-██╔══██║██║    ██╔══╝  ██║ ██╔██╗     ██║╚██╔╝██║  ╚██╔╝  
-██║  ██║██║    ██║     ██║██╔╝ ██╗    ██║ ╚═╝ ██║   ██║   
-╚═╝  ╚═╝╚═╝    ╚═╝     ╚═╝╚═╝  ╚═╝    ╚═╝     ╚═╝   ╚═╝   
-          M O N E Y
-```
+Most people learn about money from a feed. This teaches you to judge what you
+find there.
 
-**A local-first, AI-powered personal finance dashboard.**  
-Your data stays on your machine. No subscriptions. No cloud lock-in.
+Four tracks — accounts, income vs. spending, savings, investing. Each is short
+lessons, practice questions that explain themselves, a step where you use the
+real tool with your own numbers, and a final test. The test is the point: you
+watch actual short-form finance videos and explain them in your own words, and
+a human-written reference answer is what your answer is marked against. Pass at
+80% and that track's tool unlocks.
 
-[![Next.js](https://img.shields.io/badge/Next.js_15-black?style=flat-square&logo=next.js)](https://nextjs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
-[![Local-first](https://img.shields.io/badge/data-stays_local-1a6b3a?style=flat-square)](#-what-is-this)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
+It teaches. It does not advise, and it never tells anyone what to do with their
+money.
 
-[**→ Setup Guide**](docs/SETUP.md) · [**→ AI Skills**](#-ai-finance-skills)
-
-</div>
-
----
-
-## ✨ What is this?
-
-**AI Fix My Money** is a self-hosted personal finance dashboard built on Next.js 15. It gives you:
-
-- 📊 **Spending, savings, and investing dashboards** with real-time charts
-- 🤖 **AI Finance Advisor** with 13 runnable skills across spending, savings, and investing
-- 🏦 **Bank statement import** — paste from Perplexity Finance, upload CSV/OFX, or edit JSON directly
-- 🔒 **Privacy-first** — all data lives in your browser (localStorage) or local filesystem, never on a shared server
-- 📡 **MCP endpoint** — lets AI agents (Claude, Perplexity Computer) push data to your dashboard automatically
-
----
-
-## 🚀 Quickstart — 4 steps
-
-> **Prerequisites:** Node.js 20+ and Git. That's it.
+## Running it
 
 ```bash
-# 1. Clone the repo
-git clone https://github.com/SoSaLay/ai-fix-my-money.git
-cd ai-fix-my-money
-
-# 2. Install dependencies
 npm install
-
-# 3. (Optional) create an env file — only for opt-in integrations
-cp .env.example .env.local   # safe to skip; the app needs no env vars
-
-# 4. Start the app
 npm run dev
 ```
 
-Open **http://localhost:3000** — you're live.
+That works with no configuration. Lessons, practice questions and the tools all
+run; only the final test needs a key, because marking a written answer costs
+money. Copy `.env.example` to `.env.local` and fill in two values to get it:
 
-> Want Docker instead? See [SETUP.md → Docker Quickstart](docs/SETUP.md#quick-start--docker).
+| Variable | What it does |
+|---|---|
+| `ANTHROPIC_API_KEY` | Marks written answers. Without it the test loads but cannot grade. |
+| `QUIZ_ATTEMPT_SECRET` | Signs attempt tokens. Any 32+ character random string. |
 
----
-
-## 🔑 Environment Variables
-
-**The app runs with zero environment variables.** There are no accounts, no database, and no
-cloud services — your data lives entirely in your browser. Copying `.env.example` to `.env.local`
-is optional and only matters for the two opt-in integrations below.
-
-### `.env.example` (main app)
-
-```env
-# Informational only — the URL the app runs on.
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-
-# Optional — only needed if you let an AI agent push data into the app via /api/mcp.
-# This is the bearer token the agent must send. Generate your own:
-#   openssl rand -hex 32
-MCP_SECRET=replace_with_your_own_secret_openssl_rand_hex_32
+```bash
+openssl rand -base64 32
 ```
 
-### `mcp-server/.env.example` (Financial Datasets MCP server — optional)
+## How it is put together
 
-```env
-# Get your key from https://financialdatasets.ai/
-FINANCIAL_DATASETS_API_KEY=your-financial-datasets-api-key
-```
+Next.js 15 App Router, React 18, Tailwind. Deployed on AWS Amplify, where the
+route handlers run on Lambda.
 
-> **Simplest setup:** skip the env file entirely and just run `npm run dev`. Everything works.
+**There is no database and no sign-in.** Everything a learner does — their
+figures, their progress, their review queue — lives in that browser's local
+storage. That keeps the whole thing free to run and means no one hands over
+their finances to be stored. It also means the honest version of the trade:
+clear your browser data and your progress is gone, and a phone and a laptop are
+two different learners.
 
----
+**The question pool is files in this repo.** `src/lib/learning/video-pool/*.json`
+holds every approved video with the question, reference answer and rubric a
+reviewer wrote for it. They are imported statically, so they ship inside the
+build and the deployed app never reads them off disk. The review screen that
+edits them runs in development only — approving a video produces a diff, and
+merging it is the approval.
 
-## 🤖 Deploy with an AI Agent (Claude Code / Cursor / Copilot)
+**The answer key never reaches a browser.** `pool.ts` is marked `server-only`,
+so a client component importing it fails the build rather than shipping the
+reference answers. `toPublicQuestion` is the only supported way to send a pool
+item to the page.
 
-If you use an AI coding agent, you can have it set up and deploy the entire project for you.
-
-**Just paste this into your agent:**
-
-```
-Clone https://github.com/SoSaLay/ai-fix-my-money.git, read docs/SETUP.md
-completely, then set up and run the app following the Node.js quickstart. Use only the minimum
-env vars (NEXT_PUBLIC_APP_URL=http://localhost:3000). Open the app at http://localhost:3000 and
-confirm it loads.
-```
-
-The `SETUP.md` file is written specifically for AI agents — it contains full architecture context, all setup steps in order, a Dockerfile template, and troubleshooting. Your agent will read it and handle everything end-to-end.
-
----
-
-## 📁 Project Structure
+### Where things live
 
 ```
-ai-fix-my-money/              ← repo root
-├── src/                      ← All app source
-│   ├── app/                  ← Routes: landing, dashboard, advisor, api/mcp…
-│   ├── components/           ← UI components
-│   ├── lib/ai-skills.ts      ← All 13 AI advisor skills
-│   └── contexts · hooks · types
-├── data/financial-data.json  ← Your financial data goes here
-├── public/                   ← Static assets
-├── docs/                     ← SETUP.md, design.md, sample reports
-├── mcp-server/               ← Financial Datasets MCP server (optional)
-└── .env.example              ← Copy → .env.local (optional)
+src/
+  app/
+    (marketing)/       landing page
+    (app)/             the learner's app — tracks, tools, review
+    admin/review/      the video review screen (development only)
+    api/quiz/          serve a paper, grade one written answer
+  components/          by feature — learning, savings, spending, investing, ui
+  contexts/            learning progress, financial data
+  lib/
+    learning/          curriculum, quiz sampling, grading, the video pool
+    storage/           local storage, which is the whole storage layer
+    analytics/         PostHog, anonymous
+    finance/           the money model
+    investing/         allocation maths
+  types/
+scripts/               video ingestion and the weekly embed health check
+docs/                  design notes, roadmap, lesson question drafts
 ```
 
----
+## Things worth knowing before you change it
 
-## 🧠 AI Finance Skills
+**Papers currently draw the whole pool.** Each track's final test samples
+exactly as many videos as it has approved, so a retake is the same set
+reshuffled, and one embed dying takes that track's test offline. Both fix
+themselves once the pools grow past their paper size — see
+`TARGET_POOL_SIZE` in `video-pool/constants.ts`.
 
-The **AI Advisor** has 13 runnable skills across three tabs:
+**The grading route is open.** With no accounts there is nobody to attribute a
+request to, so `/api/quiz/grade` is rate limited per IP in one Lambda's memory,
+which is worth very little. Set a monthly spend cap on the Anthropic key.
 
-| Tab | Skill | What it does |
-|---|---|---|
-| 💰 Savings | Savings Rate Analysis | Benchmarks your rate against 20% and shows the gap |
-| 💰 Savings | Emergency Fund Check | How many months of expenses you have covered |
-| 💰 Savings | Cash Flow Deep Dive | Breaks income into fixed / variable / subs / saved |
-| 💰 Savings | Goal Pacing Report | Projects your annual savings and 5-year trajectory |
-| 🛒 Spending | Spending Breakdown | Ranks every category and spots the biggest leaks |
-| 🛒 Spending | Subscription Audit | Flags unused or redundant subscriptions to cut |
-| 🛒 Spending | Fixed Cost Ratio | How much income is locked in non-negotiable expenses |
-| 🛒 Spending | Cost Reduction Tips | Personalized cuts based on your actual spend pattern |
-| 📈 Investing | Market News Brief | Aggregates latest headlines from 10+ financial sources |
-| 📈 Investing | Market Sentiment | FinBERT sentiment score across financial news |
-| 📈 Investing | Market Forecast | Kronos time-series 30-day projection with volatility overlay |
-| 📈 Investing | Investment Signal Tracker | Tracks whether your thesis signals are strengthening or weakening |
-| 📈 Investing | Full Investment Report | Portfolio grade, net worth trajectory, and next steps |
+**The weekly health check** (`.github/workflows/check-videos.yml`) asks TikTok
+whether each approved video still exists and commits the retirements. That is
+why it runs in CI and not on Lambda — production cannot write the pool.
 
-> **Note:** Savings and Spending skills compute real results from your own data. The Investing
-> skills currently return **illustrative sample output** — they're placeholders for a planned
-> integration with the open-source [alphaear suite](https://github.com/RKiding/Awesome-finance-skills)
-> and are labelled as such in the UI. Treat them as a demo, not live market data.
+## Commands
 
----
+```bash
+npm run dev          # development server
+npm run type-check   # tsc --noEmit
+npm run build        # production build
+npm run ingest       # pull candidate videos (needs TIKHUB_API_KEY)
+npm run check-videos # retire embeds that have gone
+```
 
-## 📖 Full Documentation
+## Licence
 
-For detailed setup instructions, Docker, Tailscale access from your phone, and troubleshooting — see the full guide:
-
-**[docs/SETUP.md](docs/SETUP.md)**
-
----
-
-<div align="center">
-
-Built by [SoSaLay](https://github.com/SoSaLay) · MIT License
-
-</div>
+MIT. See [LICENSE](LICENSE).

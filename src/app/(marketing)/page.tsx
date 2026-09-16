@@ -5,7 +5,7 @@ import { TrackTabs, type TrackSummary } from '@/components/marketing/track-tabs'
 import {
   CTA_CLASS, CTA_SMALL_CLASS, Faq, FinalCta, Footer, HowItWorks, StatsStrip, Why, type LandingStats,
 } from '@/components/marketing/landing-sections'
-import { PASS_THRESHOLD, TRACKS, trackMinutes } from '@/lib/learning/tracks'
+import { PASS_THRESHOLD, TRACKS } from '@/lib/learning/tracks'
 import { liveVideos } from '@/lib/learning/video-pool/pool'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -73,15 +73,28 @@ const STATS: LandingStats = {
 }
 
 /**
- * One track, start to finish, averaged across tracks: the lessons' own reading
- * time, about half a minute per practice question, and the final test at about
- * three minutes per video (watch, then write) and half a minute per multiple
- * choice. Rounded up to the nearest five so it reads as the estimate it is.
+ * One track, start to finish. This one is a stated figure rather than a counted
+ * one, which makes it the exception on this page — everything above is derived
+ * so it cannot drift, and this is not.
+ *
+ * `trackMinutes` computes 41 on average today, because it costs a video question
+ * at three minutes: watch a clip, think, then speak or type a few sentences.
+ * That is the right allowance for someone meeting the video cold. Running the
+ * whole curriculum end to end took closer to thirty a track, so thirty is what
+ * the page claims — the brisker of the two honest readings, not a number the
+ * model produces.
+ *
+ * Worth knowing what it papers over. Tracks actually range from about 35 to 50
+ * minutes, Investing being the long one, so a single figure flatters the short
+ * tracks and undersells the long. And `trackMinutes` undercounts reading: it
+ * bills each lesson at `readSeconds`, which is a fixed 20-second gate before the
+ * questions unlock, not a reading estimate — the lessons run to 2,799 words,
+ * nearer 13 minutes than 6 across the four tracks.
+ *
+ * Revisit this if the curriculum grows or the papers change size. It will not
+ * correct itself.
  */
-const MINUTES_PER_TRACK = (() => {
-  const total = LIVE_TRACKS.reduce((sum, t) => sum + trackMinutes(t), 0)
-  return Math.ceil(total / Math.max(1, LIVE_TRACKS.length) / 5) * 5
-})()
+const MINUTES_PER_TRACK = 30
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PAGE
