@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" font-family="Inter, system-ui, sans-serif">
-  <rect width="640" height="480" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 390" font-family="Inter, system-ui, sans-serif">
+  <rect width="640" height="390" fill="#ffffff"/>
   <text x="40" y="52" fill="#2d2f33" font-size="21" font-weight="700">Three ways, one axis</text>
   <text x="40" y="78" fill="#5a5b60" font-size="14">How much of the thing you own is what changes the ceiling — and the risk.</text>
 
@@ -42,8 +42,4 @@
   <text x="444" y="288" fill="#2d2f33" font-size="12" font-weight="600">+ No fixed ceiling</text>
   <text x="444" y="308" fill="#5a5b60" font-size="12">− Highest failure rate</text>
   <text x="444" y="328" fill="#5a5b60" font-size="12">− Costs money up front</text>
-
-  <line x1="40" y1="388" x2="600" y2="388" stroke="#acadb1" stroke-width="1" stroke-opacity="0.5"/>
-  <text x="40" y="416" fill="#2d2f33" font-size="13.5" font-weight="600">Most people move left to right.</text>
-  <text x="40" y="438" fill="#5a5b60" font-size="13">A career is usually what funds the other two — which is why it comes first.</text>
 </svg>

@@ -6,7 +6,7 @@ import {
   Home, Zap, Smartphone, Wifi, Shield, Car, Landmark, Tv, Baby, Dumbbell,
   ShoppingCart, UtensilsCrossed, Fuel, Bus, ShoppingBag, Clapperboard,
   HeartPulse, Plane, PawPrint, Scissors,
-  Briefcase, Laptop, Clock, Coins, Store, HeartHandshake, PiggyBank, TrendingUp, Banknote,
+  Briefcase, Laptop, Clock, Coins, Store, HeartHandshake, PiggyBank, Banknote,
   type LucideIcon,
 } from 'lucide-react'
 import { useFinancialData } from '@/contexts/financial-data-context'
@@ -47,7 +47,6 @@ const TEMPLATES: Partial<Record<Section, { name: string; Icon: LucideIcon }[]>> 
     { name: 'Benefits',        Icon: Landmark       },
     { name: 'Pension',         Icon: PiggyBank      },
     { name: 'Rental income',   Icon: Home           },
-    { name: 'Investments',     Icon: TrendingUp     },
     { name: 'Support',         Icon: HeartHandshake },
   ],
   fixed: [
@@ -240,7 +239,7 @@ export function ProfileEntry({ section }: { section: Section }) {
                 onChange={e => setName(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') setEditingName(false) }}
                 placeholder={copy.namePlaceholder}
-                className="bg-surface-container rounded-xl px-3.5 py-2.5 text-body-md text-on-surface outline-none focus:ring-2 focus:ring-secondary/40 min-w-0"
+                className="rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-4 py-2.5 text-body-md text-on-surface outline-none transition-colors focus:border-on-surface/40 min-w-0"
                 aria-label={copy.nameLabel}
               />
             )}
@@ -251,7 +250,7 @@ export function ProfileEntry({ section }: { section: Section }) {
               onKeyDown={e => { if (e.key === 'Enter') add() }}
               inputMode="decimal"
               placeholder="0.00"
-              className="bg-surface-container rounded-xl px-3.5 py-2.5 text-body-md text-on-surface outline-none focus:ring-2 focus:ring-secondary/40 w-full min-w-0"
+              className="rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-4 py-2.5 text-body-md text-on-surface tabular-nums outline-none transition-colors focus:border-on-surface/40 w-full min-w-0"
               aria-label="Monthly amount"
             />
           </div>
@@ -260,7 +259,7 @@ export function ProfileEntry({ section }: { section: Section }) {
             <button
               onClick={add}
               disabled={!name.trim() || isNaN(parseFloat(amount))}
-              className="bg-secondary text-white rounded-xl px-5 py-2.5 text-label-lg font-medium disabled:opacity-35 transition-opacity"
+              className="btn-action items-center justify-center disabled:opacity-35"
             >
               Add
             </button>

@@ -106,7 +106,7 @@
       "shares": 272,
       "plays": 76213
     },
-    "question": "This creator is right that bonds are worth holding. But when would bonds actually cost you — and in what situations would that money have been better put to work elsewhere?",
+    "question": "But when would bonds actually cost you — and in what situations would that money have been better put to work elsewhere?",
     "claimUnderTest": "Bonds are a valuable holding because they pay reliable interest and tend not to move with the stock market.",
     "referenceAnswer": "The creator's case is sound as far as it goes. Bonds pay on a known schedule and return principal at maturity, so they're the right home for money attached to a date. The inverse relationship with stocks does the real work: when equities fall, bonds typically hold up better, so a portfolio holding both takes less damage in a downturn and there's something to draw on without selling stocks at a loss. For anyone who'll need the money soon, that floor is worth more than any ceiling.\n\nThe cost shows up over long horizons. The return is capped by the structure — you're a lender, so the best outcome is being repaid with interest. You get none of the upside if the borrower thrives, which is exactly what stock ownership gives you. Over decades that difference compounds into a large gap, so a young investor holding a lot of bonds is paying for stability they don't yet need, in growth they can't get back. The years given up are the expensive part, not the percentage.\n\nThe clearest version of this is a strong market. When the economy is expanding and stocks are climbing, bonds keep paying their fixed coupon while equities capture the growth — and the money in bonds simply doesn't participate. A run of good years is where a bond-heavy portfolio falls furthest behind, and the gap compounds, since the forgone growth would itself have been growing. There's a second hit in the same conditions: a strong economy usually brings rising rates, and rising rates push down the price of bonds already held, because new bonds paying more make existing ones less attractive to a buyer. Inflation does similar damage from another direction — when it runs above the yield, a fixed payment loses purchasing power, a real loss disguised as a flat line.\n\nSo the shape is: bonds buy certainty, and certainty is worth paying for when you need the money soon and worth very little when you don't. The mistake isn't holding bonds — it's holding them at a point in life where growth matters more than protection.",
     "rubric": [
@@ -176,7 +176,7 @@
       "It only works if you keep contributing consistently, with money you don't need and a long enough horizon to recover"
     ],
     "reviewedAt": "2026-09-13T05:21:15.743Z",
-    "status": "approved",
+    "status": "retired",
     "lastCheckedAt": "2026-09-14T15:51:41.268Z"
   },
   {
@@ -286,14 +286,14 @@
       "shares": 3601,
       "plays": 510020
     },
-    "question": "This creator walks through risk-reward ratios and chart setups. Why does day trading demand so much more of you than other forms of investing? What does it come down to?",
+    "question": "Why does day trading demand so much more of you than other forms of investing? What does it come down to?",
     "claimUnderTest": "Day trading requires working knowledge of specific technical tools and strategies to earn a return.",
-    "referenceAnswer": "It comes down to how much you have to bring yourself. Buying a broad index fund requires almost no expertise — the diversification is built in and time does the work. Day trading has none of that built in. Every element is a decision you have to make correctly: which setup to take, when to enter, where to exit, how much to risk. The tools the creator shows are the vocabulary for making those decisions, and you can't participate meaningfully without knowing them. Going in without that knowledge isn't investing at speed; it's guessing with real money.\n\nThe learning doesn't stop at reading charts, either. Prices move for reasons — earnings, sector news, economic data, broad sentiment — and a technical setup can be overrun by any of them. So a trader has to hold both the technical layer and some grasp of what actually moves the companies they're trading. That's a lot of ground, and it's why upskilling is continuous rather than a course you finish.\n\nThe second half is that none of it can simply be copied. Investing is tailored to the individual — your risk tolerance, your capital, your time available, your goals. A strategy that works for someone with different circumstances may be wrong for you even if it's sound in itself, because their tolerance for drawdown or their reaction time isn't yours. You're not trading to make anyone else money; the point is growing your own, which means the approach has to fit your situation rather than mirror someone else's. Copying a creator's setup without that translation is one of the most common ways people lose money.\n\nSo the difficulty is twofold: a large body of skill to acquire, and the work of adapting it to yourself. Passive investing asks for neither, which is why it suits most people — and why day trading demands a level of commitment that has to be chosen deliberately.",
+    "referenceAnswer": "It comes down to skill you have to build yourself. Day trading takes real knowledge, experience and consistent practice, and committing that time is what lowers the risk. Nothing does the work for you here the way time and diversification do in passive investing.\n\nWorth knowing: a strategy copied from someone else still has to fit your own money and risk tolerance, and the learning never really stops.",
     "rubric": [
-      "Day trading requires you to supply the skill yourself — nothing is built in the way diversification and time are in passive investing",
-      "You need working knowledge of the tools and strategies, plus an understanding of what actually moves prices",
-      "Strategies can't just be copied — they have to be tailored to your own risk tolerance, capital and goals",
-      "The commitment is continuous: ongoing learning and self-assessment, not a one-time skill you acquire"
+      "Says you have to learn the skill yourself — knowledge, experience, practice, discipline or committed time. Any mention along those lines is full marks",
+      "Tip only: nothing works in your favour automatically the way time and diversification do in passive investing",
+      "Tip only: you need to know the tools and what actually moves prices",
+      "Tip only: a strategy has to fit your own capital, risk tolerance and goals — it cannot just be copied"
     ],
     "reviewedAt": "2026-09-13T15:41:59.073Z",
     "status": "approved",
@@ -316,14 +316,14 @@
       "shares": 56,
       "plays": 30445
     },
-    "question": "Options carry external value like time decay and volatility, while futures move linearly with price. What would make options or futures suitable or unsuitable for someone and what should you consider before getting into either?",
+    "question": "What would make options or futures suitable or unsuitable for someone?",
     "claimUnderTest": "Options have extrinsic value affected by time decay and implied volatility, while futures are intrinsic and move linearly with price action.",
-    "referenceAnswer": "Both instruments give leverage — control of a large position for a fraction of its value — which is what makes them attractive and what makes them dangerous. That leverage is the common thread, but what you're managing differs.\n\nOptions carry extrinsic value, so the price moves for reasons beyond direction. Time decay works against a buyer every day, and implied volatility can change a contract's value without the underlying moving at all. That's an added layer of difficulty — being right about direction isn't sufficient if you're wrong about timing. It also creates uses futures don't have: options can hedge an existing position, and a buyer's loss is capped at the premium paid, which is a genuinely limited downside. Selling options is the opposite, with limited gain and large potential loss.\n\nFutures are simpler in structure, moving linearly with price — the creator's example being $50 per point on ES. That simplicity cuts both ways. There's no time decay eroding your position, but there's also no capped downside. Futures are marked to market daily, so losses are debited as they occur, and a margin call can require more money or force a liquidation. Losing more than you put in is possible, which is the sharpest distinction from buying options.\n\nWhat someone would weigh in deciding: what they want the money to do, how much time they can commit, and what they can afford to lose. Both instruments require real technical knowledge and ongoing attention — they aren't things to hold passively. Someone whose goal is long-term growth can reach it through index funds and ETFs without either, at considerably lower risk and effort. Someone interested in generating income or hedging, who has the knowledge and treats it as a limited portion of a portfolio rather than the core, is in a different position. The deciding factors are goals, expertise, time and risk capacity — not which instrument performs better, since neither does in the abstract.",
+    "referenceAnswer": "Two sides to it.\n\nUnsuitable: both carry real risk, and they take time and effort to learn. Get the direction or the timing wrong and the money goes quickly.\n\nSuitable: both give you leverage. You control a much larger position than your own money would buy, so a small move can pay off far more than the same cash would elsewhere.",
     "rubric": [
-      "Both provide leverage, which amplifies gains and losses alike and is the main source of risk in each",
-      "Options add extrinsic factors — time decay and implied volatility — so being right on direction isn't enough; buying options caps loss at the premium",
-      "Futures move linearly with no time decay, but have no capped downside: daily settlement and margin calls mean you can lose more than you put in",
-      "Both demand technical knowledge and active attention; long-term growth alone can be pursued through index funds without either"
+      "Names both sides — the risk, and the effort it takes to learn them, as what makes them unsuitable; and the leverage, controlling more than your own money, as what makes them suitable. Both sides is full marks",
+      "Only one of the two sides is a 1: it is half the answer",
+      "Tip only: options lose value as time passes, so being right on direction is not enough",
+      "Tip only: futures settle daily, so a move against you can cost more than you put in"
     ],
     "reviewedAt": "2026-09-13T15:59:57.830Z",
     "status": "approved",
@@ -356,7 +356,7 @@
       "Limited regulation and thin markets make manipulation and scandals more common than in traditional markets"
     ],
     "reviewedAt": "2026-09-13T16:21:04.885Z",
-    "status": "approved",
+    "status": "retired",
     "lastCheckedAt": "2026-09-14T15:51:41.268Z"
   }
 ]

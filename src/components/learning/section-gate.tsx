@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { CheckCircle2 } from 'lucide-react'
+import { CheckCircle2, Sparkles } from 'lucide-react'
 import { useLearning } from '@/contexts/learning-context'
 import { getTrack, type TrackId } from '@/lib/learning/tracks'
 
@@ -34,30 +34,28 @@ export function SectionGate({
       <>
         <div className="px-8 pt-6">
           <div className="bg-secondary-fixed/25 rounded-3xl px-6 py-5 flex flex-col gap-3">
-            <span className="text-label-sm uppercase tracking-widest text-secondary font-semibold">
-              {track.action.label ?? 'Your turn'} · {track.title}
-            </span>
+            <p className="text-title-md text-on-surface font-semibold">{track.action.title}</p>
 
-            <div>
-              <p className="text-title-md text-on-surface font-semibold">{track.action.title}</p>
-              <p className="text-body-md text-on-surface-variant mt-1.5 leading-relaxed">
-                {track.action.prompt}
-              </p>
-            </div>
-
-            <ul className="flex flex-col gap-2 mt-1">
-              {track.action.tasks.map(task => (
-                <li key={task} className="flex gap-2.5">
-                  <span className="mt-[9px] w-1.5 h-1.5 rounded-full bg-secondary/60 shrink-0" aria-hidden />
-                  <p className="text-body-sm text-on-surface-variant leading-relaxed">{task}</p>
+            <ol className="flex flex-col gap-2">
+              {track.action.steps.map((step, i) => (
+                <li key={step} className="flex gap-2.5">
+                  <span className="text-body-md text-on-surface tabular-nums shrink-0" aria-hidden>{i + 1}.</span>
+                  <p className="text-body-md text-on-surface-variant">{step}</p>
                 </li>
               ))}
-            </ul>
+            </ol>
 
-            <div className="flex items-center justify-between gap-4 flex-wrap pt-2">
-              <p className="text-label-sm text-on-surface-variant max-w-lg">
-                Done when: {track.action.doneWhen}
-              </p>
+            {track.action.bonus && (
+              <div className="flex gap-2.5 items-start">
+                <Sparkles size={15} className="text-[#8a6400] mt-[3px] shrink-0" aria-hidden />
+                <p className="text-body-md text-on-surface-variant">
+                  <span className="text-on-surface font-medium">Bonus: </span>
+                  {track.action.bonus}
+                </p>
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-4 flex-wrap pt-1">
               <Link
                 href={`/learning/${trackId}`}
                 onClick={() => { recordAction(trackId); endGuided() }}

@@ -6,6 +6,7 @@ import {
   ChevronDown, ChevronRight, Target,
 } from 'lucide-react'
 import type { SavingsGoal } from '@/hooks/use-data'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 // ── Local types ────────────────────────────────────────────────────────────
 
@@ -65,6 +66,7 @@ function GoalRow({
 }) {
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [form, setForm] = useState<EditingState>({
     name: goal.name,
     target_amount: String(goal.target_amount),
@@ -97,7 +99,7 @@ function GoalRow({
   }
 
   const handleDelete = async () => {
-    if (!confirm(`Delete "${goal.name}"?`)) return
+    setConfirmingDelete(false)
     await onDelete(goal.id)
   }
 
@@ -112,71 +114,92 @@ function GoalRow({
 
   if (editing) {
     return (
-      <div className="flex flex-col gap-3 bg-surface-container rounded-xl p-4">
-        <div>
-          <label className="text-label-sm text-on-surface-variant mb-1 block">Goal name</label>
+      <div className="flex flex-col gap-5 bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] shadow-card p-5 sm:p-6">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-label-md text-on-surface-variant">Goal name</label>
           <input
-            className="w-full bg-surface-container-high rounded-lg px-3 py-2 text-body-md text-on-surface outline-none focus:ring-2 focus:ring-secondary"
+            className="w-full rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-4 py-3 text-body-lg text-on-surface outline-none transition-colors focus:border-on-surface/40"
             value={form.name}
             onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
             placeholder="e.g. Emergency Fund"
           />
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-label-sm text-on-surface-variant mb-1 block">Target ($)</label>
-            <input
-              type="number"
-              min="1"
-              className="w-full bg-surface-container-high rounded-lg px-3 py-2 text-body-md text-on-surface outline-none focus:ring-2 focus:ring-secondary"
-              value={form.target_amount}
-              onChange={e => setForm(f => ({ ...f, target_amount: e.target.value }))}
-              placeholder="10000"
-            />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-label-md text-on-surface-variant">Target amount</label>
+            <div className="flex items-center gap-1 rounded-2xl border border-on-surface/15 px-4 py-3 focus-within:border-on-surface/40 transition-colors">
+              <span className="text-body-lg text-on-surface-variant">$</span>
+              <input
+                type="number"
+                min="1"
+                className="w-full bg-transparent text-body-lg text-on-surface tabular-nums outline-none"
+                value={form.target_amount}
+                onChange={e => setForm(f => ({ ...f, target_amount: e.target.value }))}
+                placeholder="10,000"
+              />
+            </div>
           </div>
-          <div>
-            <label className="text-label-sm text-on-surface-variant mb-1 block">% of monthly income</label>
-            <input
-              type="number"
-              min="0"
-              max="100"
-              step="1"
-              className="w-full bg-surface-container-high rounded-lg px-3 py-2 text-body-md text-on-surface outline-none focus:ring-2 focus:ring-secondary"
-              value={form.allocation_pct}
-              onChange={e => setForm(f => ({ ...f, allocation_pct: e.target.value }))}
-              placeholder="10"
-            />
+          <div className="flex flex-col gap-1.5">
+            <label className="text-label-md text-on-surface-variant">Share of monthly income</label>
+            <div className="flex items-center gap-1 rounded-2xl border border-on-surface/15 px-4 py-3 focus-within:border-on-surface/40 transition-colors">
+              <input
+                type="number"
+                min="0"
+                max="100"
+                step="1"
+                className="w-full bg-transparent text-body-lg text-on-surface tabular-nums outline-none"
+                value={form.allocation_pct}
+                onChange={e => setForm(f => ({ ...f, allocation_pct: e.target.value }))}
+                placeholder="10"
+              />
+              <span className="text-body-lg text-on-surface-variant">%</span>
+            </div>
           </div>
         </div>
+
         {!isNaN(parseFloat(form.allocation_pct)) && parseFloat(form.allocation_pct) > 0 && (
-          <p className="text-label-sm text-on-surface-variant">
-            ≈ ${Math.round((parseFloat(form.allocation_pct) / 100) * monthlyIncome).toLocaleString()} / month contribution
-          </p>
+          <div className="rounded-2xl bg-surface-container-low px-5 py-4 flex items-baseline justify-between gap-4 flex-wrap">
+            <span className="text-body-lg text-on-surface-variant">Monthly contribution</span>
+            <span className="text-headline-md sm:text-display-sm font-bold text-on-surface tabular-nums">
+              ${Math.round((parseFloat(form.allocation_pct) / 100) * monthlyIncome).toLocaleString()}
+            </span>
+          </div>
         )}
-        <div className="flex gap-2 mt-1">
+
+        <div className="flex items-center gap-3 flex-wrap">
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-1.5 px-4 py-2 bg-secondary text-white rounded-lg text-label-md font-semibold disabled:opacity-50"
+            className="btn-action items-center justify-center gap-1.5 disabled:opacity-40"
           >
-            <Check size={14} />
+            <Check size={15} />
             {saving ? 'Saving…' : 'Save'}
           </button>
           <button
             onClick={handleCancel}
-            className="flex items-center gap-1.5 px-4 py-2 bg-surface-container-high text-on-surface rounded-lg text-label-md"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-label-lg text-on-surface-variant hover:text-on-surface hover:bg-on-surface/[0.06] transition-colors"
           >
-            <X size={14} />
+            <X size={15} />
             Cancel
           </button>
           <button
-            onClick={handleDelete}
-            className="ml-auto flex items-center gap-1.5 px-3 py-2 text-error rounded-lg text-label-md hover:bg-error/8"
+            onClick={() => setConfirmingDelete(true)}
+            className="ml-auto flex items-center gap-1.5 px-4 py-2.5 rounded-full text-label-lg text-error hover:bg-error/[0.08] transition-colors"
           >
-            <Trash2 size={14} />
+            <Trash2 size={15} />
             Delete
           </button>
         </div>
+
+        <ConfirmDialog
+          open={confirmingDelete}
+          title={`Delete "${goal.name}"?`}
+          body="The goal and its progress are removed. This cannot be undone."
+          confirmLabel="Delete goal"
+          onConfirm={handleDelete}
+          onCancel={() => setConfirmingDelete(false)}
+        />
       </div>
     )
   }
@@ -255,59 +278,76 @@ function NewGoalForm({
   }
 
   return (
-    <div className="flex flex-col gap-3 bg-surface-container rounded-xl p-4 border border-secondary/20">
-      <p className="text-label-md font-semibold text-on-surface">{label}</p>
-      <input
-        className="w-full bg-surface-container-high rounded-lg px-3 py-2 text-body-md text-on-surface outline-none focus:ring-2 focus:ring-secondary"
-        value={form.name}
-        onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-        placeholder="Goal name (e.g. Emergency Fund)"
-        autoFocus
-      />
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="text-label-sm text-on-surface-variant mb-1 block">Target ($)</label>
-          <input
-            type="number"
-            min="1"
-            className="w-full bg-surface-container-high rounded-lg px-3 py-2 text-body-md text-on-surface outline-none focus:ring-2 focus:ring-secondary"
-            value={form.target_amount}
-            onChange={e => setForm(f => ({ ...f, target_amount: e.target.value }))}
-            placeholder="10000"
-          />
+    <div className="flex flex-col gap-5 bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] shadow-card p-5 sm:p-6">
+      <p className="text-title-md text-on-surface">{label}</p>
+
+      <div className="flex flex-col gap-1.5">
+        <label className="text-label-md text-on-surface-variant">Goal name</label>
+        <input
+          className="w-full rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-4 py-3 text-body-lg text-on-surface outline-none transition-colors focus:border-on-surface/40"
+          value={form.name}
+          onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+          placeholder="e.g. Emergency Fund"
+          autoFocus
+        />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-label-md text-on-surface-variant">Target amount</label>
+          <div className="flex items-center gap-1 rounded-2xl border border-on-surface/15 px-4 py-3 focus-within:border-on-surface/40 transition-colors">
+            <span className="text-body-lg text-on-surface-variant">$</span>
+            <input
+              type="number"
+              min="1"
+              className="w-full bg-transparent text-body-lg text-on-surface tabular-nums outline-none"
+              value={form.target_amount}
+              onChange={e => setForm(f => ({ ...f, target_amount: e.target.value }))}
+              placeholder="10,000"
+            />
+          </div>
         </div>
-        <div>
-          <label className="text-label-sm text-on-surface-variant mb-1 block">% of monthly income</label>
-          <input
-            type="number"
-            min="0"
-            max="100"
-            step="1"
-            className="w-full bg-surface-container-high rounded-lg px-3 py-2 text-body-md text-on-surface outline-none focus:ring-2 focus:ring-secondary"
-            value={form.allocation_pct}
-            onChange={e => setForm(f => ({ ...f, allocation_pct: e.target.value }))}
-          />
+        <div className="flex flex-col gap-1.5">
+          <label className="text-label-md text-on-surface-variant">Share of monthly income</label>
+          <div className="flex items-center gap-1 rounded-2xl border border-on-surface/15 px-4 py-3 focus-within:border-on-surface/40 transition-colors">
+            <input
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              className="w-full bg-transparent text-body-lg text-on-surface tabular-nums outline-none"
+              value={form.allocation_pct}
+              onChange={e => setForm(f => ({ ...f, allocation_pct: e.target.value }))}
+            />
+            <span className="text-body-lg text-on-surface-variant">%</span>
+          </div>
         </div>
       </div>
+
+      {/* What that share is actually worth — the figure people are choosing by. */}
       {monthlyContrib > 0 && (
-        <p className="text-label-sm text-on-surface-variant">
-          ≈ ${monthlyContrib.toLocaleString()} / month contribution
-        </p>
+        <div className="rounded-2xl bg-surface-container-low px-5 py-4 flex items-baseline justify-between gap-4 flex-wrap">
+          <span className="text-body-lg text-on-surface-variant">Monthly contribution</span>
+          <span className="text-headline-md sm:text-display-sm font-bold text-on-surface tabular-nums">
+            ${monthlyContrib.toLocaleString()}
+          </span>
+        </div>
       )}
-      <div className="flex gap-2">
+
+      <div className="flex items-center gap-3 flex-wrap">
         <button
           onClick={handleCreate}
           disabled={saving || !form.name.trim()}
-          className="flex items-center gap-1.5 px-4 py-2 bg-secondary text-white rounded-lg text-label-md font-semibold disabled:opacity-50"
+          className="btn-action items-center justify-center gap-1.5 disabled:opacity-40"
         >
-          <Check size={14} />
-          {saving ? 'Creating…' : 'Create Goal'}
+          <Check size={15} />
+          {saving ? 'Creating…' : 'Create goal'}
         </button>
         <button
           onClick={() => onClose()}
-          className="flex items-center gap-1.5 px-4 py-2 bg-surface-container-high text-on-surface rounded-lg text-label-md"
+          className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-label-lg text-on-surface-variant hover:text-on-surface hover:bg-on-surface/[0.06] transition-colors"
         >
-          <X size={14} />
+          <X size={15} />
           Cancel
         </button>
       </div>
@@ -333,36 +373,37 @@ function NewFolderForm({
   }
 
   return (
-    <div className="flex flex-col gap-3 bg-surface-container rounded-xl p-4 border border-secondary/20">
-      <div className="flex items-center gap-2">
-        <span className="text-base leading-none">🎯</span>
-        <p className="text-label-md font-semibold text-on-surface">New Parent Goal</p>
+    <div className="flex flex-col gap-5 bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] shadow-card p-5 sm:p-6">
+      <div className="flex flex-col gap-1.5">
+        <p className="text-title-md text-on-surface">New parent goal</p>
+        <p className="text-body-md text-on-surface-variant leading-relaxed">
+          Group related savings goals under one project — e.g. &quot;Home Renovation&quot; with items for kitchen, bathroom, etc.
+        </p>
       </div>
-      <p className="text-label-sm text-on-surface-variant">
-        Group related savings goals under one project — e.g. &quot;Home Renovation&quot; with items for kitchen, bathroom, etc.
-      </p>
+
       <input
-        className="w-full bg-surface-container-high rounded-lg px-3 py-2 text-body-md text-on-surface outline-none focus:ring-2 focus:ring-secondary"
+        className="w-full rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-4 py-3 text-body-lg text-on-surface outline-none transition-colors focus:border-on-surface/40"
         value={name}
         onChange={e => setName(e.target.value)}
         placeholder="Project name (e.g. Home Renovation)"
         autoFocus
         onKeyDown={e => e.key === 'Enter' && handleCreate()}
       />
-      <div className="flex gap-2">
+
+      <div className="flex items-center gap-3 flex-wrap">
         <button
           onClick={handleCreate}
           disabled={!name.trim()}
-          className="flex items-center gap-1.5 px-4 py-2 bg-secondary text-white rounded-lg text-label-md font-semibold disabled:opacity-50"
+          className="btn-action items-center justify-center gap-1.5 disabled:opacity-40"
         >
-          <Check size={14} />
-          Create Project
+          <Check size={15} />
+          Create project
         </button>
         <button
           onClick={onClose}
-          className="flex items-center gap-1.5 px-4 py-2 bg-surface-container-high text-on-surface rounded-lg text-label-md"
+          className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-label-lg text-on-surface-variant hover:text-on-surface hover:bg-on-surface/[0.06] transition-colors"
         >
-          <X size={14} />
+          <X size={15} />
           Cancel
         </button>
       </div>
@@ -393,6 +434,7 @@ function FolderSection({
 }) {
   const [collapsed, setCollapsed] = useState(false)
   const [addingGoal, setAddingGoal] = useState(false)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   const totalTarget = goals.reduce((sum, g) => sum + g.target_amount, 0)
   const totalCurrent = goals.reduce((sum, g) => sum + g.current_amount, 0)
@@ -404,48 +446,61 @@ function FolderSection({
   }
 
   const handleDeleteFolder = () => {
-    if (!confirm(`Remove project "${folder.name}"? Goals inside will become standalone goals.`)) return
+    setConfirmingDelete(false)
     onDeleteFolder(folder.id)
   }
 
   return (
-    <div className="flex flex-col rounded-xl border border-surface-container-high overflow-hidden">
+    <div className="flex flex-col rounded-3xl border border-on-surface/[0.06] bg-surface-container-lowest shadow-card overflow-hidden">
       {/* Folder header */}
-      <div className="flex items-center gap-2 px-4 py-3 bg-surface-container-low">
+      <div className="flex items-center gap-3 px-5 py-4 bg-surface-container-low">
         <button
           onClick={() => setCollapsed(c => !c)}
-          className="flex items-center gap-2 flex-1 text-left min-w-0"
+          className="flex items-center gap-2.5 flex-1 text-left min-w-0"
         >
           {collapsed
-            ? <ChevronRight size={14} className="text-on-surface-variant shrink-0" />
-            : <ChevronDown size={14} className="text-on-surface-variant shrink-0" />}
+            ? <ChevronRight size={16} className="text-on-surface-variant shrink-0" />
+            : <ChevronDown size={16} className="text-on-surface-variant shrink-0" />}
           <span className="text-base leading-none shrink-0">🎯</span>
-          <p className="text-label-lg font-semibold text-on-surface truncate">{folder.name}</p>
-          <span className="text-label-sm text-on-surface-variant shrink-0">({goals.length})</span>
+          <p className="text-title-md text-on-surface truncate">{folder.name}</p>
+          <span className="text-label-md text-on-surface-variant shrink-0">
+            {goals.length} goal{goals.length === 1 ? '' : 's'}
+          </span>
         </button>
         {goals.length > 0 && (
-          <span className="text-label-sm font-medium text-on-surface shrink-0">{overallPct}%</span>
+          <span className="rounded-full bg-surface-container-lowest border border-on-surface/[0.06] px-3 py-1 text-label-md text-on-surface tabular-nums shrink-0">
+            {overallPct}%
+          </span>
         )}
         <button
-          onClick={handleDeleteFolder}
-          className="p-1.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-error/8 transition-colors shrink-0"
+          onClick={() => setConfirmingDelete(true)}
+          className="p-2 rounded-full text-on-surface-variant hover:text-error hover:bg-error/[0.08] transition-colors shrink-0"
           title="Remove project"
         >
-          <Trash2 size={13} />
+          <Trash2 size={15} />
         </button>
       </div>
 
+      <ConfirmDialog
+        open={confirmingDelete}
+        title={`Remove "${folder.name}"?`}
+        body="Goals inside it are kept — they become standalone goals."
+        confirmLabel="Remove project"
+        onConfirm={handleDeleteFolder}
+        onCancel={() => setConfirmingDelete(false)}
+      />
+
       {!collapsed && (
-        <div className="flex flex-col gap-3 px-4 py-3">
+        <div className="flex flex-col gap-4 px-5 py-4">
           {goals.length > 1 && (
-            <div className="flex flex-col gap-1.5 pb-1 border-b border-surface-container-high">
-              <div className="flex items-center justify-between">
-                <p className="text-label-sm text-on-surface-variant">Overall</p>
-                <p className="text-label-sm font-medium text-on-surface">
+            <div className="flex flex-col gap-2 pb-3 border-b border-on-surface/[0.07]">
+              <div className="flex items-baseline justify-between gap-3">
+                <p className="text-label-lg text-on-surface-variant">Overall</p>
+                <p className="text-title-md text-on-surface tabular-nums">
                   ${totalCurrent.toLocaleString()} / ${totalTarget.toLocaleString()}
                 </p>
               </div>
-              <div className="h-1.5 bg-surface-container rounded-full overflow-hidden">
+              <div className="h-2 bg-surface-container rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-500"
                   style={{ width: `${overallPct}%`, backgroundColor: '#4c49c9' }}
@@ -455,7 +510,7 @@ function FolderSection({
           )}
 
           {goals.length === 0 && !addingGoal && (
-            <p className="text-label-sm text-on-surface-variant text-center py-2">
+            <p className="text-body-md text-on-surface-variant text-center py-3">
               No goals yet — add one below.
             </p>
           )}
@@ -475,14 +530,14 @@ function FolderSection({
               monthlyIncome={monthlyIncome}
               onCreate={onCreate}
               onClose={handleGoalClose}
-              label="Add Goal to Project"
+              label="Add goal to project"
             />
           ) : (
             <button
               onClick={() => setAddingGoal(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-label-sm text-secondary hover:bg-secondary/8 transition-colors self-start mt-1"
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-on-surface/15 text-label-lg text-on-surface hover:bg-on-surface/[0.06] transition-colors self-start"
             >
-              <Plus size={13} />
+              <Plus size={15} />
               Add goal to project
             </button>
           )}

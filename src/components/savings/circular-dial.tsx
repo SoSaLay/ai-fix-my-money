@@ -47,11 +47,17 @@ export function CircularDial({
     ? Math.max(0, maxFreePctProp)
     : Math.max(0, 100 - lockedPct)
 
-  const lockedLength = (lockedPct / 100) * circumference
-  const freeLength   = (freePct   / 100) * circumference
+  // The ring stops at a full circle. Allocations can add past 100% of income —
+  // the figures below say so — but an arc that laps itself reads as nothing.
+  const drawnLockedPct = Math.min(lockedPct, 100)
+  const drawnFreePct   = Math.max(0, Math.min(freePct, 100 - drawnLockedPct))
+  const drawnTotalPct  = drawnLockedPct + drawnFreePct
+
+  const lockedLength = (drawnLockedPct / 100) * circumference
+  const freeLength   = (drawnFreePct   / 100) * circumference
 
   // Thumb sits at the end of the orange arc
-  const thumbAngleDeg = (totalPct / 100) * 360 - 90
+  const thumbAngleDeg = (drawnTotalPct / 100) * 360 - 90
   const thumbRad      = (thumbAngleDeg * Math.PI) / 180
   const thumbX        = cx + radius * Math.cos(thumbRad)
   const thumbY        = cy + radius * Math.sin(thumbRad)
@@ -131,7 +137,7 @@ export function CircularDial({
         />
 
         {/* Red arc — goals allocation (locked) */}
-        {lockedPct > 0 && (
+        {drawnLockedPct > 0 && (
           <circle
             cx={cx} cy={cy} r={radius}
             fill="none"
@@ -144,7 +150,7 @@ export function CircularDial({
         )}
 
         {/* Free arc — draggable portion */}
-        {freePct > 0 && (
+        {drawnFreePct > 0 && (
           <circle
             cx={cx} cy={cy} r={radius}
             fill="none"
@@ -157,12 +163,12 @@ export function CircularDial({
         )}
 
         {/* Thumb — shows at end of whichever arc is outermost */}
-        {totalPct > 0 && (
+        {drawnTotalPct > 0 && (
           <circle
             cx={thumbX}
             cy={thumbY}
             r={strokeWidth / 2 + 2}
-            fill={freePct > 0 ? freeColor : lockedColor}
+            fill={drawnFreePct > 0 ? freeColor : lockedColor}
             stroke="white"
             strokeWidth={3}
           />

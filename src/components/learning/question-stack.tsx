@@ -3,7 +3,9 @@
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import Image from 'next/image'
 import type { QuizQuestion, LessonImage } from '@/lib/learning/tracks'
+import { shuffleOptions } from '@/lib/learning/shuffle-options'
 import { AnswerOption, WhyPanel } from '@/components/learning/answer-option'
+import { Calculator } from '@/components/learning/calculator'
 
 interface QuestionStackProps {
   questions: QuizQuestion[]
@@ -23,12 +25,15 @@ interface QuestionStackProps {
  * anything — the answers just have to exist before the learner moves on.
  */
 export function QuestionStack({
-  questions,
+  questions: given,
   images,
   revealImmediately = true,
   onChange,
 }: QuestionStackProps) {
   const [answers, setAnswers] = useState<Record<string, number>>({})
+
+  // Options are reordered so the right one is not always in the same place.
+  const questions = useMemo(() => given.map(shuffleOptions), [given])
 
   // Questions point at art by src, so alt text stays defined in one place.
   const bySrc = useMemo(
@@ -116,6 +121,8 @@ export function QuestionStack({
           )
         })}
       </ol>
+
+      {questions.some(q => q.calculator) && <Calculator />}
     </section>
   )
 }
@@ -128,16 +135,16 @@ export function QuestionStack({
 function QuestionImage({ image }: { image: LessonImage }) {
   return (
     <figure className="w-full max-w-[420px] rounded-2xl overflow-hidden bg-surface-container-low">
-      <div className="relative w-full aspect-[4/3]">
-        <Image
-          src={image.src}
-          alt={image.alt}
-          fill
-          sizes="420px"
-          unoptimized={image.src.endsWith('.svg')}
-          className="object-contain"
-        />
-      </div>
+      {/* Sized by the diagram's own proportions, so a short one leaves no band. */}
+      <Image
+        src={image.src}
+        alt={image.alt}
+        width={0}
+        height={0}
+        sizes="420px"
+        unoptimized={image.src.endsWith('.svg')}
+        className="w-full h-auto"
+      />
     </figure>
   )
 }

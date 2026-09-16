@@ -13,14 +13,14 @@ spells out the same option. `why` is the explanation revealed after answering, r
 or wrong. `imageSrc`, where present, is the lesson diagram repeated beside the
 question. `id` is what the spaced-review queue stores.
 
-**4 tracks · 17 lessons · 74 questions**
+**4 tracks · 17 lessons · 71 questions**
 
 ## Contents
 
 - [Accounts](#accounts) — 4 lessons, 16 questions
 - [Income vs. Spending](#income-vs-spending) — 5 lessons, 19 questions
 - [Savings](#savings) — 3 lessons, 10 questions
-- [Investing](#investing) — 5 lessons, 29 questions
+- [Investing](#investing) — 5 lessons, 26 questions
 
 ---
 
@@ -171,7 +171,7 @@ question. `id` is what the spaced-review queue stores.
   "questions": [
     {
       "id": "acc-4-q1",
-      "question": "You owe $450 on a card with a $1,500 limit. What is your utilisation on that card?",
+      "question": "You owe $450 on a card with a $1,500 limit. What is your utilization on that card?",
       "options": [
         "4.5%",
         "30%",
@@ -180,8 +180,8 @@ question. `id` is what the spaced-review queue stores.
       ],
       "answer": 1,
       "correctAnswer": "30%",
-      "imageSrc": "/learning/accounts-utilisation.svg",
-      "why": "450 ÷ 1500 = 0.30, so 30%. Utilisation is always balance divided by limit, not balance divided by income or spending."
+      "imageSrc": "/learning/accounts-utilization.svg",
+      "why": "450 ÷ 1500 = 0.30, so 30%. Utilization is always balance divided by limit, not balance divided by income or spending."
     },
     {
       "id": "acc-4-q2",
@@ -229,7 +229,7 @@ question. `id` is what the spaced-review queue stores.
         "The current balance",
         "The statement balance from the last cycle close",
         "The minimum payment",
-        "Whatever keeps you under 30% utilisation"
+        "Whatever keeps you under 30% utilization"
       ],
       "answer": 1,
       "correctAnswer": "The statement balance from the last cycle close",
@@ -240,7 +240,7 @@ question. `id` is what the spaced-review queue stores.
       "question": "Which factor carries the most weight in a credit score?",
       "options": [
         "Payment history",
-        "Credit utilisation",
+        "Credit utilization",
         "Length of history",
         "Inquiries"
       ],
@@ -449,7 +449,7 @@ question. `id` is what the spaced-review queue stores.
         "How much you can save",
         "The minimum a month costs you before any choices",
         "Your net worth",
-        "Your credit utilisation"
+        "Your credit utilization"
       ],
       "answer": 1,
       "correctAnswer": "The minimum a month costs you before any choices",
@@ -496,7 +496,7 @@ question. `id` is what the spaced-review queue stores.
   "questions": [
     {
       "id": "spd-3-q1",
-      "question": "Why group spending into categories rather than listing transactions?",
+      "question": "Why does it make sense to group spending into categories rather than listing every transaction?",
       "options": [
         "It looks better",
         "Category totals reveal patterns that individual charges hide",
@@ -798,7 +798,7 @@ question. `id` is what the spaced-review queue stores.
 
 ## Investing
 
-`investing` · unlocks `/investing` · 5 lessons · 29 questions
+`investing` · unlocks `/investing` · 5 lessons · 26 questions
 
 > You can explain what you own, why its value moves, how long it needs, and what each kind of investment risks.
 
@@ -883,7 +883,7 @@ question. `id` is what the spaced-review queue stores.
 
 ### Financial basics help growth
 
-`inv-3` · 60s read · 5 questions
+`inv-3` · 60s read · 4 questions
 
 ```json
 {
@@ -942,19 +942,6 @@ question. `id` is what the spaced-review queue stores.
       "answer": 1,
       "correctAnswer": "You contribute money already taxed, and qualified withdrawals — growth included — are tax-free",
       "why": "A Roth is funded with money you have already paid tax on, which is why qualified withdrawals come out tax-free. Lowering your taxable income today is what the traditional 401(k) contribution does instead."
-    },
-    {
-      "id": "inv-3-q5",
-      "question": "Why does the taxable brokerage sit at the top of the order rather than the bottom?",
-      "options": [
-        "It is the riskiest kind of account",
-        "The steps below it either remove a guaranteed cost or come with a tax advantage or employer money",
-        "Brokerages require the other accounts to exist first",
-        "It charges the highest fees"
-      ],
-      "answer": 1,
-      "correctAnswer": "The steps below it either remove a guaranteed cost or come with a tax advantage or employer money",
-      "why": "Clearing debt is a guaranteed saving, savings removes a risk, and the retirement and health accounts carry a match or a tax advantage. The taxable account has none of those, so it comes after them."
     }
   ]
 }
@@ -1036,7 +1023,7 @@ question. `id` is what the spaced-review queue stores.
     },
     {
       "id": "inv-6-q6",
-      "question": "Read the pattern down the three tables. How does risk relate to certainty and time?",
+      "question": "Across the three tables, how does risk relate to certainty and time?",
       "options": [
         "The less certain and shorter-term an investment is, the more risk you take on",
         "The shorter-term an investment is, the less risk you take on",
@@ -1075,7 +1062,7 @@ question. `id` is what the spaced-review queue stores.
     },
     {
       "id": "inv-4-q2",
-      "question": "What is the required return in this list?",
+      "question": "What does “required return” mean?",
       "options": [
         "The return a brokerage advertises",
         "The return you need to reach your goal, based on your time and savings",
@@ -1101,29 +1088,29 @@ question. `id` is what the spaced-review queue stores.
     },
     {
       "id": "inv-4-q4",
-      "question": "Maya, Jordan and Leo invest differently. What is the point of showing all three?",
+      "question": "Two people invest the same amount. One wants the money in months, the other in years. What does that change?",
       "options": [
-        "One of them is right and the other two are mistakes",
-        "The goal should decide what you invest for, how much risk you take, and when you use the money",
-        "Higher risk reliably produces more money",
-        "Everyone should hold some individual stocks"
+        "Nothing — the amount is what matters",
+        "The shorter timeline usually means taking more risk to get there",
+        "The longer timeline needs a higher return",
+        "Only which account they use"
       ],
       "answer": 1,
-      "correctAnswer": "The goal should decide what you invest for, how much risk you take, and when you use the money",
-      "why": "None of the three strategies is better in the abstract. What the money is for, and when it is needed, is what makes a plan fit or not fit."
+      "correctAnswer": "The shorter timeline usually means taking more risk to get there",
+      "why": "Wanting the money sooner is what pushes people into shorter-term, more speculative investments. More time lets a steadier approach do the work instead."
     },
     {
       "id": "inv-4-q5",
-      "question": "Leo keeps most of his money in diversified funds and a small portion in higher-risk positions. What is the stated tradeoff?",
+      "question": "What does the lesson say about picking a level of risk?",
       "options": [
-        "There is none, because the core portfolio is protected",
-        "The higher upside comes with a real possibility of losing some or all of that money",
-        "His diversified funds can no longer fall",
-        "The speculative portion is guaranteed to accelerate his wealth"
+        "There is one right approach everyone should follow",
+        "Choose the level that fits your goals, timeline, and ability to handle losses",
+        "Take as much risk as you can stand, always",
+        "It depends only on how much you earn"
       ],
       "answer": 1,
-      "correctAnswer": "The higher upside comes with a real possibility of losing some or all of that money",
-      "why": "The speculative portion is money that can go to zero. Keeping it small is what makes that outcome survivable, not what prevents it."
+      "correctAnswer": "Choose the level that fits your goals, timeline, and ability to handle losses",
+      "why": "More risk means a greater chance of losing money, and no single level is right for everyone. Your goal, your timeline, and what you can sit through are what decide it."
     }
   ]
 }
@@ -1131,7 +1118,7 @@ question. `id` is what the spaced-review queue stores.
 
 ### Buy and manage investments
 
-`inv-8` · 60s read · 8 questions
+`inv-8` · 60s read · 6 questions
 
 ```json
 {
@@ -1192,20 +1179,6 @@ question. `id` is what the spaced-review queue stores.
       "why": "Whatever grew fastest becomes an oversized share of the total. Rebalancing trims it back and tops up what lagged, so the mix still matches your goals and risk tolerance."
     },
     {
-      "id": "inv-8-q0",
-      "question": "What is an expense ratio?",
-      "options": [
-        "A one-off charge when you buy",
-        "An annual percentage of your balance taken by the fund",
-        "The tax on your gains",
-        "The fund’s return"
-      ],
-      "answer": 1,
-      "correctAnswer": "An annual percentage of your balance taken by the fund",
-      "imageSrc": "/learning/investing-fees.svg",
-      "why": "It is charged every year on whatever the balance is, in good years and bad. That is why fees are one of the things worth comparing before you choose where to invest."
-    },
-    {
       "id": "inv-8-q2",
       "question": "When does selling an investment create a tax bill?",
       "options": [
@@ -1230,19 +1203,6 @@ question. `id` is what the spaced-review queue stores.
       "answer": 1,
       "correctAnswer": "Recovering from a loss takes a larger percentage gain, and being wiped out ends the compounding",
       "why": "The maths is asymmetric and the consequence is final. Money that is gone cannot compound, however good the next idea turns out to be."
-    },
-    {
-      "id": "inv-8-q4",
-      "question": "What is the single idea this track keeps returning to?",
-      "options": [
-        "Trade often to find the best entry",
-        "You bought a piece of a business someone else runs, and businesses grow over years",
-        "Higher risk always means higher return",
-        "Fees do not matter at small balances"
-      ],
-      "answer": 1,
-      "correctAnswer": "You bought a piece of a business someone else runs, and businesses grow over years",
-      "why": "Everything else follows from it. The biggest advantage most investors have is not predicting the market — it is staying invested long enough to compound."
     }
   ]
 }

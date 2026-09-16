@@ -21,14 +21,17 @@ export const DEFAULT_QUIZ_MIX: QuizMix = { videos: 8, choices: 2 }
  * about what an investment can do — and judging it. That is what a written
  * answer tests and a multiple choice cannot.
  *
- * Investing draws twelve rather than ten, so its paper is scored out of 24.
- * The pass fraction is applied to the paper's own total, so the bar moves with
- * it rather than being pinned to ten questions.
+ * Accounts has seven approved videos and Savings nine, so each tops its paper
+ * up with multiple choice until those pools grow.
+ *
+ * The pass fraction is applied to each paper's own total, so the bar moves with
+ * it rather than being pinned to any one shape.
  */
 const QUIZ_MIX_BY_TRACK: Record<string, QuizMix> = {
+  accounts: { videos: 7, choices: 3 },
   spending: { videos: 10, choices: 0 },
-  savings: { videos: 10, choices: 0 },
-  investing: { videos: 12, choices: 0 },
+  savings: { videos: 9, choices: 1 },
+  investing: { videos: 10, choices: 0 },
 }
 
 export function quizMix(trackId: string): QuizMix {

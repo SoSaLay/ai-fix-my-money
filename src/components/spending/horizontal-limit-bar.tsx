@@ -1,12 +1,17 @@
 'use client'
 
-import { useRef, useCallback } from 'react'
+import { useRef, useCallback, useState } from 'react'
+import { Check, Pencil, X } from 'lucide-react'
 
 interface HorizontalLimitBarProps {
   pct: number
   dollarAmount: number
   currentSpendingPct: number
   onChange: (pct: number) => void
+  /** Typing an exact figure, as an alternative to dragging. */
+  onAmountChange: (amount: number) => void
+  /** The most the limit can be set to — what the slider's far end is worth. */
+  maxAmount: number
   disabled?: boolean
 }
 
@@ -28,10 +33,22 @@ export function HorizontalLimitBar({
   dollarAmount,
   currentSpendingPct,
   onChange,
+  onAmountChange,
+  maxAmount,
   disabled = false,
 }: HorizontalLimitBarProps) {
   const trackRef = useRef<HTMLDivElement>(null)
   const isDragging = useRef(false)
+
+  // Typing the figure straight in. Empty until the pencil is pressed.
+  const [draft, setDraft] = useState<string | null>(null)
+
+  const commitDraft = useCallback(() => {
+    if (draft === null) return
+    const value = Number(draft.replace(/[^0-9.]/g, ''))
+    if (Number.isFinite(value)) onAmountChange(Math.max(0, Math.min(value, maxAmount)))
+    setDraft(null)
+  }, [draft, maxAmount, onAmountChange])
 
   const getPctFromEvent = useCallback(
     (clientX: number): number => {
@@ -65,6 +82,8 @@ export function HorizontalLimitBar({
     isDragging.current = false
   }, [])
 
+  // The bar draws on the exact value; everything written down is whole.
+  const shownPct = Math.round(pct)
   const thumbColor = getBarColor(pct)
   const statusLabel = getLabel(pct)
   const formattedAmount = `$${dollarAmount.toLocaleString('en-US', {
@@ -79,9 +98,63 @@ export function HorizontalLimitBar({
     <div className="flex flex-col gap-5 w-full">
       {/* Value row */}
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <span className="text-headline-md sm:text-display-sm font-bold text-on-surface">{formattedAmount}</span>
+        {draft !== null ? (
+          <span className="flex items-center gap-2">
+            <span className="flex items-center gap-1 rounded-xl border border-on-surface/20 bg-surface-container-lowest px-3 py-1.5">
+              <span className="text-headline-sm font-bold text-on-surface">$</span>
+              <input
+                autoFocus
+                inputMode="decimal"
+                value={draft}
+                onChange={e => setDraft(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') commitDraft()
+                  if (e.key === 'Escape') setDraft(null)
+                }}
+                onBlur={commitDraft}
+                aria-label="Spending limit amount"
+                className="w-32 bg-transparent text-headline-md font-bold text-on-surface tabular-nums outline-none"
+              />
+            </span>
+            <button
+              type="button"
+              onMouseDown={e => e.preventDefault()}
+              onClick={commitDraft}
+              aria-label="Save amount"
+              className="p-1.5 rounded-lg text-on-surface hover:bg-on-surface/10"
+            >
+              <Check size={16} />
+            </button>
+            <button
+              type="button"
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => setDraft(null)}
+              aria-label="Cancel"
+              className="p-1.5 rounded-lg text-on-surface-variant hover:bg-on-surface/10"
+            >
+              <X size={16} />
+            </button>
+          </span>
+        ) : (
+          <span className="flex items-center gap-1.5">
+            <span className="text-headline-md sm:text-display-sm font-bold text-on-surface tabular-nums">
+              {formattedAmount}
+            </span>
+            {!disabled && (
+              <button
+                type="button"
+                onClick={() => setDraft(String(dollarAmount))}
+                aria-label="Edit spending limit amount"
+                title="Type an exact amount"
+                className="p-1.5 rounded-lg text-on-surface-variant hover:bg-on-surface/10 hover:text-on-surface transition-colors"
+              >
+                <Pencil size={15} />
+              </button>
+            )}
+          </span>
+        )}
         <span className="text-headline-sm font-semibold" style={{ color: thumbColor }}>
-          {pct}%
+          {shownPct}%
         </span>
         <span className="text-label-md text-on-surface-variant">of monthly income</span>
         <span
@@ -114,8 +187,8 @@ export function HorizontalLimitBar({
           role="slider"
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-valuenow={pct}
-          aria-label={`Spending limit: ${pct}%`}
+          aria-valuenow={shownPct}
+          aria-label={`Spending limit: ${shownPct}%`}
         >
           {/* Dim overlay — fades everything right of the thumb */}
           <div

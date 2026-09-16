@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" font-family="Inter, system-ui, sans-serif">
-  <rect width="640" height="480" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 460" font-family="Inter, system-ui, sans-serif">
+  <rect width="640" height="460" fill="#ffffff"/>
   <text x="40" y="52" fill="#2d2f33" font-size="21" font-weight="700">Gross is not the number you budget with</text>
   <text x="40" y="78" fill="#5a5b60" font-size="14">Take-home is what actually arrives, and it is the only figure the rest of the month runs on.</text>
 
@@ -28,6 +28,4 @@
   <rect x="40" y="376" width="520" height="52" rx="12" fill="#4c49c9"/>
   <text x="60" y="408" fill="#ffffff" font-size="15" font-weight="600">Take-home pay</text>
   <text x="540" y="408" fill="#ffffff" font-size="17" font-weight="700" text-anchor="end">$2,734</text>
-
-  <text x="40" y="456" fill="#5a5b60" font-size="12.5">Roughly a third of the headline number never reaches the account.</text>
 </svg>

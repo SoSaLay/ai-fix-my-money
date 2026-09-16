@@ -72,7 +72,7 @@ export interface ManualAccount {
   /** e.g. 'checking', 'roth_ira', 'credit_card' */
   type: string
   balance: number
-  /** Credit limit — revolving accounts only. Utilisation needs it. */
+  /** Credit limit — revolving accounts only. Utilization needs it. */
   limit?: number
   createdAt: string
 }

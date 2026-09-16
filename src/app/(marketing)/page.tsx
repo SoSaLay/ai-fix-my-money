@@ -5,8 +5,8 @@ import { TrackTabs, type TrackSummary } from '@/components/marketing/track-tabs'
 import {
   CTA_CLASS, CTA_SMALL_CLASS, Faq, FinalCta, Footer, HowItWorks, StatsStrip, Why, type LandingStats,
 } from '@/components/marketing/landing-sections'
-import { PASS_THRESHOLD, TRACKS, readingMinutes } from '@/lib/learning/tracks'
-import { liveVideos, quizMix } from '@/lib/learning/video-pool/pool'
+import { PASS_THRESHOLD, TRACKS, trackMinutes } from '@/lib/learning/tracks'
+import { liveVideos } from '@/lib/learning/video-pool/pool'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // REJECTED VIDEOS
@@ -79,14 +79,7 @@ const STATS: LandingStats = {
  * choice. Rounded up to the nearest five so it reads as the estimate it is.
  */
 const MINUTES_PER_TRACK = (() => {
-  const total = LIVE_TRACKS.reduce((sum, t) => {
-    const mix = quizMix(t.id)
-    return sum
-      + readingMinutes(t)
-      + t.lessons.reduce((n, l) => n + l.questions.length, 0) * 0.5
-      + mix.videos * 3
-      + mix.choices * 0.5
-  }, 0)
+  const total = LIVE_TRACKS.reduce((sum, t) => sum + trackMinutes(t), 0)
   return Math.ceil(total / Math.max(1, LIVE_TRACKS.length) / 5) * 5
 })()
 

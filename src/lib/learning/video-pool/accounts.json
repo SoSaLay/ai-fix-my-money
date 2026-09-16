@@ -45,14 +45,13 @@
       "shares": 85861,
       "plays": 7769766
     },
-    "question": "The video says paying your statement balance in full each month keeps you out of interest. Does paying in full always mean you owe no interest?",
+    "question": "Does paying in full always mean you owe no interest?",
     "claimUnderTest": "Pay the statement balance in full by the due date and the grace period covers you — no interest is charged.",
-    "referenceAnswer": "It holds up, but only while you keep it up. The grace period is conditional: it applies to new purchases only if you paid the previous statement balance in full. Pay in full every month and you never touch interest, because each cycle's purchases are covered by the grace period the last full payment earned you.\n\nThe failure case is what makes the claim conditional. Carry a balance one month and you lose the grace period — from that point, new purchases start accruing interest from the day they post, not from the next statement date. Paying in full the following month doesn't retroactively erase that interest, and it usually takes a full cycle of paying in full to get the grace period back. So there's also a gap between the statement balance and the current balance: paying the statement balance is what protects you, even if you've spent more since the statement closed. And the grace period doesn't apply at all to cash advances, which accrue from day one regardless.",
+    "referenceAnswer": "Yes. Pay your full statement balance by the due date every month and you aren't charged interest on your purchases.\n\nWorth knowing: if you carried a balance the month before, interest can still show up until you've paid in full again, and cash advances are charged interest right away.",
     "rubric": [
-      "Says paying the statement balance in full each month does avoid interest, via the grace period",
-      "Explains the grace period is conditional on having paid the previous statement in full",
-      "Notes that once you carry a balance, new purchases accrue interest immediately until you re-qualify",
-      "Distinguishes statement balance from current balance as the amount that matters"
+      "Says yes — paying in full means no interest. Any answer along those lines is full marks, with or without a reason",
+      "Tip only: if you carried a balance the month before, interest can still show up until you've paid in full again",
+      "Tip only: cash advances are charged interest right away, even if you pay in full"
     ],
     "reviewedAt": "2026-09-09T22:34:23.505Z",
     "status": "approved",
@@ -138,12 +137,11 @@
     },
     "question": "The creator revealed they're carrying a large amount of debt. Does that mean their net worth is low?",
     "claimUnderTest": "The debt figure was presented as correcting the assumption that the creator is wealthy.",
-    "referenceAnswer": "Not necessarily. Net worth is assets minus liabilities, so a debt number on its own is only half the equation. What matters is what the debt bought. If someone borrowed to acquire property, equipment, or a business that's worth more than the loan against it, the debt sits opposite an asset and net worth can still be strongly positive. Large borrowing is often a sign of access to credit, which itself requires income and a track record.\n\nThe debt only signals trouble when there's nothing on the other side of it — consumer spending, high-interest balances, obligations against assets that lose value or produce no income. So the honest read is that you can't score anyone from a liability figure alone, in either direction.\n\nThe same logic runs the other way, which is why the original estimate was wrong too. Guessing net worth from visible signals — revenue, a house, a car — measures assets while ignoring what's owed against them. Both the researcher's high estimate and the \"actually in debt\" correction make the same mistake from opposite ends: each takes one side of the balance sheet as the answer.",
+    "referenceAnswer": "Not necessarily. A debt number on its own doesn't tell you net worth, because net worth is what someone owns minus what they owe — you'd need to see both sides. Being able to borrow a lot often means lenders trust the person's income and track record.\n\nIf the debt bought property, equipment, or a business worth more than the loan, net worth can still be high. Debt only drags net worth down when there's nothing valuable on the other side of it, like spending or high-interest balances.",
     "rubric": [
-      "Defines net worth as assets minus liabilities",
-      "Explains that debt held against valuable or income-producing assets doesn't mean low net worth",
-      "Distinguishes that from debt with nothing behind it, which does reduce net worth",
-      "Notes the original high estimate had the same flaw — judging from one side only"
+      "Says no, not necessarily — debt alone doesn't show someone's net worth, because what they own matters too",
+      "Explains that debt held against valuable or income-producing assets can leave net worth high",
+      "Notes that debt with nothing valuable behind it does lower net worth"
     ],
     "reviewedAt": "2026-09-09T23:22:34.748Z",
     "status": "approved",
@@ -206,7 +204,7 @@
       "Notes the balance sheet shows position over time, unlike income, and tracking it reveals real progress"
     ],
     "reviewedAt": "2026-09-09T23:44:01.405Z",
-    "status": "approved",
+    "status": "retired",
     "lastCheckedAt": "2026-09-14T15:51:27.108Z"
   },
   {
@@ -226,15 +224,11 @@
       "shares": 50343,
       "plays": 3628576
     },
-    "question": "Using the creator's approach, how would you split your monthly income, and which accounts would each piece go into?",
-    "claimUnderTest": "Your monthly income should be divided by percentage across a few specific destinations rather than left in one account.",
-    "referenceAnswer": "The shape of the answer matters more than the exact percentages. Income lands in checking, which is the hub — fixed costs and spending run through it, and everything else gets moved out from there rather than left sitting.\n\nFrom there the money splits by job:\n\nSavings (ideally high-yield) holds the emergency fund — the cushion for job loss or a surprise expense, kept liquid and separate so it isn't spent by accident. This usually gets funded early, at least to a starter amount.\n401(k), at minimum up to the employer match. This is the \"free money\" — the employer contributes on top of what you put in, so not capturing it is leaving compensation behind. It's the highest-return move available and generally comes before extra debt payments on anything low-interest.\nDebt payoff, made from checking to the card or loan. High-interest balances, credit cards especially, are prioritized because the interest rate you avoid is a guaranteed return.\nBrokerage, for investing beyond retirement accounts — money that doesn't have a near-term job and can stay invested, with the tradeoff that it isn't tax-advantaged but also isn't locked until retirement.\n\nThe rough ordering most of these breakdowns land on: cover fixed expenses, grab the employer match, build a small emergency cushion, kill high-interest debt, then split what's left between longer-term savings and investing. A percentage rule is a starting frame, not a prescription — the split shifts with income, cost of living, and how much debt is in the picture.",
+    "question": "Using the creator's approach, list the three accounts your monthly income would be divided into.",
+    "claimUnderTest": "Your monthly income should be divided across a few separate accounts rather than left in one.",
+    "referenceAnswer": "Checking, savings, and brokerage.",
     "rubric": [
-      "Names checking as where income lands and spending runs through",
-      "Names savings (emergency fund) as a separate destination from spending money",
-      "Mentions 401(k), ideally identifying the employer match as the \"free money\"",
-      "Mentions paying down debt, and/or a brokerage for longer-term investing",
-      "Grade this one loosely — any reasonable split across those accounts should earn credit, and a learner shouldn't be penalized for naming different percentages than the video used."
+      "Names the three accounts: checking, savings, and brokerage. A high-yield savings account counts as savings, and naming them in any order, with or without percentages or purposes, is full marks"
     ],
     "reviewedAt": "2026-09-09T23:52:23.193Z",
     "status": "approved",

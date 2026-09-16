@@ -4,21 +4,28 @@ import { useState, useCallback } from 'react'
 import { Plus, X } from 'lucide-react'
 import { useFinancialData } from '@/contexts/financial-data-context'
 
+// Whether a type counts as owed is decided by keywords in its value elsewhere
+// ('credit', 'loan', 'mortgage', 'auto'…), so asset values must steer clear of
+// those words — a car is 'vehicle', never 'auto'.
 const ACCOUNT_TYPES: { value: string; label: string; group: string }[] = [
-  { value: 'checking',     label: 'Checking',            group: 'Holds your money' },
-  { value: 'savings',      label: 'Savings',             group: 'Holds your money' },
-  { value: 'money_market', label: 'Money market',        group: 'Holds your money' },
-  { value: 'cash',         label: 'Cash / payment app',  group: 'Holds your money' },
-  { value: 'brokerage',    label: 'Brokerage',           group: 'Holds investments' },
-  { value: 'retirement',   label: 'Retirement (401k, IRA)', group: 'Holds investments' },
-  { value: 'credit_card',  label: 'Credit card',         group: 'Money you owe' },
-  { value: 'student_loan', label: 'Student loan',        group: 'Money you owe' },
-  { value: 'auto_loan',    label: 'Auto loan',           group: 'Money you owe' },
-  { value: 'mortgage',     label: 'Mortgage',            group: 'Money you owe' },
-  { value: 'personal_loan',label: 'Personal loan',       group: 'Money you owe' },
+  { value: 'checking',     label: 'Checking',            group: 'Assets: cash' },
+  { value: 'savings',      label: 'Savings',             group: 'Assets: cash' },
+  { value: 'money_market', label: 'Money market',        group: 'Assets: cash' },
+  { value: 'cash',         label: 'Cash / payment app',  group: 'Assets: cash' },
+  { value: 'brokerage',    label: 'Brokerage',           group: 'Assets: investments' },
+  { value: 'retirement',   label: 'Retirement (401k, IRA)', group: 'Assets: investments' },
+  { value: 'real_estate',  label: 'Home or property',    group: 'Assets: things you own' },
+  { value: 'vehicle',      label: 'Car or vehicle',      group: 'Assets: things you own' },
+  { value: 'valuables',    label: 'Valuables (jewelry, collectibles)', group: 'Assets: things you own' },
+  { value: 'other_asset',  label: 'Other asset',         group: 'Assets: things you own' },
+  { value: 'credit_card',  label: 'Credit card',         group: 'Liabilities: money you owe' },
+  { value: 'student_loan', label: 'Student loan',        group: 'Liabilities: money you owe' },
+  { value: 'auto_loan',    label: 'Auto loan',           group: 'Liabilities: money you owe' },
+  { value: 'mortgage',     label: 'Mortgage',            group: 'Liabilities: money you owe' },
+  { value: 'personal_loan',label: 'Personal loan',       group: 'Liabilities: money you owe' },
 ]
 
-const GROUPS = ['Holds your money', 'Holds investments', 'Money you owe']
+const GROUPS = ['Assets: cash', 'Assets: investments', 'Assets: things you own', 'Liabilities: money you owe']
 
 /**
  * Manual account entry. Typing each account out is the point — it is how
@@ -33,6 +40,10 @@ export function AddAccountForm() {
   const [limit, setLimit] = useState('')
 
   const isCredit = type === 'credit_card'
+  const group = ACCOUNT_TYPES.find(t => t.value === type)?.group
+  const balanceLabel =
+    group === 'Assets: things you own' ? 'What it’s worth today' :
+    group === 'Liabilities: money you owe' ? 'Balance owed' : 'Current balance'
 
   const reset = useCallback(() => {
     setName(''); setType('checking'); setBalance(''); setLimit(''); setOpen(false)
@@ -54,7 +65,7 @@ export function AddAccountForm() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-label-lg font-medium text-secondary bg-secondary-fixed/25 hover:bg-secondary-fixed/40 transition-colors w-fit"
+        className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-on-surface/15 text-label-lg text-on-surface hover:bg-on-surface/[0.06] transition-colors w-fit"
       >
         <Plus size={16} /> Add an account
       </button>
@@ -62,7 +73,7 @@ export function AddAccountForm() {
   }
 
   return (
-    <div className="bg-surface-container-lowest rounded-2xl p-5 flex flex-col gap-4">
+    <div className="bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] shadow-card p-5 sm:p-6 flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <p className="text-title-md text-on-surface font-semibold">Add an account</p>
         <button onClick={reset} className="text-on-surface-variant hover:text-on-surface" aria-label="Cancel">
@@ -77,7 +88,7 @@ export function AddAccountForm() {
             value={name}
             onChange={e => setName(e.target.value)}
             placeholder="Chase checking"
-            className="w-full bg-surface-container rounded-xl px-3.5 py-2.5 text-body-md text-on-surface outline-none focus:ring-2 focus:ring-secondary/40"
+            className="w-full rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-4 py-2.5 text-body-md text-on-surface outline-none transition-colors focus:border-on-surface/40"
           />
         </Field>
 
@@ -85,7 +96,7 @@ export function AddAccountForm() {
           <select
             value={type}
             onChange={e => setType(e.target.value)}
-            className="w-full bg-surface-container rounded-xl px-3.5 py-2.5 text-body-md text-on-surface outline-none focus:ring-2 focus:ring-secondary/40"
+            className="w-full rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-4 py-2.5 text-body-md text-on-surface outline-none transition-colors focus:border-on-surface/40"
           >
             {GROUPS.map(group => (
               <optgroup key={group} label={group}>
@@ -98,14 +109,14 @@ export function AddAccountForm() {
         </Field>
 
         <div className="grid grid-cols-2 gap-3">
-          <Field label={isCredit ? 'Balance owed' : 'Current balance'}>
+          <Field label={balanceLabel}>
             <input
               value={balance}
               onChange={e => setBalance(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') submit() }}
               inputMode="decimal"
               placeholder="0.00"
-              className="w-full bg-surface-container rounded-xl px-3.5 py-2.5 text-body-md text-on-surface outline-none focus:ring-2 focus:ring-secondary/40"
+              className="w-full rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-4 py-2.5 text-body-md text-on-surface outline-none transition-colors focus:border-on-surface/40"
             />
           </Field>
 
@@ -117,7 +128,7 @@ export function AddAccountForm() {
                 onKeyDown={e => { if (e.key === 'Enter') submit() }}
                 inputMode="decimal"
                 placeholder="0.00"
-                className="w-full bg-surface-container rounded-xl px-3.5 py-2.5 text-body-md text-on-surface outline-none focus:ring-2 focus:ring-secondary/40"
+                className="w-full rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-4 py-2.5 text-body-md text-on-surface outline-none transition-colors focus:border-on-surface/40"
               />
             </Field>
           )}
@@ -125,7 +136,7 @@ export function AddAccountForm() {
 
         {isCredit && (
           <p className="text-label-sm text-on-surface-variant">
-            Balance ÷ limit is your utilisation on this card.
+            Balance ÷ limit is your utilization on this card.
           </p>
         )}
       </div>
@@ -133,7 +144,7 @@ export function AddAccountForm() {
       <button
         onClick={submit}
         disabled={!name.trim() || isNaN(parseFloat(balance))}
-        className="self-start bg-secondary text-white rounded-xl px-5 py-2.5 text-label-lg font-medium disabled:opacity-35 transition-opacity"
+        className="btn-action self-start items-center justify-center disabled:opacity-35"
       >
         Add account
       </button>
@@ -144,7 +155,7 @@ export function AddAccountForm() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-label-sm text-on-surface-variant">{label}</span>
+      <span className="text-label-md text-on-surface-variant">{label}</span>
       {children}
     </label>
   )

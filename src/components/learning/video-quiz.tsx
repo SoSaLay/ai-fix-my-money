@@ -18,9 +18,11 @@ import { ArrowRight, Check, Loader2, Mic, MicOff, RotateCcw, Square, Volume2 } f
 
 import { VideoEmbed } from '@/components/learning/video-embed'
 import { AnswerOption, WhyPanel } from '@/components/learning/answer-option'
+import { Calculator } from '@/components/learning/calculator'
 import { useDictation } from '@/hooks/use-dictation'
 import { completeAttempt, reportVideoUnavailable } from '@/lib/learning/quiz/client'
 import { findLessonImage, type QuizQuestion, type Track } from '@/lib/learning/tracks'
+import { shuffleOptions } from '@/lib/learning/shuffle-options'
 import type { PublicVideoQuestion } from '@/lib/learning/video-pool/types'
 import { finalRankPoints } from '@/lib/learning/rank'
 
@@ -99,6 +101,9 @@ export function VideoQuiz({ track, onSubmit, onDone, attemptKey }: VideoQuizProp
     return paper.choices
       .map(c => track.finalQuiz.find(q => q.id === c.id))
       .filter((q): q is QuizQuestion => Boolean(q))
+      // Reordered here, before anything reads `answer`, so the mark matches
+      // what the learner was shown.
+      .map(shuffleOptions)
   }, [paper, track.finalQuiz])
 
   const videos = paper?.videos ?? []
@@ -215,6 +220,8 @@ export function VideoQuiz({ track, onSubmit, onDone, attemptKey }: VideoQuizProp
           }
         />
       ))}
+
+      {choices.some(q => q.calculator) && <Calculator />}
 
       <div className="flex items-center justify-end gap-4 flex-wrap">
         {!allAnswered && (
@@ -423,7 +430,7 @@ function VideoQuestion({
   )
 }
 
-/** The mark, its reasoning, and what the answer did not reach. */
+/** The mark, its reasoning, and what the answer did not reach — tips on full marks. */
 function GradeCard({ grade }: { grade: Grade }) {
   const label =
     grade.verdict === 'full' ? 'Full marks' :
@@ -449,7 +456,7 @@ function GradeCard({ grade }: { grade: Grade }) {
       {grade.missed.length > 0 && (
         <div className="flex flex-col gap-1.5">
           <span className="text-label-lg text-on-surface">
-            Not covered
+            {grade.verdict === 'full' ? 'Worth adding next time' : 'Not covered'}
           </span>
           <ul className="list-disc pl-5 text-body-md text-on-surface-variant flex flex-col gap-1">
             {grade.missed.map(point => (
@@ -484,16 +491,15 @@ function ChoiceQuestion({
 
       {image && (
         <figure className="w-full max-w-[420px] rounded-2xl overflow-hidden bg-surface-container-low">
-          <div className="relative w-full aspect-[4/3]">
-            <Image
-              src={image.src}
-              alt={image.alt}
-              fill
-              sizes="420px"
-              unoptimized={image.src.endsWith('.svg')}
-              className="object-contain"
-            />
-          </div>
+          <Image
+            src={image.src}
+            alt={image.alt}
+            width={0}
+            height={0}
+            sizes="420px"
+            unoptimized={image.src.endsWith('.svg')}
+            className="w-full h-auto"
+          />
         </figure>
       )}
 

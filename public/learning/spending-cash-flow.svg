@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" font-family="Inter, system-ui, sans-serif">
-  <rect width="640" height="480" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 410" font-family="Inter, system-ui, sans-serif">
+  <rect width="640" height="410" fill="#ffffff"/>
   <text x="40" y="52" fill="#2d2f33" font-size="21" font-weight="700">Cash flow is what is left over</text>
   <text x="40" y="78" fill="#5a5b60" font-size="14">Money in, less money out. Its sign decides what every other choice is made of.</text>
 
@@ -21,7 +21,4 @@
   <text x="60" y="345" fill="#2d2f33" font-size="15" font-weight="600">Monthly cash flow</text>
   <text x="60" y="367" fill="#5a5b60" font-size="12.5">Negative — the gap is being covered by something</text>
   <text x="540" y="356" fill="#ba1a1a" font-size="21" font-weight="700" text-anchor="end">− $310</text>
-
-  <text x="40" y="412" fill="#5a5b60" font-size="13">Positive cash flow is the raw material for saving, investing, and paying debt</text>
-  <text x="40" y="434" fill="#5a5b60" font-size="13">down. Negative cash flow means savings or credit is quietly filling the gap.</text>
 </svg>

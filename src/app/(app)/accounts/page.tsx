@@ -340,6 +340,7 @@ function AccountsPageTool() {
 
   const totalAssets = accounts.reduce((sum, a) => sum + Number(a.current_balance), 0)
   const totalDebts = debts.reduce((sum, d) => sum + Math.abs(Number(d.current_balance)), 0)
+  const netWorth = totalAssets - totalDebts
 
   const depositoryAccounts = accounts.filter(a => a.type === 'depository' || a.type === 'investment')
 
@@ -423,6 +424,17 @@ function AccountsPageTool() {
             <p className="text-display-sm font-bold text-sunset">
               ${totalDebts.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
+          </div>
+
+          {/* The one subtraction the two totals above exist for */}
+          <div className="col-span-2 bg-surface-container-lowest rounded-2xl shadow-card p-6 flex items-end justify-between gap-4 flex-wrap">
+            <div>
+              <p className="text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Net Worth</p>
+              <p className={`text-display-sm font-bold tabular-nums ${netWorth < 0 ? 'text-error' : 'text-success'}`}>
+                {netWorth < 0 ? '−' : ''}${Math.abs(netWorth).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+            </div>
+            <p className="text-body-md text-on-surface-variant">Total assets − total debt</p>
           </div>
         </div>
       </div>

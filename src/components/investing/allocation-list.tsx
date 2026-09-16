@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Check, Plus, X } from 'lucide-react'
+import { Check, Pencil, Plus, X } from 'lucide-react'
 
 import {
   INVESTMENT_CATEGORIES,
@@ -36,9 +36,6 @@ interface AllocationListProps {
 export function AllocationList({
   allocations, custom, monthlyIncome, headroomPct, disabled, onChange, onCustomChange,
 }: AllocationListProps) {
-  const chosen = INVESTMENT_CATEGORIES.filter(c => (allocations[c.id] ?? 0) > 0)
-  const rest = INVESTMENT_CATEGORIES.filter(c => (allocations[c.id] ?? 0) <= 0)
-
   const setCustomPct = (id: string, pct: number) =>
     onCustomChange(custom.map(c => (c.id === id ? { ...c, pct } : c)))
 
@@ -52,46 +49,24 @@ export function AllocationList({
         </p>
       </div>
 
-      {chosen.length > 0 && (
-        <div className="flex flex-col gap-2.5">
-          {chosen.map(category => (
-            <AllocationRow
-              key={category.id}
-              name={category.name}
-              badge={RISK_LABEL[category.tier]}
-              shade={RISK_RAMP[category.tier]}
-              pct={allocations[category.id] ?? 0}
-              monthlyIncome={monthlyIncome}
-              headroomPct={headroomPct}
-              disabled={disabled}
-              onSet={pct => onChange(category.id, pct)}
-            />
-          ))}
-        </div>
-      )}
-
-      {rest.length > 0 && (
-        <div className="flex flex-col gap-2.5">
-          {chosen.length > 0 && (
-            <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">
-              Not allocated
-            </p>
-          )}
-          {rest.map(category => (
-            <AllocationRow
-              key={category.id}
-              name={category.name}
-              badge={RISK_LABEL[category.tier]}
-              shade={RISK_RAMP[category.tier]}
-              pct={0}
-              monthlyIncome={monthlyIncome}
-              headroomPct={headroomPct}
-              disabled={disabled}
-              onSet={pct => onChange(category.id, pct)}
-            />
-          ))}
-        </div>
-      )}
+      {/* One list in a fixed order. Splitting funded rows into their own group
+          moved a row the moment it was funded, which tore the slider out from
+          under the pointer mid-drag. */}
+      <div className="flex flex-col gap-2.5">
+        {INVESTMENT_CATEGORIES.map(category => (
+          <AllocationRow
+            key={category.id}
+            name={category.name}
+            badge={RISK_LABEL[category.tier]}
+            shade={RISK_RAMP[category.tier]}
+            pct={allocations[category.id] ?? 0}
+            monthlyIncome={monthlyIncome}
+            headroomPct={headroomPct}
+            disabled={disabled}
+            onSet={pct => onChange(category.id, pct)}
+          />
+        ))}
+      </div>
 
       <div className="flex flex-col gap-2.5">
         <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">Other</p>
@@ -133,10 +108,7 @@ function AddCustom({ onAdd }: { onAdd: (name: string) => void }) {
   }
 
   return (
-    <div
-      className="rounded-xl px-4 py-3 flex items-center gap-3"
-      style={{ boxShadow: 'inset 0 0 0 1px rgba(172,173,177,0.35)' }}
-    >
+    <div className="rounded-2xl border border-on-surface/15 px-4 py-2.5 flex items-center gap-3 focus-within:border-on-surface/40 transition-colors">
       <input
         type="text"
         value={name}
@@ -150,9 +122,9 @@ function AddCustom({ onAdd }: { onAdd: (name: string) => void }) {
       <button
         onClick={add}
         disabled={!name.trim()}
-        className="shrink-0 inline-flex items-center gap-1 text-label-sm text-secondary font-medium disabled:opacity-40"
+        className="shrink-0 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-label-md text-on-surface hover:bg-on-surface/[0.06] transition-colors disabled:opacity-40"
       >
-        <Plus size={13} /> Add
+        <Plus size={14} /> Add
       </button>
     </div>
   )
@@ -197,48 +169,59 @@ function AllocationRow({
     set(isNaN(parsed) ? 0 : parsed)
   }
 
-  // The controls stay open while a row holds money, so the slider is there to
-  // drag without hunting for a way back into edit mode.
-  const showControls = (active || open) && !disabled
+  // The tick confirms the row and puts the controls away. Without this it
+  // committed a value the row already held, so it looked like nothing happened.
+  const confirm = () => {
+    commitTyped()
+    setOpen(false)
+  }
+
+  const showControls = open && !disabled
 
   return (
     <div
-      className="rounded-xl px-4 py-3 flex flex-col gap-2 transition-colors"
+      className="rounded-2xl px-4 py-3 flex flex-col gap-2 transition-colors"
       style={{
         backgroundColor: active ? shade.tint : undefined,
         borderLeft: `3px solid ${active ? shade.stripe : 'transparent'}`,
-        boxShadow: active ? undefined : 'inset 0 0 0 1px rgba(172,173,177,0.35)',
+        boxShadow: active ? undefined : 'inset 0 0 0 1px rgba(45,47,51,0.15)',
       }}
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 min-w-0">
           <p className="text-body-md font-semibold text-on-surface truncate">{name}</p>
           <span
-            className="text-label-sm font-semibold shrink-0 px-2 py-0.5 rounded-full"
+            className="text-label-sm font-semibold shrink-0 px-2.5 py-0.5 rounded-full"
             style={{ color: shade.stripe, backgroundColor: active ? 'rgba(255,255,255,0.6)' : shade.tint }}
           >
             {badge}
           </span>
         </div>
 
-        {active ? (
-          <div className="shrink-0 text-right">
-            <span className="text-body-md font-semibold text-on-surface tabular-nums">
-              {pct}%
-            </span>
-            <span className="block text-label-sm text-on-surface-variant tabular-nums">
-              ${amount.toLocaleString()}/mo
-            </span>
-          </div>
-        ) : !showControls ? (
-          <button
-            onClick={() => !disabled && setOpen(true)}
-            disabled={disabled}
-            className="shrink-0 inline-flex items-center gap-1 text-label-sm text-secondary font-medium disabled:opacity-50"
-          >
-            <Plus size={13} /> Select
-          </button>
-        ) : null}
+        <div className="flex items-center gap-2 shrink-0">
+          {active && (
+            <div className="text-right">
+              <span className="text-body-md font-semibold text-on-surface tabular-nums">
+                {pct}%
+              </span>
+              <span className="block text-label-sm text-on-surface-variant tabular-nums">
+                ${amount.toLocaleString()}/mo
+              </span>
+            </div>
+          )}
+
+          {!showControls && !disabled && (
+            <button
+              onClick={() => setOpen(true)}
+              className={active
+                ? 'p-1.5 rounded-full text-on-surface-variant hover:bg-on-surface/[0.06] transition-colors'
+                : 'inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-label-md text-on-surface hover:bg-on-surface/[0.06] transition-colors'}
+              aria-label={active ? `Edit ${name}` : undefined}
+            >
+              {active ? <Pencil size={14} /> : <><Plus size={14} /> Select</>}
+            </button>
+          )}
+        </div>
       </div>
 
       {showControls && (
@@ -261,7 +244,7 @@ function AllocationRow({
                 its own ground and its own outline rather than borrowing the
                 row's. White on white is invisible on a row nobody has funded
                 yet, which is exactly when the field matters most. */}
-            <div className="flex items-center gap-0.5 rounded-lg border border-outline-variant/70 bg-white pl-1.5 pr-2 py-1 focus-within:ring-2 focus-within:ring-secondary">
+            <div className="flex items-center gap-0.5 rounded-xl border border-on-surface/20 bg-white pl-1.5 pr-2 py-1 focus-within:border-on-surface/45 transition-colors">
               <input
                 type="number"
                 min={0}
@@ -270,25 +253,26 @@ function AllocationRow({
                 onChange={e => setDraft(e.target.value)}
                 onBlur={commitTyped}
                 onKeyDown={e => {
-                  if (e.key === 'Enter') commitTyped()
+                  if (e.key === 'Enter') confirm()
                   if (e.key === 'Escape') setDraft(String(pct || ''))
                 }}
                 // Centred, not right-aligned: the browser draws its stepper
                 // arrows inside the right edge of the field, so right-aligned
                 // digits end up underneath them. Centring puts clear space on
                 // both sides of the number.
-                className="w-16 bg-transparent text-body-md text-on-surface text-center outline-none"
+                className="w-16 bg-transparent text-body-md text-on-surface tabular-nums text-center outline-none"
                 aria-label={`Percent of income for ${name}, typed`}
               />
               <span className="text-label-sm text-on-surface-variant">%</span>
             </div>
 
             <button
-              onClick={commitTyped}
-              className="p-1.5 rounded-lg hover:bg-surface-container"
+              onMouseDown={e => e.preventDefault()}
+              onClick={confirm}
+              className="p-1.5 rounded-full bg-[#17171c] text-white hover:bg-black transition-colors"
               aria-label={`Confirm ${name}`}
             >
-              <Check size={15} className="text-on-surface" />
+              <Check size={15} />
             </button>
 
             {(active || onRemove) && (
@@ -297,10 +281,10 @@ function AllocationRow({
                   if (onRemove) onRemove()
                   else { set(0); setOpen(false) }
                 }}
-                className="p-1.5 rounded-lg hover:bg-surface-container"
+                className="p-1.5 rounded-full text-on-surface-variant hover:bg-on-surface/[0.06] transition-colors"
                 aria-label={onRemove ? `Remove ${name}` : `Clear ${name}`}
               >
-                <X size={15} className="text-on-surface-variant" />
+                <X size={15} />
               </button>
             )}
           </div>

@@ -196,14 +196,13 @@
       "shares": 1848,
       "plays": 137511
     },
-    "question": "The video walks $50,000 in sales down to $17,500 after tax. How does that same breakdown apply to your personal finances, and why does it matter if you start a business?",
+    "question": "How does that same breakdown apply to your personal finances?",
     "claimUnderTest": "Revenue isn't profit — costs of goods, overhead, and taxes come out in sequence, and only the last number is what you actually keep.",
-    "referenceAnswer": "The structure is the same one that runs your paycheck, just with more steps exposed. Gross salary is your revenue — the headline number that never arrives intact. Taxes and withholdings come out the way they do for the business, and what lands in your account is net income. Your fixed costs — rent, insurance, car payment, utilities — are the personal version of overhead, and what survives all of it is your real discretionary money. In both cases the top number describes the size of what flows through you, and the bottom number describes what you keep. Judging yourself or a business by revenue is the same mistake in two settings.\n\nThe difference matters most if you start a business, because the steps that were invisible in a paycheck become yours to manage. An employer hides the deductions; a business owner has to subtract them manually and keep the result straight. Two traps follow. First, revenue feels like income — a $50,000 month doesn't mean $50,000 to spend, and confusing the two is how owners overspend while technically profitable. Second, taxes aren't withheld for you. Nobody removes that $7,500 before it hits your account, so it has to be set aside deliberately, usually through quarterly estimated payments, or it comes due as a bill you've already spent.\n\nKnowing the intermediate numbers is what makes the business improvable. Gross profit tells you whether the product itself makes money after what it costs to produce and sell; if that margin is thin, more sales won't save you. Net profit tells you whether the operation supports its overhead. A business can grow revenue every month and still be losing, and you can't see which problem you have from the top line alone.\n\nThe practical version for someone starting out: separate business and personal accounts so the numbers stay readable, price off gross margin rather than revenue, reserve for taxes as money comes in rather than at year-end, and treat after-tax profit as the only figure comparable to a salary.",
+    "referenceAnswer": "The same shape runs your paycheck. Money comes in at the top, taxes come out, fixed costs come out, and what survives is what you actually keep. Gross pay is the business's revenue, and the number in your account is what matters.\n\nWorth knowing: the top number is never what you can spend, in either setting. Running a business, nobody withholds tax for you, so you have to set it aside yourself.",
     "rubric": [
-      "Maps the structure to personal finances — gross pay is revenue, taxes and withholdings come out, fixed costs are overhead, what's left is what you keep",
-      "States that revenue isn't income, in either setting — the top number isn't what you can spend",
-      "Notes that a business owner must set aside taxes themselves, since nothing is withheld for them",
-      "Explains why the intermediate numbers matter — gross margin shows whether the product is profitable, net profit whether the operation is"
+      "Connects the breakdown to personal finances — money in at the top, taxes and costs out, and what's left is what you keep. Any answer along those lines is full marks",
+      "Tip only: revenue isn't income — the top number isn't what you can spend",
+      "Tip only: a business owner has to set aside taxes themselves, since nothing is withheld for them"
     ],
     "reviewedAt": "2026-09-11T01:56:40.011Z",
     "status": "approved",
@@ -316,14 +315,14 @@
       "shares": 6961,
       "plays": 321231
     },
-    "question": "The creator says his journeyman license means his \"new minimum wage is a six figure salary.\" What makes a skill valuable enough to do that, and what does that suggest about how people should think about building skills?",
+    "question": "The creator says his journeyman license means his \"new minimum wage is a six figure salary.\" What makes a skill valuable enough to do that?",
     "claimUnderTest": "A licensed trade is worth acquiring because it produces high pay permanently, transfers anywhere, and doesn't expire.",
-    "referenceAnswer": "What makes the skill valuable is the combination of real demand and limited supply. Electrical work has to be done, can't be outsourced or automated away easily, and the number of people qualified to do it is constrained by the training and licensing required. That's the general shape of a high-income skill: something people need, that not many can do, where the barrier is real enough to keep the field from flooding but low enough that an ordinary person can cross it.\n\nThe durability is the underrated part. He describes the license as a floor rather than a ceiling — something he can always return to. A skill you own doesn't disappear when a job does, doesn't depend on one employer, and travels with you geographically. That's a different kind of security than a high salary at a single company, and it's why he can treat six figures as his worst case rather than his best.\n\nThe broader point is about the path in. His was an apprenticeship — paid training, no tuition, no debt, and earning by his early twenties. That's one route among several, and the common thread is that valuable skills are acquired, not credentialed into existence. Trades, certifications, self-taught technical skills, and sales all have paths that don't run through a four-year degree, and the market pays for demonstrated capability rather than for the method used to acquire it. What's actually required is choosing something with real demand and committing long enough to reach competence, since the value comes from the scarcity that the difficulty creates.\n\nThe regret he expresses — not knowing at eighteen — is really about time. Skills compound: the earlier the investment, the longer it pays, and the sooner the income can be used to build everything else",
+    "referenceAnswer": "People need the work done and not many people can do it. Demand is what gives the skill its price, and the training and licensing keep the field from flooding.\n\nWorth knowing: a skill like this belongs to you, so it outlasts any one job, and there is more than one way in — an apprenticeship, a certification, or teaching yourself.",
     "rubric": [
-      "Identifies what creates value: genuine demand plus limited supply, with a real barrier to entry",
-      "Notes the skill is durable and portable — it belongs to you, outlasts any job, and works as a floor rather than a one-time win",
-      "Recognizes multiple paths to acquiring it — apprenticeships, certifications, self-teaching — not only a degree",
-      "Points out the time element: acquiring skills earlier means a longer payoff period"
+      "Says the skill is in demand — people need it and will pay for it. Any answer along those lines is full marks",
+      "Tip only: limited supply matters too — training or licensing keeps the field from flooding",
+      "Tip only: the skill is durable and portable, so it outlasts any one job",
+      "Tip only: there are several ways in — apprenticeships, certifications, or teaching yourself"
     ],
     "reviewedAt": "2026-09-11T03:18:48.859Z",
     "status": "approved",

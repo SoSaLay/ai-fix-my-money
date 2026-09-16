@@ -192,6 +192,18 @@ function SavingsPageTool() {
               )}
             </div>
 
+            {/* Over-committed: the ring is full, so the numbers have to say it */}
+            {totalSavingsAmount > monthlyIncome && (
+              <div className="w-full rounded-xl bg-error/[0.08] px-4 py-3">
+                <p className="text-label-md text-on-surface leading-relaxed">
+                  Your goals need ${totalSavingsAmount.toLocaleString()} a month, but you take home
+                  {' '}${Math.round(monthlyIncome).toLocaleString()} — that is
+                  {' '}${(totalSavingsAmount - Math.round(monthlyIncome)).toLocaleString()} more than you have.
+                  Lower a goal&rsquo;s share, or give it longer.
+                </p>
+              </div>
+            )}
+
             <CommittedAllocations
               monthlyIncome={monthlyIncome}
               spendingPct={lockedSpendingPct}

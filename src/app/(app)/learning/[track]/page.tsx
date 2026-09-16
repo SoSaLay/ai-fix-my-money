@@ -1,13 +1,13 @@
 'use client'
 
-import { use, useState, useEffect, useCallback, useMemo } from 'react'
+import { use, useState, useEffect, useLayoutEffect, useCallback, useMemo, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
-  ArrowLeft, ArrowRight, Check, PenLine, Sparkles, Trophy, RotateCcw, Unlock,
+  ArrowLeft, ArrowRight, Check, Sparkles, Trophy, RotateCcw, Unlock,
 } from 'lucide-react'
 import { useLearning, type Stage } from '@/contexts/learning-context'
-import { getTrack, shortTitle, type Track, type Lesson, type LessonSection } from '@/lib/learning/tracks'
+import { getTrack, shortTitle, type Track, type Lesson } from '@/lib/learning/tracks'
 import { DISCLAIMER_INVESTING } from '@/lib/learning/disclaimer'
 import { DisclaimerFooter } from '@/components/learning/disclaimer-footer'
 import { LessonContent } from '@/components/learning/lesson-content'
@@ -16,6 +16,7 @@ import { ReadTimer } from '@/components/learning/read-timer'
 import { QuestionStack } from '@/components/learning/question-stack'
 import { VideoQuiz } from '@/components/learning/video-quiz'
 import { StepRail, type RailItem } from '@/components/learning/step-rail'
+import { Confetti } from '@/components/learning/celebration'
 
 export default function TrackPage({ params }: { params: Promise<{ track: string }> }) {
   const { track: trackParam } = use(params)
@@ -36,6 +37,18 @@ export default function TrackPage({ params }: { params: Promise<{ track: string 
     if (!ready || !track) return
     setView(stageFor(track.id))
   }, [ready, track, stageFor])
+
+  // A new step starts at the top. Without this, pressing Next at the bottom of
+  // one lesson drops the learner at the bottom of the next.
+  const viewKey = view ? (view.kind === 'lesson' ? `lesson:${view.id}` : view.kind) : null
+  const shownView = useRef<string | null>(null)
+  useLayoutEffect(() => {
+    if (!viewKey) return
+    if (shownView.current !== null && shownView.current !== viewKey) {
+      window.scrollTo({ top: 0, behavior: 'instant' })
+    }
+    shownView.current = viewKey
+  }, [viewKey])
 
   if (!ready || !track) {
     return <Missing message="That track doesn’t exist." />
@@ -168,7 +181,7 @@ export default function TrackPage({ params }: { params: Promise<{ track: string 
           )}
 
           {view.kind === 'done' && (
-            <Congratulations track={track} result={progress.final} didAction={progress.actionDone} />
+            <Congratulations track={track} result={progress.final} />
           )}
 
         </div>
@@ -196,7 +209,25 @@ function LessonStage({
   const [reading, setReading] = useState(!alreadyAnswered)
   const [state, setState] = useState({ allAnswered: false, missed: [] as string[], correct: 0 })
 
-  const onElapsed = useCallback(() => setReading(false), [])
+  // Swapping the timer for the questions must not move the page. The browser's
+  // scroll anchoring can latch onto something below the timer and follow it
+  // down past the new questions, so the reading position is put back by hand.
+  const readingScroll = useRef<number | null>(null)
+
+  const onElapsed = useCallback(() => {
+    readingScroll.current = window.scrollY
+    setReading(false)
+  }, [])
+
+  useLayoutEffect(() => {
+    if (reading || readingScroll.current === null) return
+    const y = readingScroll.current
+    readingScroll.current = null
+    window.scrollTo({ top: y, behavior: 'instant' })
+    // Anchoring can adjust again on the next layout, once the questions settle.
+    const frame = requestAnimationFrame(() => window.scrollTo({ top: y, behavior: 'instant' }))
+    return () => cancelAnimationFrame(frame)
+  }, [reading])
 
   return (
     <div className="flex flex-col gap-8">
@@ -247,46 +278,10 @@ function LessonStage({
 // ─── Action: go and use the real tool ────────────────────────────────────────
 
 /**
- * Reference material carried into the action step. Deliberately quieter than a
- * lesson — this is something to look across while working, not something to
- * read through, so it sits in a recessed block rather than in the page's own
- * type scale.
+ * Two short lists and one button: what to have ready, and what to do once the
+ * tool is open. The rail already says this step is the learner's to do, so the
+ * page doesn't repeat it.
  */
-function ActionBrief({ sections }: { sections: LessonSection[] }) {
-  return (
-    <div className="bg-surface-container-low rounded-2xl p-5 sm:p-6 flex flex-col gap-5">
-      {sections.map((section, i) => (
-        <div
-          key={section.heading ?? i}
-          className={section.divider && i > 0 ? 'border-t border-on-surface/10 pt-5' : undefined}
-        >
-          {section.heading && (
-            <p className="text-title-md text-on-surface mb-2">{section.heading}</p>
-          )}
-          {section.body && (
-            <p className="text-body-lg text-on-surface-variant leading-relaxed">{section.body}</p>
-          )}
-          {section.bullets && (
-            <ul className="flex flex-col gap-2.5">
-              {section.bullets.map(bullet => (
-                <li key={bullet.term ?? bullet.text} className="flex gap-3">
-                  <span className="mt-[10px] w-1.5 h-1.5 rounded-full bg-on-surface/40 shrink-0" aria-hidden />
-                  <p className="text-body-lg text-on-surface-variant leading-relaxed">
-                    {bullet.term && (
-                      <span className="text-on-surface font-medium">{bullet.term}. </span>
-                    )}
-                    {bullet.text}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      ))}
-    </div>
-  )
-}
-
 function ActionStage({
   track, done, onGo, onContinue,
 }: {
@@ -298,41 +293,45 @@ function ActionStage({
   const action = track.action!
   return (
     <div className="bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] p-6 sm:p-10 flex flex-col gap-8 max-w-3xl w-full">
-      <div className="flex items-center gap-2.5">
-        <span className="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center">
-          <PenLine size={15} className="text-on-surface" />
-        </span>
-        <span className="text-title-md text-on-surface-variant">
-          {action.label ?? 'Your turn'}
-        </span>
-      </div>
+      <h2 className="text-display-sm sm:text-display-md text-on-surface">{action.title}</h2>
 
-      <div className="flex flex-col gap-3">
-        <h2 className="text-display-sm sm:text-display-md text-on-surface">{action.title}</h2>
-        <p className="text-title-lg text-on-surface-variant">{action.prompt}</p>
-      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="rounded-2xl bg-surface-container-low p-5 sm:p-6 flex flex-col gap-4">
+          <h3 className="text-headline-md text-on-surface">What you need</h3>
+          <ul className="flex flex-col gap-3">
+            {action.need.map(item => (
+              <li key={item} className="flex gap-3">
+                <span className="mt-[10px] w-1.5 h-1.5 rounded-full bg-on-surface/40 shrink-0" aria-hidden />
+                <p className="text-body-lg text-on-surface-variant">{item}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-      {action.brief && <ActionBrief sections={action.brief} />}
+        <div className="rounded-2xl bg-surface-container-low p-5 sm:p-6 flex flex-col gap-4">
+          <h3 className="text-headline-md text-on-surface">What you’ll do</h3>
+          <ol className="flex flex-col gap-3">
+            {action.steps.map((step, i) => (
+              <li key={step} className="flex gap-3">
+                <span className="w-6 h-6 rounded-full bg-surface-container-lowest flex items-center justify-center text-label-md text-on-surface tabular-nums shrink-0" aria-hidden>
+                  {i + 1}
+                </span>
+                <p className="text-body-lg text-on-surface-variant">{step}</p>
+              </li>
+            ))}
+          </ol>
 
-      <div className="flex flex-col gap-4">
-        <h3 className="text-headline-md text-on-surface">What to do</h3>
-        <ol className="flex flex-col gap-3">
-          {action.tasks.map((task, i) => (
-            <li key={task} className="flex gap-3.5">
-              <span className="mt-0.5 w-7 h-7 rounded-full bg-surface-container-low flex items-center justify-center text-label-lg text-on-surface tabular-nums shrink-0" aria-hidden>
-                {i + 1}
+          {action.bonus && (
+            <div className="flex gap-3 border-t border-on-surface/10 pt-4">
+              <span className="w-6 h-6 rounded-full bg-[rgba(224,163,0,0.14)] flex items-center justify-center shrink-0" aria-hidden>
+                <Sparkles size={13} className="text-[#8a6400]" />
               </span>
-              <p className="text-body-lg text-on-surface-variant leading-relaxed">{task}</p>
-            </li>
-          ))}
-        </ol>
-      </div>
-
-      <div className="rounded-2xl border border-on-surface/10 px-5 py-4 flex gap-3">
-        <Check size={18} className="text-success mt-0.5 shrink-0" aria-hidden />
-        <div className="flex flex-col gap-1">
-          <p className="text-title-md text-on-surface">Done when</p>
-          <p className="text-body-lg text-on-surface-variant leading-relaxed">{action.doneWhen}</p>
+              <p className="text-body-lg text-on-surface-variant">
+                <span className="text-on-surface font-medium">Bonus: </span>
+                {action.bonus}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -394,16 +393,15 @@ function FinalStage({
 // ─── Congratulations ─────────────────────────────────────────────────────────
 
 function Congratulations({
-  track, result, didAction,
+  track, result,
 }: {
   track: Track
   result: { best: number; total: number; attempts: number } | null
-  /** False when the learner tested out and skipped the lessons. */
-  didAction: boolean
 }) {
   return (
     <div className="flex items-center justify-center bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] px-6 sm:px-8 py-16 sm:py-20 animate-fade-in">
       <div className="flex flex-col gap-6 items-center text-center max-w-xl">
+        <Confetti />
         <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center">
           <Trophy size={34} className="text-success" />
         </div>
@@ -422,12 +420,6 @@ function Congratulations({
 
         <p className="text-title-lg text-on-surface max-w-md">
           {track.outcome}
-        </p>
-
-        <p className="text-body-lg text-on-surface-variant leading-relaxed max-w-md">
-          {didAction
-            ? `${track.title} is unlocked for good, and it already holds the data you entered. Everything you covered will come back in review over the next week.`
-            : `${track.title} is unlocked for good. The lessons are still here whenever you want them, and anything you missed comes back in review over the next week.`}
         </p>
 
         <div className="flex items-center gap-3 flex-wrap justify-center mt-2">

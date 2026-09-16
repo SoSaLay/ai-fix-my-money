@@ -3,10 +3,10 @@
 import Link from 'next/link'
 import {
   CreditCard, PieChart, PiggyBank, TrendingUp,
-  Lock, Check, ArrowRight, RotateCcw, Clock,
+  Lock, Check, ArrowRight, RotateCcw,
 } from 'lucide-react'
 import { useLearning } from '@/contexts/learning-context'
-import { TRACKS, readingMinutes, type Track } from '@/lib/learning/tracks'
+import { TRACKS, type Track } from '@/lib/learning/tracks'
 import { progressColor } from '@/lib/learning/progress-colors'
 import { DisclaimerFooter } from '@/components/learning/disclaimer-footer'
 import { RankButton } from '@/components/learning/rank-button'
@@ -94,8 +94,6 @@ function TrackCard({
   const comingSoon = track.status === 'coming-soon'
   const open = unlocked && !comingSoon
 
-  const minutes = readingMinutes(track)
-
   const body = (
     <div
       className={`rounded-3xl px-6 py-5 flex flex-col gap-4 transition-all ${
@@ -147,9 +145,6 @@ function TrackCard({
       <div className="flex items-center gap-4 pl-14 flex-wrap">
         {track.lessons.length > 0 && (
           <>
-            <span className="flex items-center gap-1.5 text-label-sm text-on-surface-variant">
-              <Clock size={12} /> ~{minutes} min
-            </span>
             <div className="flex-1 min-w-[80px] h-1 rounded-full bg-outline-variant/40 overflow-hidden">
               <div
                 className="h-full rounded-full transition-all"

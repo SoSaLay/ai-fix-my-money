@@ -16,7 +16,9 @@ function SpendingPageTool() {
   const { data: summary, loading: summaryLoading } = useDashboardSummary()
   const { data: spendingLimitData, updateLimit, updating } = useSpendingLimit()
 
-  // Spending limit as % of MONTHLY INCOME (the true capacity ceiling)
+  // Spending limit as % of MONTHLY INCOME (the true capacity ceiling). Held
+  // unrounded, so a figure typed in comes back as the figure typed in rather
+  // than the nearest whole percent of income.
   const [spendingLimitPct, setSpendingLimitPct] = useState(0)
   const [isLocked, setIsLocked] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
@@ -30,7 +32,7 @@ function SpendingPageTool() {
     if (spendingLimitData?.hasLimit && spendingLimitData.limit && summary) {
       const income = summary.spending.monthly_income
       if (income > 0) {
-        const pct = Math.round((spendingLimitData.limit.amount / income) * 100)
+        const pct = (spendingLimitData.limit.amount / income) * 100
         setSpendingLimitPct(Math.min(pct, 100))
         setIsLocked(true)
         initializedRef.current = true
@@ -102,6 +104,12 @@ function SpendingPageTool() {
   const handleBarChange = (newPct: number) => {
     setSpendingLimitPct(Math.min(newPct, maxSpendingPct))
     setHasUnsavedChanges(true)
+  }
+
+  // Typing a figure keeps that exact figure — the percentage carries decimals.
+  const handleAmountChange = (amount: number) => {
+    if (monthlyIncome <= 0) return
+    handleBarChange((amount / monthlyIncome) * 100)
   }
 
 
@@ -182,6 +190,8 @@ function SpendingPageTool() {
               dollarAmount={spendingLimitAmount}
               currentSpendingPct={budgetPct}
               onChange={handleBarChange}
+              onAmountChange={handleAmountChange}
+              maxAmount={Math.round((monthlyIncome * maxSpendingPct) / 100)}
               disabled={isLocked}
             />
 

@@ -16,14 +16,14 @@
       "shares": 2660,
       "plays": 582690
     },
-    "question": "The video is right that a high-yield savings account earns you more than a regular one. But how far can that alone take you? What actually determines how much you end up with over the long run?",
+    "question": "The video is right that a high-yield savings account earns you more than a regular one. But what specific skill or ability actually determines how much you end up with over the long run?",
     "claimUnderTest": "A high-yield savings account is a meaningfully better place to keep your savings than a standard account.",
-    "referenceAnswer": "The claim is correct and worth acting on — on money you're already holding, a HYSA pays materially more than a standard savings account, and there's no real downside to using one. But the upside has a ceiling. The rate is set by short-term benchmarks, not by the saver, and it floats down as easily as up. So the interest earned is a function of how much is sitting in the account, which means the account can only ever amplify a balance the saver built. It doesn't build the balance. What determines the long-term outcome is the contribution habit: how much goes in and how reliably it keeps going in. Someone saving steadily into an ordinary account ends up well ahead of someone with the best rate available and an inconsistent habit. The right way to think about a HYSA is as a small bonus for saving properly and a mild encouragement to keep doing it — not as the thing that changes the trajectory. Pick a competitive one, and put the attention on the habit.",
+    "referenceAnswer": "Your ability to save, month after month. The account can only pay interest on what you put in it, so how much you set aside and how consistently you keep doing it is what decides where you end up.\n\nWorth knowing: the rate is set by market conditions and can fall, and interest scales with the balance — so the account amplifies your saving rather than replacing it.",
     "rubric": [
-      "Long-term outcome is driven by how much you save and how consistently, not by the account earning the interest",
-      "Affirms the video's correct point — a HYSA does beat a regular savings account and is worth using",
-      "HYSA returns are capped: the rate is set by market conditions, not by the saver, and can fall",
-      "Interest scales with the balance, so the account amplifies savings rather than creating them"
+      "Names the saving itself — how much you put away, or doing it consistently month after month. Any answer along those lines is full marks",
+      "Tip only: the account can only pay interest on what you put in it",
+      "Tip only: the rate is set by market conditions and can fall, so the return is capped",
+      "Tip only: interest scales with the balance, so the account amplifies saving rather than creating it"
     ],
     "reviewedAt": "2026-09-13T00:17:52.940Z",
     "status": "approved",
@@ -50,10 +50,10 @@
     "claimUnderTest": "Imposing a one-week cooling-off period before a purchase leads to better spending decisions.",
     "referenceAnswer": "The wait isn't about the money — nothing about the price changes in seven days. It's about separating the impulse from the want. Wanting something is at its strongest in the moment you encounter it, and that intensity feels like evidence that you need the item. The waiting period lets that feeling decay so you can see what's left. If after a week you've stopped thinking about it, the pull was the impulse, not the item. If you still want it and can name what you'll actually do with it, that's a real want, and buying it is fine.\n\nThe useful distinction isn't \"useless vs. needed\" as fixed categories — plenty of worthwhile purchases aren't needs. It's whether the purchase survives contact with a clear head. A good test at the end of the week: can you say specifically how it fits into your life, and would you still choose it knowing what that money represents in hours worked? If the answer only comes back as a vague \"it'd be nice,\" that's the impulse still talking.\n\nThe mechanism also explains its own limits. The wait works precisely because impulse fades and genuine need doesn't — so it costs you nothing on real needs and catches the rest. It's not a rule against spending; it's a filter that lets you spend on things you'll still be glad about later.",
     "rubric": [
-      "The wait exists to let the impulse fade so you can tell a real want from a momentary one",
-      "If you still want it after the week and can say what it's for, buying it is the right call",
-      "The money represents work — worth weighing the cost against what it took to earn",
-      "The wait costs nothing on genuine needs, since those don't fade"
+      "Says the wait shows whether you actually want or need the thing. Any answer along those lines is full marks",
+      "Tip only: it works because an impulse fades while a real want doesn't",
+      "Tip only: if you still want it after the week and can say what it's for, buying it is the right call",
+      "Tip only: waiting costs nothing on genuine needs, since those don't fade"
     ],
     "reviewedAt": "2026-09-13T00:22:33.669Z",
     "status": "approved",
@@ -106,7 +106,7 @@
       "shares": 169,
       "plays": 49173
     },
-    "question": "APY is the number banks advertise when they're competing for your deposit. Why does understanding what it actually measures matter when you're deciding where to put your money?",
+    "question": "Why does understanding APY matter when you're deciding where to put your money?",
     "claimUnderTest": "APY is the interest earned on a savings account over one year, and it compounds — the next year you earn interest on the interest as well as the original balance.",
     "referenceAnswer": "APY is useful because it's a single figure that already accounts for compounding, which makes it a fair basis for comparison. When you're looking at several accounts, the APY tells you what each one would actually pay over a year on the same balance, so you can line them up directly rather than trying to reason about how often each bank compounds or how it credits interest. That's exactly why banks advertise it — and why knowing what it means turns marketing into information you can use.\n\nUnderstanding it also tells you what the number does and doesn't cover. APY is a rate, not an amount: it only becomes real money when multiplied by your balance. The video's example makes this concrete — 1% on $2,000 is $20, and the following year that 1% applies to $2,020. Same rate, slightly more money, because the interest joined the balance. So a difference between two advertised APYs matters in proportion to how much you're keeping in the account, and the difference between 0.01% and 5.5% is enormous as a rate but still modest in dollars on a small balance.\n\nFinally, it gives you a common unit across account types. Standard savings, high-yield savings and CDs all quote APY, which is what lets you weigh them against each other — and against what you give up, like a CD locking your money away for a set term. Without understanding the number, you can't tell whether a higher rate is worth the trade-off attached to it.",
     "rubric": [
@@ -140,10 +140,9 @@
     "claimUnderTest": "A CD requires locking your money up with the bank for a fixed term, so it suits savers who want less risk than investing.",
     "referenceAnswer": "A CD fits when you can answer two questions confidently: you know you won't need this specific money before the term ends, and you have a date in mind that the money is for. The lock-up is the whole trade — you give up access for a term in exchange for a rate the bank will commit to. That's only a good deal if losing access genuinely costs you nothing.\n\nThat makes CDs a poor home for an emergency fund, since the entire point of that money is being reachable without notice, and it would be tied up exactly when you need it most. It also makes them a poor fit for money you might want for an opportunity you can't schedule. Where they work well is money with a known future use — a purchase or expense you've already put a date on — and money belonging to someone whose situation makes losing value unacceptable, like savings that will be spent soon and can't afford to be down when that day comes.\n\nThe creator's risk framing is the other half. Someone comfortable taking on more risk, with a long time horizon and no near-term need for the money, is generally giving up growth by locking it in a CD — a brokerage account fits that person better. The CD's appeal is certainty, not return. So the decision isn't really about which pays more; it's about whether you need to know exactly what this money will be worth on a particular date. When you do, the lock-up isn't a cost. When you don't, it usually is.",
     "rubric": [
-      "A CD suits money you're confident you won't need before the term ends, since you're giving up access for that whole period",
-      "Money with a known future date and purpose is the natural fit; an emergency fund is not, because access is its whole point",
-      "If you can take more risk and don't need the money soon, a brokerage account generally suits you better than locking it up",
-      "What a CD buys is certainty about the value on a set date, not the highest return available"
+      "Says a CD suits money you're confident you won't need before the term ends. Any answer along those lines is full marks",
+      "Tip only: money with a known future date and purpose is the natural fit; an emergency fund is not, because access is its whole point",
+      "Tip only: what a CD buys is certainty about the value on a set date, not the highest return available"
     ],
     "reviewedAt": "2026-09-13T00:55:10.631Z",
     "status": "approved",
@@ -230,10 +229,10 @@
     "claimUnderTest": "Opening a brokerage account and buying a low-cost money market fund earns substantially more than a traditional savings account, without taking on additional risk",
     "referenceAnswer": "The core difference is what the institution can offer you. A bank sets the rate on its own products, so whatever it pays on savings is the number you get — you're a depositor, and the bank keeps the spread between what it earns on your money and what it pays you. A brokerage is a place to buy things rather than a product itself, so instead of accepting one rate you're choosing among funds. The money market fund passes through what its underlying holdings earn, minus a small expense ratio, which is why the yield tracks short-term government rates more closely than a bank's advertised savings rate does.\n\nThat leads to the second difference: flexibility. Once the money is in a brokerage account, it isn't locked into one use. The same account holds money market funds, CDs from multiple banks, bonds, index funds — so as your goals change, you can move money without opening anything new. A savings account can only ever be a savings account. The brokerage becomes a single place your money can grow in whatever form fits the goal at the time, which matters more over years than the rate difference does in any one year.\n\nSome banks do offer money market funds or similar products, so this isn't a hard wall — but the selection is limited to what that bank sells, and the comparison shopping the video describes, checking independent sites for the best low-cost fund, is what the brokerage route makes possible.\n\nWorth understanding what you give up. Money in a brokerage money market fund isn't FDIC-insured the way a bank deposit is, and settlement means access is same-day-ish rather than instant. For most savings that's a fine trade, but it's a real difference from a savings account, not a free upgrade.",
     "rubric": [
-      "A bank pays you its own set rate; a brokerage lets you choose among funds whose yield tracks what the underlying holdings earn",
-      "The brokerage account holds many kinds of investment, so the money isn't locked into one use as your goals change",
-      "The fund's return comes from short-term government securities, less a small expense ratio — not from the institution's generosity",
-      "Access and protection differ: a money market fund isn't a bank deposit, so insurance and instant access aren't the same"
+      "Says a brokerage gets you a higher yield than the bank pays, or gets you access to investments the bank doesn't offer. Any answer along those lines is full marks",
+      "Tip only: a bank sets its own rate and keeps the difference, while a fund's yield tracks what its holdings earn",
+      "Tip only: the brokerage account holds many kinds of investment, so the money isn't locked into one use",
+      "Tip only: a money market fund isn't a bank deposit, so insurance and instant access aren't the same"
     ],
     "reviewedAt": "2026-09-13T01:14:19.075Z",
     "status": "approved",
@@ -260,10 +259,9 @@
     "claimUnderTest": "Compound interest grows money by earning returns on previous returns, so a balance grows faster the longer it's left to compound.",
     "referenceAnswer": "Compounding runs on a few inputs, and the useful thing about seeing the math is recognizing which ones are yours to move.\n\nTime is the biggest lever and the one you can only spend once. Because each year's growth becomes the next year's base, the early years do quiet work that only becomes visible much later — which is why starting sooner beats starting bigger. Money put in at 25 and left alone can finish ahead of a larger amount started at 35, purely on the extra years. The practical version: start now with whatever you have rather than waiting until the amount feels significant.\n\nAmount is the second lever, and it's the most direct one. Compounding is a percentage of the balance, so the balance determines what that percentage is worth. Doubling what's in the account doubles what compounding has to work with. This is why increasing contributions — as income rises, or when an expense ends — has an effect out of proportion to the size of the increase, because that extra money then compounds for every remaining year.\n\nFrequency ties the two together. Every contribution starts its own compounding clock, so adding money regularly means you're not depending on a single lump sum to carry the whole result. A steady habit builds the balance that the other two levers act on, and it's the part most fully under your control.\n\nThe two supporting points: leave the money alone, because withdrawing removes not just the amount but all the future growth it would have produced; and treat the rate as the input you control least, since chasing a higher one usually means accepting more risk. The dependable gains come from starting early, putting in more, and keeping it up.",
     "rubric": [
-      "Start as early as possible — time is the most powerful input, since each year's growth becomes the next year's base",
-      "Contribute more, because compounding is a percentage of the balance, so a bigger balance produces bigger growth",
-      "Contribute consistently — every addition starts compounding itself, building the balance the growth acts on",
-      "Leave it untouched; withdrawing costs you the future growth that money would have produced, not just the amount taken"
+      "Names something that makes compounding work harder — contributing more, contributing regularly, leaving it alone, or giving it more time. Any one of those is full marks",
+      "Tip only: compounding is a percentage of the balance, so a bigger balance produces bigger growth",
+      "Tip only: withdrawing costs the future growth that money would have produced, not just the amount taken"
     ],
     "reviewedAt": "2026-09-13T01:22:16.252Z",
     "status": "approved",
@@ -296,7 +294,7 @@
       "The trade-offs — minimum balance to earn the rate, possible withdrawal limits — are manageable at her balance and payment pattern"
     ],
     "reviewedAt": "2026-09-13T01:29:56.725Z",
-    "status": "approved",
+    "status": "retired",
     "lastCheckedAt": "2026-09-14T15:51:36.676Z"
   }
 ]

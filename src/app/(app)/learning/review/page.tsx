@@ -6,6 +6,8 @@ import Image from 'next/image'
 import { ArrowLeft, Check, X, ArrowRight } from 'lucide-react'
 import { useLearning, type ReviewItem } from '@/contexts/learning-context'
 import { getTrack, findLessonImage, type QuizQuestion } from '@/lib/learning/tracks'
+import { shuffleOptions } from '@/lib/learning/shuffle-options'
+import { Calculator } from '@/components/learning/calculator'
 
 /**
  * Spaced review. Questions come back at 1 day, 3 days, then a week. Getting one
@@ -41,7 +43,11 @@ export default function ReviewPage() {
   const [tally, setTally] = useState({ right: 0, wrong: 0 })
 
   const item = due[index]
-  const question = useMemo(() => item ? findQuestion(item) : null, [item])
+  // Reordered options, so the right answer is not always in the same place.
+  const question = useMemo(() => {
+    const found = item ? findQuestion(item) : null
+    return found ? shuffleOptions(found) : null
+  }, [item])
 
   // A question that leaned on a diagram in the lesson keeps it here — checking
   // the picture is the point of the review, not a shortcut past it.
@@ -98,18 +104,19 @@ export default function ReviewPage() {
 
             <h1 className="text-headline-lg text-on-surface">{question.question}</h1>
 
+            {question.calculator && <Calculator />}
+
             {image && (
               <figure className="w-full max-w-[380px] rounded-2xl overflow-hidden bg-surface-container-lowest">
-                <div className="relative w-full aspect-[4/3]">
-                  <Image
-                    src={image.src}
-                    alt={image.alt}
-                    fill
-                    sizes="380px"
-                    unoptimized={image.src.endsWith('.svg')}
-                    className="object-contain"
-                  />
-                </div>
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  width={0}
+                  height={0}
+                  sizes="380px"
+                  unoptimized={image.src.endsWith('.svg')}
+                  className="w-full h-auto"
+                />
               </figure>
             )}
 
