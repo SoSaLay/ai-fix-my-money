@@ -10,6 +10,7 @@ import {
   GraduationCap,
   Lock,
   Check,
+  Settings,
   X,
 } from 'lucide-react'
 import { clsx } from 'clsx'
@@ -135,6 +136,21 @@ export function Sidebar({ pathname, open, onClose }: SidebarProps) {
         })}
       </nav>
 
+      {/* Pinned to the bottom: where a learner goes to see how their data is kept, or wipe it. */}
+      <div className="pt-3 mt-3 border-t border-outline-variant/40">
+        <Link
+          href="/settings"
+          className={clsx(
+            'flex items-center gap-3 px-3 py-2.5 rounded-xl text-label-lg font-medium transition-all duration-150',
+            pathname.startsWith('/settings')
+              ? 'bg-secondary-fixed/30 text-secondary'
+              : 'text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface',
+          )}
+        >
+          <Settings size={18} />
+          Settings
+        </Link>
+      </div>
     </aside>
     </>
   )

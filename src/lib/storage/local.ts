@@ -43,3 +43,26 @@ export function removeLocal(key: string): void {
     // As above.
   }
 }
+
+/** Every key this app writes starts with this. Nothing else on the origin does. */
+const PREFIX = 'llg_'
+
+/**
+ * Erase everything this app has stored in this browser: progress, review queue,
+ * onboarding, every figure and goal. The caller reloads afterwards — React state
+ * still holds the old values until it does, and a reload is the only way to be
+ * sure nothing in memory writes them back.
+ */
+export function clearAllLocal(): void {
+  try {
+    const keys: string[] = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key?.startsWith(PREFIX)) keys.push(key)
+    }
+    // Collected first: removing while indexing shifts the indices.
+    for (const key of keys) localStorage.removeItem(key)
+  } catch {
+    // Storage refused. There is nothing stored to clear, either.
+  }
+}

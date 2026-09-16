@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, Github, Plus } from 'lucide-react'
+import { ArrowRight, Github, HardDrive, Plus, RotateCcw, ShieldCheck, Smartphone } from 'lucide-react'
 
 import { RANKS, POINTS_PER_CHOICE, POINTS_PER_WRITTEN } from '@/lib/learning/rank'
 import { DISCLAIMER_SHORT } from '@/lib/learning/disclaimer'
@@ -96,6 +96,46 @@ export function HowItWorks({ minutesPerTrack }: { minutesPerTrack: number }) {
   )
 }
 
+// ─── Your data ───────────────────────────────────────────────────────────────
+
+/**
+ * How storage works, stated before anyone types a figure in. There is no
+ * account and no database, and for an app about money that is worth saying up
+ * front rather than leaving in the FAQ.
+ */
+const DATA_POINTS = [
+  { icon: ShieldCheck, title: 'No account', body: 'Nothing to sign up for. Just start.' },
+  { icon: HardDrive, title: 'Saved in your browser', body: 'Your progress and figures stay on this device, never on our servers.' },
+  { icon: Smartphone, title: 'One device at a time', body: 'Clear your browser or switch devices and you start fresh.' },
+  { icon: RotateCcw, title: 'Yours to wipe', body: 'Reset everything anytime from Settings.' },
+]
+
+export function YourData() {
+  return (
+    <section id="your-data" className="px-6 pb-24 sm:pb-32 max-w-6xl mx-auto w-full scroll-mt-8">
+      <h2 className="text-display-md sm:text-display-lg text-on-surface max-w-3xl mb-10 sm:mb-14">
+        Your data stays with you.{' '}
+        <span className="text-on-surface-variant">Not with us.</span>
+      </h2>
+
+      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        {DATA_POINTS.map(({ icon: Icon, title, body }) => (
+          <li
+            key={title}
+            className="flex flex-col gap-3 rounded-3xl bg-surface-container-lowest border border-on-surface/[0.06] p-6"
+          >
+            <div className="w-11 h-11 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+              <Icon size={20} aria-hidden />
+            </div>
+            <h3 className="text-headline-md text-on-surface">{title}</h3>
+            <p className="text-body-lg text-on-surface-variant">{body}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
 // ─── The why ─────────────────────────────────────────────────────────────────
 
 const WHY = [
@@ -180,6 +220,18 @@ export function Faq({ passPercent }: { passPercent: number }) {
     {
       q: 'Is this financial advice?',
       a: 'No. It explains how money works so you can make your own decisions. Nothing here tells you to buy, sell or hold anything.',
+    },
+    {
+      q: 'Do I need an account?',
+      a: 'No. There’s no sign-up. Your progress and the figures you enter are saved in this browser only.',
+    },
+    {
+      q: 'What happens to my progress?',
+      a: 'It stays on this device. Clearing your browser data erases it, and a different browser or device starts fresh.',
+    },
+    {
+      q: 'What do you see?',
+      a: 'Your written test answers are sent to be marked, and we count anonymous usage, like lessons finished. Your figures never leave this browser.',
     },
     {
       q: 'Do I need to connect my bank?',

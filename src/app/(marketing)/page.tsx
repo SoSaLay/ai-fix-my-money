@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react'
 import { VideoReel, type ReelVideo } from '@/components/marketing/video-reel'
 import { TrackTabs, type TrackSummary } from '@/components/marketing/track-tabs'
 import {
-  CTA_CLASS, CTA_SMALL_CLASS, Faq, FinalCta, Footer, HowItWorks, StatsStrip, Why, type LandingStats,
+  CTA_CLASS, CTA_SMALL_CLASS, Faq, FinalCta, Footer, HowItWorks, StatsStrip, Why, YourData, type LandingStats,
 } from '@/components/marketing/landing-sections'
 import { PASS_THRESHOLD, TRACKS } from '@/lib/learning/tracks'
 import { liveVideos } from '@/lib/learning/video-pool/pool'
@@ -140,6 +140,7 @@ export default function MarketingPage() {
       </section>
 
       <HowItWorks minutesPerTrack={MINUTES_PER_TRACK} />
+      <YourData />
       <Why />
       <Faq passPercent={Math.round(PASS_THRESHOLD * 100)} />
       <FinalCta />

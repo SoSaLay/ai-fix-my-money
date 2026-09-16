@@ -51,6 +51,15 @@ export function track<E extends AnalyticsEvent>(name: E['name'], props: E['props
   posthog.capture(name, props)
 }
 
+/**
+ * After a reset, so the person starting over is a new anonymous visitor rather
+ * than the same one with their history wiped.
+ */
+export function resetAnalytics(): void {
+  if (!started) return
+  posthog.reset()
+}
+
 export function capturePageview(url: string): void {
   if (!started) return
   posthog.capture('$pageview', { $current_url: url })
