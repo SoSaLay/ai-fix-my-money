@@ -87,9 +87,9 @@ const STATS: LandingStats = {
  * Worth knowing what it papers over. Tracks actually range from about 35 to 50
  * minutes, Investing being the long one, so a single figure flatters the short
  * tracks and undersells the long. And `trackMinutes` undercounts reading: it
- * bills each lesson at `readSeconds`, which is a fixed 20-second gate before the
- * questions unlock, not a reading estimate — the lessons run to 2,799 words,
- * nearer 13 minutes than 6 across the four tracks.
+ * bills each lesson at `readSeconds`, which is a 5- or 10-second pause before
+ * the questions unlock, not a reading estimate — the lessons run to 2,799
+ * words, nearer 13 minutes of reading across the four tracks.
  *
  * Revisit this if the curriculum grows or the papers change size. It will not
  * correct itself.

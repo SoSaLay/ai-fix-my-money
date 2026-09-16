@@ -155,9 +155,10 @@ export function Why() {
 
           <ul className="flex flex-col">
             {WHY.map(item => (
-              <li key={item.lead} className="border-t border-white/15 last:border-b py-6">
-                <p className="text-headline-lg sm:text-display-sm text-white/65">
-                  <span className="text-white">{item.lead}</span> {item.rest}
+              <li key={item.lead} className="why-line border-t border-white/15 last:border-b py-6">
+                <p className="why-line-text text-headline-lg sm:text-display-sm text-white/65">
+                  <span className="text-white">{item.lead}</span>{' '}
+                  <span className="why-line-rest">{item.rest}</span>
                 </p>
               </li>
             ))}

@@ -6,8 +6,7 @@ import type { NextConfig } from 'next'
  * page, which this does not affect.
  *
  * There is no Content-Security-Policy here yet. A CSP that forgets the TikTok
- * embed breaks the quiz silently, so it goes on in Report-Only first. See
- * DEPLOYMENT.md §6.3.
+ * embed breaks the quiz silently, so it goes on in Report-Only first.
  */
 const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },

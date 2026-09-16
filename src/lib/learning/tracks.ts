@@ -114,8 +114,13 @@ export interface LessonImage {
 export interface Lesson {
   id: string
   title: string
-  /** Reading window in seconds before the questions appear. */
-  readSeconds: 20
+  /**
+   * How long the lesson holds before its questions appear. A pause to read, not
+   * an estimate of reading time. Five for the handful of very short lessons,
+   * ten for everything else — the type allows only those two, so a new lesson
+   * picks one deliberately.
+   */
+  readSeconds: 5 | 10
   /** One-line framing shown above the content. Omit where it would repeat. */
   intro?: string
   sections: LessonSection[]
@@ -172,7 +177,7 @@ const ACCOUNTS: Track = {
     {
       id: 'acc-1',
       title: 'Account definition',
-      readSeconds: 20,
+      readSeconds: 5,
       sections: [
         {
           body: 'Why start here? Accounts are how you manage your money, and every number you enter on this platform comes off one. An account is a record held by an institution showing what you own with them, or what you owe them.',
@@ -215,7 +220,7 @@ const ACCOUNTS: Track = {
     {
       id: 'acc-2',
       title: 'Account types',
-      readSeconds: 20,
+      readSeconds: 10,
       sections: [
         {
           body: '“I spend on lots of things and pay off my credit card.”',
@@ -366,7 +371,7 @@ const ACCOUNTS: Track = {
     {
       id: 'acc-4',
       title: 'Credit',
-      readSeconds: 20,
+      readSeconds: 10,
       sections: [
         {
           body: 'Credit is money you borrow with a promise to repay it. Credit accounts are then reported to credit bureaus, creating your credit report. This record assess your financial reliability and interest rates. Your credit score summarizes that report as a single number.',
@@ -466,7 +471,7 @@ const ACCOUNTS: Track = {
     {
       id: 'acc-5',
       title: 'Net worth',
-      readSeconds: 20,
+      readSeconds: 5,
       sections: [
         {
           body: 'Everything you own, minus everything you owe. That is the whole calculation.',
@@ -653,7 +658,7 @@ const SPENDING: Track = {
     {
       id: 'spd-1',
       title: 'Income',
-      readSeconds: 20,
+      readSeconds: 5,
       sections: [
         {
           body: 'Income is any money you receive.',
@@ -717,7 +722,7 @@ const SPENDING: Track = {
     {
       id: 'spd-intro',
       title: 'Increasing income',
-      readSeconds: 20,
+      readSeconds: 10,
       sections: [
         {
           body: 'Increasing your income solves a lot of money problems at once — it gives you more freedom and more room to decide where your money goes. There are three repeatable ways to increase what you have.',
@@ -811,7 +816,7 @@ const SPENDING: Track = {
     {
       id: 'spd-2',
       title: 'Fixed costs',
-      readSeconds: 20,
+      readSeconds: 10,
       sections: [
         {
           body: 'Fixed costs are the bills you have already committed to — rent or mortgage, insurance, loan payments, phone, utilities. They arrive on a schedule whether you think about them or not.',
@@ -886,7 +891,7 @@ const SPENDING: Track = {
     {
       id: 'spd-3',
       title: 'Variable spending',
-      readSeconds: 20,
+      readSeconds: 10,
       sections: [
         {
           body: 'Variable spending is everything you decide to buy during the month — groceries, eating out, transportation, shopping, entertainment. It’s variable because the amount changes with the choices you make.',
@@ -961,7 +966,7 @@ const SPENDING: Track = {
     {
       id: 'spd-5',
       title: 'Cash flow',
-      readSeconds: 20,
+      readSeconds: 10,
       sections: [
         {
           body: 'Everything you earn, minus everything you spend, in one month. That is the whole calculation. It decides whether there is anything left to save or invest.',
@@ -1065,7 +1070,7 @@ const SAVINGS: Track = {
     {
       id: 'sav-1',
       title: 'Savings',
-      readSeconds: 20,
+      readSeconds: 10,
       sections: [
         {
           body: 'Savings is money you set aside instead of spend, to use later. Sometimes the best thing you can do with money is not spend it. It holds its value while it waits for the right opportunity.',
@@ -1115,7 +1120,7 @@ const SAVINGS: Track = {
     {
       id: 'sav-2',
       title: 'Types of savings',
-      readSeconds: 20,
+      readSeconds: 10,
       sections: [
         {
           heading: 'Remember these from Accounts?',
@@ -1195,7 +1200,7 @@ const SAVINGS: Track = {
     {
       id: 'sav-3',
       title: 'Interest',
-      readSeconds: 20,
+      readSeconds: 10,
       sections: [
         {
           body: 'So far, this course has only mentioned interest with credit cards—the cost of borrowing money when you don’t pay it back on time. With savings, the same mechanism works in your favor: banks pay you interest for keeping your money with them.',
@@ -1324,7 +1329,7 @@ const INVESTING: Track = {
     {
       id: 'inv-1',
       title: 'Investing',
-      readSeconds: 20,
+      readSeconds: 10,
       sections: [
         {
           body: 'Investing is buying a piece of something someone else already started. Specifically, you are buying a solution. Every business you can think of solves a problem at scale, and gets paid for solving it. When you invest, you are investing in that solution, and in most cases many solutions at once.',
@@ -1428,7 +1433,7 @@ const INVESTING: Track = {
     {
       id: 'inv-3',
       title: 'Financial basics help growth',
-      readSeconds: 20,
+      readSeconds: 10,
       sections: [
         {
           body: 'Investing doesn’t have to be complicated. There are a few optional steps you can take to start investing wisely and have a solid foundation for growing your money.',
@@ -1511,7 +1516,7 @@ const INVESTING: Track = {
     {
       id: 'inv-6',
       title: 'Investment choices',
-      readSeconds: 20,
+      readSeconds: 10,
       intro: 'Risk rises with uncertainty. The less certain and shorter-term an investment is, the more risk you take on.',
       sections: [
         {
@@ -1682,7 +1687,7 @@ const INVESTING: Track = {
     {
       id: 'inv-4',
       title: 'Your goals',
-      readSeconds: 20,
+      readSeconds: 10,
       intro: 'Your investment plan should fit six things:',
       sections: [
         {
@@ -1776,7 +1781,7 @@ const INVESTING: Track = {
     {
       id: 'inv-8',
       title: 'Buy and manage investments',
-      readSeconds: 20,
+      readSeconds: 10,
       sections: [
         {
           heading: '1. Buy Through a Brokerage',

@@ -183,4 +183,44 @@
     .why-glow-indigo,
     .why-glow-amber { animation: none; }
   }
+
+  /* Each line of "The why" answers a pointer: the sentence lifts, its quieter
+     half brightens, and the brand gradient draws along the rule above it.
+
+     Scoped to devices that can actually hover. Tailwind's `hover:` applies on
+     touch screens too, where a tap leaves the state stuck on until the next
+     tap somewhere else — so this lives here rather than in class names. On a
+     phone the lines simply sit still, which is fine: nothing here carries
+     meaning, it is only a response. */
+  .why-line {
+    position: relative;
+  }
+  .why-line::before {
+    content: '';
+    position: absolute;
+    inset: -1px 0 auto 0;
+    height: 1px;
+    background: linear-gradient(90deg, #4c49c9, #ff9817);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .why-line-text {
+    transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .why-line-rest {
+    transition: color 300ms ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .why-line:hover::before { transform: scaleX(1); }
+    .why-line:hover .why-line-text { transform: translateY(-4px); }
+    .why-line:hover .why-line-rest { color: rgba(255, 255, 255, 0.92); }
+  }
+
+  /* The rule still lights and the text still brightens; nothing moves. */
+  @media (prefers-reduced-motion: reduce) {
+    .why-line::before,
+    .why-line-text { transition: none; }
+    .why-line:hover .why-line-text { transform: none; }
+  }
 }
