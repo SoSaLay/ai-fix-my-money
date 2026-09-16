@@ -34,13 +34,28 @@ export async function GET(
     )
   }
 
-  return NextResponse.json({
-    trackId: track,
-    attemptId: issueAttempt({
+  // Signing throws when QUIZ_ATTEMPT_SECRET is missing or short. Uncaught, that
+  // is an empty 500 the page can only read as a network failure — so it is
+  // caught, logged for whoever is reading the server logs, and reported as the
+  // operator problem it is.
+  let attemptId: string
+  try {
+    attemptId = issueAttempt({
       trackId: track as TrackId,
       videoIds: paper.videoIds,
       choiceIds: paper.choiceIds,
-    }),
+    })
+  } catch (error) {
+    console.error('[quiz] could not sign attempt:', error instanceof Error ? error.message : error)
+    return NextResponse.json(
+      { error: 'The quiz isn’t available right now. Try again later.' },
+      { status: 503 },
+    )
+  }
+
+  return NextResponse.json({
+    trackId: track,
+    attemptId,
     videos: paper.videos,
     choices: paper.choices,
   })

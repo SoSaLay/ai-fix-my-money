@@ -16,6 +16,11 @@ frontend:
     build:
       commands:
         - npm run type-check
+        # Console environment variables exist only in this build container, not
+        # on the Lambda that serves /api. Writing the two server-side secrets to
+        # .env.production is how Amplify makes them reachable at runtime. The
+        # file is gitignored and never echoed to the build log.
+        - env | grep -E '^(ANTHROPIC_API_KEY|QUIZ_ATTEMPT_SECRET)=' >> .env.production
         - npm run build
   artifacts:
     baseDirectory: .next
