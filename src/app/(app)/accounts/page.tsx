@@ -353,8 +353,8 @@ function AccountsPageTool() {
       <TopNav title="Accounts" />
 
       <div className="flex-1 px-4 sm:px-8 pb-10 flex flex-col gap-6">
-        {/* Header row */}
-        <div className="flex items-center justify-between">
+        {/* Header row. Wraps, so the open add form takes a line of its own. */}
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-body-md text-on-surface-variant">
             {depositoryAccounts.length} account{depositoryAccounts.length !== 1 ? 's' : ''} · click <Pencil size={12} className="inline mb-0.5" /> to edit
           </p>

@@ -73,7 +73,7 @@ export function AddAccountForm() {
   }
 
   return (
-    <div className="bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] shadow-card p-5 sm:p-6 flex flex-col gap-4">
+    <div className="w-full bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] shadow-card p-5 sm:p-6 flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <p className="text-title-md text-on-surface font-semibold">Add an account</p>
         <button onClick={reset} className="text-on-surface-variant hover:text-on-surface" aria-label="Cancel">

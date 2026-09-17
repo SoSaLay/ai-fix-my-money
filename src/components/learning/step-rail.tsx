@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import { Check } from 'lucide-react'
 
 import type { Stage } from '@/contexts/learning-context'
@@ -38,16 +39,33 @@ export function StepRail({
   browsable,
   onSelect,
 }: StepRailProps) {
+  const railRef = useRef<HTMLElement>(null)
+  const stepRefs = useRef<(HTMLLIElement | null)[]>([])
+  const scrolledOnce = useRef(false)
+
+  // When the rail is narrower than its steps, keep the step on screen centred,
+  // so finished steps slide off to the left and the ones ahead stay in view.
+  // Only the rail scrolls — scrollIntoView would move the page too.
+  useEffect(() => {
+    const rail = railRef.current
+    const step = stepRefs.current[currentIndex]
+    if (!rail || !step || rail.scrollWidth <= rail.clientWidth) return
+    const left = step.offsetLeft - (rail.clientWidth - step.offsetWidth) / 2
+    rail.scrollTo({ left, behavior: scrolledOnce.current ? 'smooth' : 'instant' })
+    scrolledOnce.current = true
+  }, [currentIndex, items.length])
+
   if (items.length === 0) return null
 
   return (
     // Seven steps do not fit a phone. Scrolling the rail beats shrinking the
     // labels until they are unreadable.
     <nav
+      ref={railRef}
       aria-label="Course steps"
       className="scrollbar-dark overflow-x-auto rounded-3xl bg-surface-container-lowest border border-on-surface/[0.06] px-3 sm:px-5 pt-5 pb-4"
     >
-      <ol className="flex min-w-[600px] items-start">
+      <ol className="relative flex min-w-[600px] items-start">
         {items.map((item, i) => {
           const current = i === currentIndex
           const reachable = browsable && i <= furthestIndex
@@ -56,7 +74,7 @@ export function StepRail({
           const previousDone = i > 0 && items[i - 1].done
 
           return (
-            <li key={item.key} className="flex min-w-0 flex-1 flex-col items-center">
+            <li key={item.key} ref={el => { stepRefs.current[i] = el }} className="flex min-w-0 flex-1 flex-col items-center">
               <div className="flex w-full items-center">
                 <Connector visible={i > 0} filled={previousDone} />
                 <StepMarker

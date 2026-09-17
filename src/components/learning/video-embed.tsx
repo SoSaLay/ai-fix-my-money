@@ -95,9 +95,12 @@ export function VideoEmbed({
               title={`Video by ${creatorHandle}`}
               onLoad={() => setLoaded(true)}
               allow="encrypted-media; picture-in-picture; fullscreen"
-              // The embed is untrusted third-party content: no same-origin access,
-              // no top-level navigation, no downloads.
-              sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-presentation"
+              // The embed is untrusted third-party content: no top-level
+              // navigation, no downloads. `allow-same-origin` keeps the frame on
+              // tiktok.com's own origin, not ours — without it Safari (every iOS
+              // browser) blocks TikTok's player scripts under TikTok's own CSP
+              // and the frame never gets past its loading screen.
+              sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation"
               referrerPolicy="strict-origin-when-cross-origin"
               loading="lazy"
               className="absolute inset-0 h-full w-full border-0"

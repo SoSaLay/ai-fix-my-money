@@ -19,6 +19,12 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Nothing may scroll the page sideways. */
+  html,
+  body {
+    overflow-x: clip;
+  }
+
   body {
     background-color: #f6f6fb;
     color: #2d2f33;
@@ -30,6 +36,16 @@
     outline: none;
     box-shadow: 0 0 0 2px rgba(76, 73, 201, 0.35);
     border-radius: 0.5rem;
+  }
+}
+
+/* iOS zooms into any field set below 16px when it is tapped. Outside the
+   layers, so it wins over the text-size utilities on the field. */
+@media (pointer: coarse) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
   }
 }
 
