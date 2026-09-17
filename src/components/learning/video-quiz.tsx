@@ -12,7 +12,7 @@
 // two different rules about when you find out how you did.
 // ============================================================================
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Image from 'next/image'
 import { ArrowRight, Check, Loader2, Mic, MicOff, RotateCcw, Square, Volume2 } from 'lucide-react'
 
@@ -258,6 +258,7 @@ function VideoQuestion({
   const [error, setError] = useState<string | null>(null)
   const [reported, setReported] = useState(false)
   const dictation = useDictation(answer, setAnswer)
+  const answerBox = useRef<HTMLTextAreaElement>(null)
   const stopDictation = dictation.stop
   const [speaking, setSpeaking] = useState(false)
   const [canSpeak, setCanSpeak] = useState(false)
@@ -357,6 +358,7 @@ function VideoQuestion({
 
         <div className="flex-1 min-w-0 flex flex-col gap-3 w-full">
           <textarea
+            ref={answerBox}
             value={answer}
             onChange={event => setAnswer(event.target.value)}
             disabled={Boolean(grade) || busy}
@@ -378,27 +380,40 @@ function VideoQuestion({
 
           {!grade && dictation.supported && (
             <div className="flex items-center gap-3 flex-wrap">
-              <button
-                type="button"
-                onClick={dictation.listening ? dictation.stop : dictation.start}
-                disabled={busy}
-                aria-pressed={dictation.listening}
-                className={`inline-flex items-center gap-2 rounded-full px-4 h-10 text-label-lg transition-colors disabled:opacity-30 ${
-                  dictation.listening
-                    ? 'bg-error/10 text-error'
-                    : 'bg-surface-container-low text-on-surface hover:bg-surface-container'
-                }`}
-              >
-                {dictation.listening ? (
-                  <>
-                    <MicOff size={15} aria-hidden /> Stop speaking
-                  </>
-                ) : (
-                  <>
-                    <Mic size={15} aria-hidden /> Speak your answer
-                  </>
-                )}
-              </button>
+              {dictation.refused ? (
+                // Focused inside the tap, which is the only way iOS opens the
+                // keyboard — and its mic key is what works here.
+                <button
+                  type="button"
+                  onClick={() => answerBox.current?.focus()}
+                  disabled={busy}
+                  className="inline-flex items-center gap-2 rounded-full px-4 h-10 text-label-lg bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors disabled:opacity-30"
+                >
+                  <Mic size={15} aria-hidden /> Use your keyboard’s mic
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={dictation.listening ? dictation.stop : dictation.start}
+                  disabled={busy}
+                  aria-pressed={dictation.listening}
+                  className={`inline-flex items-center gap-2 rounded-full px-4 h-10 text-label-lg transition-colors disabled:opacity-30 ${
+                    dictation.listening
+                      ? 'bg-error/10 text-error'
+                      : 'bg-surface-container-low text-on-surface hover:bg-surface-container'
+                  }`}
+                >
+                  {dictation.listening ? (
+                    <>
+                      <MicOff size={15} aria-hidden /> Stop speaking
+                    </>
+                  ) : (
+                    <>
+                      <Mic size={15} aria-hidden /> Speak your answer
+                    </>
+                  )}
+                </button>
+              )}
               {dictation.listening && (
                 <span className="flex items-center gap-1.5 text-body-md text-on-surface-variant">
                   <span className="h-2 w-2 rounded-full bg-error animate-pulse" aria-hidden />

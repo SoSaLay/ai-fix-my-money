@@ -35,44 +35,7 @@ export function LessonContent({ lesson }: { lesson: Lesson }) {
             </p>
           )}
 
-          {section.table && (
-            // Cells wrap to fit the column, so nothing has to scroll sideways.
-            <div className="scrollbar-dark overflow-x-auto">
-              <table className="w-full border-collapse text-left [overflow-wrap:anywhere]">
-                <thead>
-                  <tr>
-                    {section.table.columns.map(column => (
-                      <th
-                        key={column}
-                        scope="col"
-                        className="border-b border-on-surface/15 pb-2.5 pr-4 text-label-lg text-on-surface-variant last:pr-0"
-                      >
-                        {column}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {section.table.rows.map((row, j) => (
-                    <tr key={j} className="align-top">
-                      {row.map((cell, k) => (
-                        <td
-                          key={k}
-                          className={
-                            k === 0
-                              ? 'border-b border-on-surface/[0.07] py-3.5 pr-4 text-body-lg text-on-surface'
-                              : 'border-b border-on-surface/[0.07] py-3.5 pr-4 text-body-lg leading-relaxed text-on-surface-variant last:pr-0'
-                          }
-                        >
-                          {cell}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          {section.table && <InlineTable table={section.table} />}
 
           {section.gridTable && <GridTable table={section.gridTable} />}
 
@@ -118,6 +81,72 @@ export function LessonContent({ lesson }: { lesson: Lesson }) {
 }
 
 /**
+ * A table set as prose: rules under the rows only.
+ *
+ * Wherever the column is too narrow for its cells, the rows become stacked
+ * blocks instead — each row's first cell as a heading, each other cell under
+ * its column name. Squeezing three columns into a phone split the first one a
+ * letter per line. Which layout shows is decided by the column's own width
+ * (`.lesson-table` in globals.css), not the screen's, because the sidebar and
+ * the note column both take space out of it.
+ */
+function InlineTable({ table }: { table: LessonTable }) {
+  return (
+    <div className="lesson-table">
+      <table className="lesson-table-wide w-full border-collapse text-left break-words">
+        <thead>
+          <tr>
+            {table.columns.map((column, i) => (
+              <th
+                key={i}
+                scope="col"
+                className="border-b border-on-surface/15 pb-2.5 pr-4 text-label-lg text-on-surface-variant last:pr-0"
+              >
+                {column}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {table.rows.map((row, j) => (
+            <tr key={j} className="align-top">
+              {row.map((cell, k) => (
+                <td
+                  key={k}
+                  className={
+                    k === 0
+                      ? 'whitespace-nowrap border-b border-on-surface/[0.07] py-3.5 pr-4 text-body-lg text-on-surface'
+                      : 'border-b border-on-surface/[0.07] py-3.5 pr-4 text-body-lg leading-relaxed text-on-surface-variant last:pr-0'
+                  }
+                >
+                  {cell}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div className="lesson-table-stacked flex-col">
+        {table.rows.map((row, j) => (
+          <div key={j} className="flex flex-col gap-3 border-b border-on-surface/[0.07] py-4 first:pt-0 last:border-b-0">
+            <p className="text-title-lg text-on-surface">{row[0]}</p>
+            {row.slice(1).map((cell, k) => (
+              <div key={k} className="flex flex-col gap-1">
+                {table.columns[k + 1] && (
+                  <p className="text-label-lg text-on-surface-variant">{table.columns[k + 1]}</p>
+                )}
+                <p className="text-body-lg leading-relaxed text-on-surface-variant">{cell}</p>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/**
  * A reference table with every cell ruled, the way a spreadsheet draws one.
  * The full grid is the point: these are rows you scan across and compare, and
  * the underline-only style used for an inline `table` reads as prose instead.
@@ -130,7 +159,7 @@ function GridTable({ table }: { table: LessonTable }) {
     // Cells wrap to fit the column, so nothing has to scroll sideways. The
     // outline sits on the wrapper so the rounded corners clip the grid cleanly.
     <div className="scrollbar-dark overflow-x-auto rounded-2xl border border-on-surface/10">
-      <table className="w-full border-collapse text-left [overflow-wrap:anywhere]">
+      <table className="w-full border-collapse text-left break-words">
         <thead>
           <tr>
             {table.columns.map((column, i) => (

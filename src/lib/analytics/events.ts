@@ -45,4 +45,7 @@ export type AnalyticsEvent =
     }
   | { name: 'tool_unlocked'; props: { track_id: TrackId } }
   | { name: 'video_reported_unavailable'; props: { track_id: TrackId | string; video_id: string } }
+  // The browser's own error code, so a device that refuses voice input can be
+  // told apart from one with no microphone.
+  | { name: 'dictation_failed'; props: { error: string; microphone: string } }
   | { name: 'review_completed'; props: { track_id: TrackId; correct: boolean } }

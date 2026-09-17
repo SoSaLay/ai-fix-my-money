@@ -49,6 +49,14 @@
   }
 }
 
+/* Lesson tables switch to stacked rows when their own column is narrow. */
+.lesson-table { container-type: inline-size; }
+.lesson-table-stacked { display: none; }
+@container (max-width: 560px) {
+  .lesson-table-wide { display: none; }
+  .lesson-table-stacked { display: flex; }
+}
+
 @layer utilities {
   /* Glassmorphism utility */
   .glass {
