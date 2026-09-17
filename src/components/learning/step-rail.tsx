@@ -45,7 +45,7 @@ export function StepRail({
     // labels until they are unreadable.
     <nav
       aria-label="Course steps"
-      className="overflow-x-auto rounded-3xl bg-surface-container-lowest border border-on-surface/[0.06] px-3 sm:px-5 pt-5 pb-4"
+      className="scrollbar-dark overflow-x-auto rounded-3xl bg-surface-container-lowest border border-on-surface/[0.06] px-3 sm:px-5 pt-5 pb-4"
     >
       <ol className="flex min-w-[600px] items-start">
         {items.map((item, i) => {

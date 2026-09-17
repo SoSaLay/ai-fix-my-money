@@ -36,9 +36,9 @@ export function LessonContent({ lesson }: { lesson: Lesson }) {
           )}
 
           {section.table && (
-            // Narrow screens scroll the table rather than the page.
-            <div className="-mx-1 overflow-x-auto px-1">
-              <table className="w-full min-w-[420px] border-collapse text-left">
+            // Cells wrap to fit the column, so nothing has to scroll sideways.
+            <div className="scrollbar-dark overflow-x-auto">
+              <table className="w-full border-collapse text-left [overflow-wrap:anywhere]">
                 <thead>
                   <tr>
                     {section.table.columns.map(column => (
@@ -127,10 +127,10 @@ function GridTable({ table }: { table: LessonTable }) {
   const riskColumn = table.riskColumn ?? table.columns.length - 1
 
   return (
-    // Narrow screens scroll the table rather than the page. The outline sits on
-    // the wrapper so the rounded corners clip the grid cleanly.
-    <div className="overflow-x-auto rounded-2xl border border-on-surface/10">
-      <table className="w-full min-w-[420px] border-collapse text-left">
+    // Cells wrap to fit the column, so nothing has to scroll sideways. The
+    // outline sits on the wrapper so the rounded corners clip the grid cleanly.
+    <div className="scrollbar-dark overflow-x-auto rounded-2xl border border-on-surface/10">
+      <table className="w-full border-collapse text-left [overflow-wrap:anywhere]">
         <thead>
           <tr>
             {table.columns.map((column, i) => (

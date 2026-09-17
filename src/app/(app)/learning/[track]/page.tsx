@@ -243,8 +243,10 @@ function LessonStage({
   return (
     <div className="flex flex-col gap-8">
       {/* Content on the left, reference imagery on the right */}
-      <div className="flex flex-col lg:flex-row gap-6 items-start">
-        <div className="flex-1 min-w-0 bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] p-6 sm:p-10 flex flex-col gap-8">
+      {/* Stretch below lg: a content-sized card grows past the screen when a
+          table in it is wide, and drags the whole page sideways. */}
+      <div className="flex flex-col lg:flex-row gap-6 lg:items-start">
+        <div className="w-full flex-1 min-w-0 bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] p-5 sm:p-8 lg:p-10 flex flex-col gap-8">
           {/* No step counter. The rail above already shows where you are, and
               a second count only made the lesson feel like a queue. */}
           <h2 className="text-display-sm sm:text-display-md text-on-surface">

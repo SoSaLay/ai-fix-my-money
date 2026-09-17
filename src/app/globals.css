@@ -70,6 +70,15 @@
   .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
   .scrollbar-thin::-webkit-scrollbar-thumb { background-color: #e7e8ee; border-radius: 999px; }
 
+  /* Sideways scrollers: the same near-black as .btn-action. */
+  .scrollbar-dark {
+    scrollbar-width: thin;
+    scrollbar-color: #17171c transparent;
+  }
+  .scrollbar-dark::-webkit-scrollbar { height: 6px; }
+  .scrollbar-dark::-webkit-scrollbar-track { background: rgba(23, 23, 28, 0.08); border-radius: 999px; }
+  .scrollbar-dark::-webkit-scrollbar-thumb { background-color: #17171c; border-radius: 999px; }
+
   /* The call-to-action across every learning screen — review, open a section,
      next step, submit. Deliberately not a brand colour: it is the one thing on
      the page competing with the material for attention, and it should look the

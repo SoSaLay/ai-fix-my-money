@@ -24,8 +24,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           <div className="min-h-screen bg-surface flex">
             <Sidebar pathname={pathname} open={navOpen} onClose={() => setNavOpen(false)} />
 
-            {/* Main content area — offset by the sidebar once it is fixed open */}
-            <main className="flex-1 flex flex-col min-h-screen min-w-0 md:ml-[220px]">
+            {/* Main content area — offset by the sidebar once it is fixed open.
+                Clipped sideways so nothing can ever scroll the page horizontally;
+                clip, unlike hidden, leaves sticky elements working. */}
+            <main className="flex-1 flex flex-col min-h-screen min-w-0 overflow-x-clip md:ml-[220px]">
               {/* Phones and small tablets: a bar to open the drawer */}
               <div className="md:hidden sticky top-0 z-30 flex items-center gap-3 px-4 py-3 bg-surface-container-lowest border-b border-outline-variant/40">
                 <button
