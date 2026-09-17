@@ -9,7 +9,7 @@
 // ============================================================================
 
 import type { TrackId } from '../../src/lib/learning/tracks'
-import type { VideoCandidate } from '../../src/lib/learning/video-pool/types'
+import { tiktokPlayerUrl, type VideoCandidate } from '../../src/lib/learning/video-pool/types'
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   return typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : null
@@ -108,7 +108,7 @@ export function toCandidate(
     platform: 'tiktok',
     videoId,
     shareUrl: shareUrl.split('?')[0],
-    embedUrl: `https://www.tiktok.com/embed/v2/${videoId}`,
+    embedUrl: tiktokPlayerUrl(videoId),
     creatorHandle,
     postedAt: new Date(createdSeconds * 1000).toISOString(),
     durationSeconds: durationSeconds(aweme),

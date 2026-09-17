@@ -14,6 +14,15 @@
 
 import type { TrackId } from '@/lib/learning/tracks'
 
+/**
+ * TikTok's official player. `rel=0` turns off the related-videos screen it
+ * shows on pause, which otherwise sends learners to videos we never chose;
+ * the caption and music line are hidden for the same reason.
+ */
+export function tiktokPlayerUrl(videoId: string): string {
+  return `https://www.tiktok.com/player/v1/${videoId}?description=0&music_info=0&rel=0`
+}
+
 export type VideoStatus = 'draft' | 'approved' | 'unavailable' | 'retired'
 
 /** What the ingest script can know before a human has watched anything. */

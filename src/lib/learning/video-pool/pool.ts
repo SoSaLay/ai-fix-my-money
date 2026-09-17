@@ -15,7 +15,7 @@
 import 'server-only'
 
 import type { TrackId } from '@/lib/learning/tracks'
-import type { PooledVideo, PublicVideoQuestion, VideoStatus } from './types'
+import { tiktokPlayerUrl, type PooledVideo, type PublicVideoQuestion, type VideoStatus } from './types'
 
 import accountsPool from './accounts.json'
 import spendingPool from './spending.json'
@@ -138,7 +138,9 @@ export function toPublicQuestion(video: PooledVideo): PublicVideoQuestion {
     trackId: video.trackId,
     kind: 'video',
     question: video.question,
-    embedUrl: video.embedUrl,
+    // Built from the id rather than the stored URL, so older pool entries
+    // saved with the embed/v2 page get the player too.
+    embedUrl: tiktokPlayerUrl(video.videoId),
     shareUrl: video.shareUrl,
     creatorHandle: video.creatorHandle,
     postedAt: video.postedAt,

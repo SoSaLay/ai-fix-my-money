@@ -60,9 +60,10 @@ const SPEECH_OFF =
 let activeSession: { end: () => void } | null = null
 
 /**
- * Asks for the microphone up front, so the browser shows its permission
- * prompt. Safari's speech recognition does not reliably ask on its own — it
- * just fails. The stream is only for the prompt and is closed immediately.
+ * Opens the browser's microphone prompt. Only used after recognition has been
+ * refused: calling this before `start()` pushes `start()` out of the tap that
+ * triggered it, and iOS Safari refuses recognition started outside a tap.
+ * The stream is only for the prompt and is closed immediately.
  */
 async function requestMicrophone(): Promise<'granted' | 'denied' | 'unavailable'> {
   if (!navigator.mediaDevices?.getUserMedia) return 'unavailable'
@@ -75,6 +76,9 @@ async function requestMicrophone(): Promise<'granted' | 'denied' | 'unavailable'
     return name === 'NotAllowedError' || name === 'SecurityError' ? 'denied' : 'unavailable'
   }
 }
+
+/** Whether this page has already shown the microphone prompt. */
+let askedForMicrophone = false
 
 /**
  * `text` is whatever is already written; `onChange` receives it with the
@@ -99,35 +103,30 @@ export function useDictation(text: string, onChange: (next: string) => void) {
     return () => session.current?.end()
   }, [])
 
-  const start = useCallback(async () => {
+  // Recognition was refused. Work out whether it is the microphone or the
+  // device's speech service, and open the prompt if it has not been shown.
+  const explainRefusal = useCallback(async () => {
+    if (!askedForMicrophone) {
+      askedForMicrophone = true
+      const mic = await requestMicrophone()
+      if (mic === 'granted') {
+        setError('Microphone allowed. Tap “Speak your answer” again to start.')
+        return
+      }
+      setError(mic === 'denied' ? BLOCKED : SPEECH_OFF)
+      return
+    }
+    setError(SPEECH_OFF)
+  }, [])
+
+  // Synchronous on purpose: iOS Safari only allows recognition that starts
+  // inside the tap itself, so nothing may be awaited before `start()`.
+  const start = useCallback(() => {
     const Ctor = recognitionConstructor()
     if (!Ctor || session.current) return
 
     activeSession?.end()
     setError(null)
-    setListening(true)
-
-    // A placeholder session, so a second tap or another mic can cancel while
-    // the permission prompt is still open.
-    let cancelled = false
-    let live: { end: () => void } | null = null
-    const pending = { end: () => { cancelled = true; finish() } }
-    session.current = pending
-    activeSession = pending
-
-    function finish() {
-      if (session.current === pending || session.current === live) session.current = null
-      if (activeSession === pending || activeSession === live) activeSession = null
-      setListening(false)
-    }
-
-    const mic = await requestMicrophone()
-    if (cancelled) return
-    if (mic === 'denied') {
-      setError(BLOCKED)
-      finish()
-      return
-    }
 
     // What was written before speaking stays put; each result event carries
     // the whole session so far, so it is rebuilt on top of this every time.
@@ -153,10 +152,12 @@ export function useDictation(text: string, onChange: (next: string) => void) {
       window.clearTimeout(timer)
       r.onstart = r.onresult = r.onerror = r.onend = null
       try { if (abort) r.abort(); else r.stop() } catch { /* already stopped */ }
-      finish()
+      if (session.current === live) session.current = null
+      if (activeSession === live) activeSession = null
+      setListening(false)
     }
 
-    live = { end: () => close(false) }
+    const live = { end: () => close(false) }
     session.current = live
     activeSession = live
 
@@ -170,12 +171,12 @@ export function useDictation(text: string, onChange: (next: string) => void) {
       latest.current.onChange(spoken === '' ? base : base + joiner + spoken)
     }
     r.onerror = event => {
-      if (event.error === 'not-allowed') {
-        setError(mic === 'granted' ? SPEECH_OFF : BLOCKED)
-      } else if (event.error === 'service-not-allowed') {
-        setError(SPEECH_OFF)
+      if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+        void explainRefusal()
       } else if (event.error === 'no-speech') {
         setError('Did not catch anything. Try again a little closer to the mic.')
+      } else if (event.error === 'audio-capture') {
+        setError('No microphone was found. Check it is connected, or type instead.')
       } else if (event.error !== 'aborted') {
         setError('Voice input stopped unexpectedly. You can try again or type instead.')
       }
@@ -185,11 +186,12 @@ export function useDictation(text: string, onChange: (next: string) => void) {
 
     try {
       r.start()
+      setListening(true)
     } catch {
       setError('Could not start voice input. Try again or type instead.')
       close(true)
     }
-  }, [])
+  }, [explainRefusal])
 
   const stop = useCallback(() => {
     session.current?.end()
