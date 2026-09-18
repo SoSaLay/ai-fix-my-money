@@ -106,6 +106,27 @@ export default function DashboardPage() {
   const unallocatedPct = Math.max(0, 100 - allocatedPct)
   const unallocatedAmount = Math.round((unallocatedPct / 100) * monthlyIncome)
 
+  // The four slices of income, read the same way by the phone list and the
+  // wide-screen pillars below.
+  const allocationRows = [
+    {
+      key: 'spending', label: 'Spending Limit', color: '#ff9817', pct: spendingPct,
+      detail: spendingLimit > 0 ? `$${Math.round(spendingAmount).toLocaleString()} limit` : 'Not set',
+    },
+    {
+      key: 'saving', label: 'Saving', color: '#1a6b3a', pct: savingsPct,
+      detail: savingsAmount > 0 ? `$${Math.round(savingsAmount).toLocaleString()} locked` : 'Not set',
+    },
+    {
+      key: 'investing', label: 'Investing', color: '#4c49c9', pct: investingPct,
+      detail: investingAmount > 0 ? `$${Math.round(investingAmount).toLocaleString()} locked` : 'Not set',
+    },
+    {
+      key: 'unallocated', label: 'Unallocated', color: null, pct: unallocatedPct,
+      detail: `$${Math.round(unallocatedAmount).toLocaleString()} free`,
+    },
+  ]
+
   // This Month derived data
   const thisMonthIncome = summary.spending.monthly_income
   const thisMonthSpending = summary.spending.monthly_spending
@@ -291,10 +312,10 @@ export default function DashboardPage() {
         </div>
 
         {/* Income Allocation Preview */}
-        <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6">
+        <div className="bg-surface-container-lowest rounded-2xl shadow-card p-4 sm:p-6">
           {/* Header */}
-          <div className="flex items-start justify-between mb-5">
-            <div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-5">
+            <div className="min-w-0">
               <h3 className="text-headline-sm font-semibold text-on-surface">Income Allocation</h3>
               <p className="text-label-sm text-on-surface-variant mt-0.5">
                 How your{' '}
@@ -304,13 +325,13 @@ export default function DashboardPage() {
                 monthly income is distributed
               </p>
             </div>
-            <div className="flex items-center gap-3 flex-shrink-0 ml-4">
-              <p className="text-label-sm text-on-surface-variant">
+            <div className="flex items-center justify-between gap-3 flex-wrap sm:justify-end sm:flex-shrink-0">
+              <p className="text-label-md text-on-surface-variant tabular-nums">
                 {allocatedPct}% allocated · {unallocatedPct}% free
               </p>
               {/* Reset allocation */}
               {showResetConfirm ? (
-                <div className="flex items-center gap-2 bg-error/8 rounded-lg px-3 py-1.5">
+                <div className="flex items-center gap-2 flex-wrap bg-error/8 rounded-lg px-3 py-1.5">
                   <span className="text-label-sm text-error font-medium">Reset all to 0?</span>
                   <button
                     onClick={() => { resetAllocations(); setShowResetConfirm(false) }}
@@ -370,61 +391,45 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Legend */}
-          <div className="grid grid-cols-4 gap-4">
-            {/* Spending */}
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: '#ff9817' }} />
-                <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">Spending Limit</p>
-              </div>
-              <p className="text-headline-sm font-bold text-on-surface">{spendingPct}%</p>
-              <p className="text-label-sm text-on-surface-variant">
-                {spendingLimit > 0
-                  ? `$${Math.round(spendingAmount).toLocaleString()} limit`
-                  : 'Not set'}
-              </p>
-            </div>
+          {/* Legend. Four columns at phone width crushed each label into its
+              own edge, so below sm the same figures read as a plain divided
+              list: what it is on the left, the share and the money on the
+              right. */}
+          <ul className="flex flex-col divide-y divide-outline-variant/25 sm:hidden">
+            {allocationRows.map(row => (
+              <li
+                key={row.key}
+                className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span
+                    className={`w-2.5 h-2.5 rounded-full shrink-0 ${row.color ? '' : 'bg-surface-container-high'}`}
+                    style={row.color ? { backgroundColor: row.color } : undefined}
+                  />
+                  <p className="text-body-md text-on-surface-variant">{row.label}</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="text-title-md font-bold text-on-surface tabular-nums">{row.pct}%</p>
+                  <p className="text-label-md text-on-surface-variant tabular-nums">{row.detail}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
 
-            {/* Saving */}
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: '#1a6b3a' }} />
-                <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">Saving</p>
+          <div className="hidden sm:grid grid-cols-4 gap-4">
+            {allocationRows.map(row => (
+              <div key={row.key} className="flex flex-col gap-1.5">
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${row.color ? '' : 'bg-surface-container-high'}`}
+                    style={row.color ? { backgroundColor: row.color } : undefined}
+                  />
+                  <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">{row.label}</p>
+                </div>
+                <p className="text-headline-sm font-bold text-on-surface tabular-nums">{row.pct}%</p>
+                <p className="text-label-sm text-on-surface-variant tabular-nums">{row.detail}</p>
               </div>
-              <p className="text-headline-sm font-bold text-on-surface">{savingsPct}%</p>
-              <p className="text-label-sm text-on-surface-variant">
-                {savingsAmount > 0
-                  ? `$${Math.round(savingsAmount).toLocaleString()} locked`
-                  : 'Not set'}
-              </p>
-            </div>
-
-            {/* Investing */}
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: '#4c49c9' }} />
-                <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">Investing</p>
-              </div>
-              <p className="text-headline-sm font-bold text-on-surface">{investingPct}%</p>
-              <p className="text-label-sm text-on-surface-variant">
-                {investingAmount > 0
-                  ? `$${Math.round(investingAmount).toLocaleString()} locked`
-                  : 'Not set'}
-              </p>
-            </div>
-
-            {/* Unallocated */}
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-surface-container-high flex-shrink-0" />
-                <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">Unallocated</p>
-              </div>
-              <p className="text-headline-sm font-bold text-on-surface">{unallocatedPct}%</p>
-              <p className="text-label-sm text-on-surface-variant">
-                ${Math.round(unallocatedAmount).toLocaleString()} free
-              </p>
-            </div>
+            ))}
           </div>
         </div>
 
