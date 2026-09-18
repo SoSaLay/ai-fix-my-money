@@ -110,27 +110,38 @@ export default function MarketingPage() {
         <Link href="/learning" className={CTA_SMALL_CLASS}>Get started</Link>
       </nav>
 
-      {/* ── Hero ── */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 px-6 pt-12 sm:pt-16 pb-24 sm:pb-32 max-w-6xl mx-auto w-full">
-        <div className="flex flex-col items-center text-center lg:items-start lg:text-left gap-8">
-          <h1 className="text-display-xl text-on-surface">
+      {/* ── Hero ──
+          On a phone the reel sits between the headline and the pitch, so the
+          videos are the first thing a visitor meets rather than something they
+          scroll past the fold to find. `display: contents` is what allows that
+          without a second copy of the headline: below `lg` the text wrapper
+          dissolves and its two halves become grid items in their own right,
+          which `order` then arranges around the reel. From `lg` the wrapper is
+          a flex column again — the original layout, untouched. */}
+      <section className="grid grid-cols-1 lg:grid-cols-2 items-center gap-8 lg:gap-x-12 lg:gap-y-0 px-6 pt-12 sm:pt-16 pb-24 sm:pb-32 max-w-6xl mx-auto w-full">
+        <div className="contents lg:flex lg:flex-col lg:items-start lg:text-left lg:gap-8">
+          <h1 className="order-1 text-display-xl text-on-surface text-center lg:text-left">
             You and your money,{' '}
             <span style={{ background: 'linear-gradient(135deg, #4c49c9, #ff9817)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               finally intelligent.
             </span>
           </h1>
 
-          <p className="text-title-lg text-on-surface-variant max-w-lg">
-            Actionable learning platform to manage and grow your money. Then test your knowledge
-            with finance content, see what you really know?
-          </p>
+          <div className="order-3 flex flex-col items-center text-center lg:items-start lg:text-left gap-8">
+            <p className="text-title-lg text-on-surface-variant max-w-lg">
+              Actionable learning platform to manage and grow your money. Then test your knowledge
+              with finance content, see what you really know?
+            </p>
 
-          <Link href="/learning" className={CTA_CLASS}>
-            Get started <ArrowRight size={16} aria-hidden />
-          </Link>
+            <Link href="/learning" className={CTA_CLASS}>
+              Get started <ArrowRight size={16} aria-hidden />
+            </Link>
+          </div>
         </div>
 
-        <VideoReel videos={REJECTED_VIDEOS} />
+        <div className="order-2">
+          <VideoReel videos={REJECTED_VIDEOS} />
+        </div>
       </section>
 
       <StatsStrip stats={STATS} />

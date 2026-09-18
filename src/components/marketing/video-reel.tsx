@@ -131,7 +131,10 @@ export function VideoReel({ videos }: { videos: ReelVideo[] }) {
   }, [videos.length])
 
   return (
-    <div className="flex items-center justify-center gap-5">
+    // On a phone the controls sit under the video rather than beside it: a
+    // column of arrows alongside pushed the video off-centre and squeezed it
+    // narrower than its own 300px.
+    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5">
       <div
         className="rounded-2xl overflow-hidden bg-black"
         style={{ boxShadow: '0 20px 60px rgba(76,73,201,0.12), 0 4px 16px rgba(0,0,0,0.06)' }}
@@ -179,7 +182,7 @@ export function VideoReel({ videos }: { videos: ReelVideo[] }) {
         </div>
       </div>
 
-      <div className="flex flex-col items-center gap-3">
+      <div className="flex flex-row sm:flex-col items-center gap-3">
         <button
           type="button"
           onClick={() => goTo(active - 1)}
@@ -189,14 +192,18 @@ export function VideoReel({ videos }: { videos: ReelVideo[] }) {
         >
           <ChevronUp size={18} />
         </button>
-        <div className="flex flex-col items-center gap-1.5">
+        <div className="flex flex-row sm:flex-col items-center gap-1.5">
           {videos.map((video, i) => (
             <button
               key={video.id}
               type="button"
               onClick={() => goTo(i)}
               aria-label={`Video ${i + 1}`}
-              className={`w-1.5 rounded-full transition-all ${i === active ? 'h-5 bg-secondary' : 'h-1.5 bg-outline-variant'}`}
+              className={`rounded-full transition-all ${
+                i === active
+                  ? 'w-5 h-1.5 sm:w-1.5 sm:h-5 bg-secondary'
+                  : 'w-1.5 h-1.5 bg-outline-variant'
+              }`}
             />
           ))}
         </div>
