@@ -139,21 +139,21 @@ export default function DashboardPage() {
 
       <div className="flex-1 px-4 sm:px-8 pb-10 flex flex-col gap-6">
         {/* ── This Month ──────────────────────────────────────────────────── */}
-        <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6">
+        <div className="bg-surface-container-lowest rounded-2xl shadow-card p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-5">
             <Calendar size={16} className="text-on-surface-variant" />
             <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">Monthly</p>
           </div>
 
           {/* Three stat pillars */}
-          <div className="grid grid-cols-3 gap-4 mb-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-5">
             {/* Income */}
             <div className="bg-surface-container rounded-2xl p-4 flex flex-col gap-1">
               <div className="flex items-center gap-1.5 mb-1">
                 <Wallet size={14} className="text-on-surface-variant" />
                 <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">Income</p>
               </div>
-              <p className="text-headline-md font-bold text-on-surface">
+              <p className="text-title-lg sm:text-headline-md font-bold text-on-surface tabular-nums">
                 ${Math.round(thisMonthIncome).toLocaleString()}
               </p>
               <p className="text-label-sm text-on-surface-variant">total monthly</p>
@@ -167,7 +167,7 @@ export default function DashboardPage() {
                   : <TrendingDown size={14} className="text-success" />}
                 <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">Spending</p>
               </div>
-              <p className="text-headline-md font-bold text-on-surface">
+              <p className="text-title-lg sm:text-headline-md font-bold text-on-surface tabular-nums">
                 ${Math.round(thisMonthSpending).toLocaleString()}
               </p>
               <p className="text-label-sm text-on-surface-variant">
@@ -175,9 +175,10 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            {/* Saved */}
+            {/* Saved — takes the full width on a phone rather than leaving a
+                hole in the second row. */}
             <div
-              className="rounded-2xl p-4 flex flex-col gap-1"
+              className="col-span-2 sm:col-span-1 rounded-2xl p-4 flex flex-col gap-1"
               style={{ background: thisMonthNet >= 0 ? 'rgba(26,107,58,0.08)' : 'rgba(186,26,26,0.08)' }}
             >
               <div className="flex items-center gap-1.5 mb-1">
@@ -187,7 +188,7 @@ export default function DashboardPage() {
                 </p>
               </div>
               <p
-                className="text-headline-md font-bold"
+                className="text-title-lg sm:text-headline-md font-bold tabular-nums"
                 style={{ color: thisMonthNet >= 0 ? '#1a6b3a' : '#ba1a1a' }}
               >
                 ${Math.abs(Math.round(thisMonthNet)).toLocaleString()}
@@ -207,20 +208,20 @@ export default function DashboardPage() {
               aria-expanded={showRecurring}
               className="flex w-full items-center justify-between gap-3 text-left disabled:cursor-default"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 min-w-0">
                 <div className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant flex-shrink-0">
                   <RefreshCw size={16} />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">Recurring Expenses</p>
-                  <p className="text-headline-sm font-bold text-on-surface mt-0.5">
+                  <p className="text-title-lg sm:text-headline-sm font-bold text-on-surface mt-0.5 tabular-nums">
                     ${recurringTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     <span className="text-label-sm font-normal text-on-surface-variant ml-2">monthly</span>
                   </p>
                 </div>
               </div>
 
-              <span className="flex items-center gap-2 text-on-surface-variant">
+              <span className="flex items-center gap-2 text-on-surface-variant shrink-0">
                 <span className="text-headline-sm font-bold text-on-surface tabular-nums">
                   {recurringItems.length}
                 </span>
