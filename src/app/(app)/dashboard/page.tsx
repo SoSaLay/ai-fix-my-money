@@ -2,16 +2,22 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { TrendingUp, TrendingDown, RefreshCw, Calendar, Wallet, PiggyBank, RotateCcw, ChevronDown } from 'lucide-react'
+import { TrendingUp, TrendingDown, RefreshCw, Calendar, Wallet, PiggyBank, RotateCcw, ChevronDown, Landmark } from 'lucide-react'
 import { TopNav } from '@/components/layout/top-nav'
 import { EmptyState } from '@/components/layout/empty-state'
-import { useDashboardSummary } from '@/hooks/use-data'
+import { ExportMenu } from '@/components/dashboard/export-menu'
+import { useDashboardSummary, type Account } from '@/hooks/use-data'
 import { useFinancialData } from '@/contexts/financial-data-context'
+import { useLearning } from '@/contexts/learning-context'
 import { INVESTMENT_CATEGORIES, knownAllocations } from '@/lib/investing/categories'
 import { RISK_LABEL, RISK_RAMP } from '@/lib/investing/risk-ramp'
+import { buildReport, type FinancialReport, type ReportAccount } from '@/lib/export/report'
 
 export default function DashboardPage() {
-  const { hasData, resetAllocations, financialData, investingGoal } = useFinancialData()
+  const {
+    hasData, resetAllocations, financialData, investingGoal, assetAccounts, debtAccounts,
+  } = useFinancialData()
+  const { ready: learningReady, allTracksComplete } = useLearning()
   const [showResetConfirm, setShowResetConfirm] = useState(false)
   const { data: summary, loading, error, refresh } = useDashboardSummary()
 
@@ -133,9 +139,84 @@ export default function DashboardPage() {
   const thisMonthNet = summary.spending.net_cash_flow
   const thisMonthSavingsRate = thisMonthIncome > 0 ? Math.round((thisMonthNet / thisMonthIncome) * 100) : 0
 
+  // --- Accounts ---
+  // Everything recorded on the Accounts page, whichever way it got there.
+  // Debts are stored signed, so the balance is read as a magnitude and the
+  // side it falls on is the list it is in.
+  const toReportAccount = (a: Account): ReportAccount => ({
+    name: a.name || a.official_name || 'Account',
+    institution: a.institution_name ?? '',
+    // 'roth_ira' is what the entry form stores; 'roth ira' is what a person reads.
+    kind: (a.subtype ?? a.type).replace(/_/g, ' '),
+    balance: Math.abs(a.current_balance),
+  })
+  const assets = assetAccounts.map(toReportAccount)
+  const liabilities = debtAccounts.map(toReportAccount)
+  const totalAssets = summary.wealth.total_assets
+  const totalLiabilities = summary.wealth.total_debts
+  const netWorth = summary.wealth.net_worth
+  const hasAccounts = assets.length > 0 || liabilities.length > 0
+
+  const reportInvestments = investments.map(inv => ({
+    name: inv.name,
+    label: inv.label,
+    pct: inv.pct,
+    monthly: Math.round((inv.pct / 100) * monthlyIncome),
+    color: inv.color,
+  }))
+
+  // The dashboard, ready to be written to a file. Built on click so the export
+  // always carries the numbers the screen is showing at that moment.
+  const reportForExport = (): FinancialReport => buildReport({
+    monthly: {
+      income: thisMonthIncome,
+      spending: thisMonthSpending,
+      net: thisMonthNet,
+      savingsRatePct: thisMonthSavingsRate,
+      spendingPctOfIncome: thisMonthIncome > 0
+        ? Math.round((thisMonthSpending / thisMonthIncome) * 100)
+        : 0,
+    },
+    spendingLimit: summary.spending.spending_limit
+      ? {
+          limit: summary.spending.spending_limit.limit,
+          period: summary.spending.spending_limit.period,
+        }
+      : null,
+    recurring: { total: recurringTotal, items: recurringItems },
+    allocation: {
+      rows: allocationRows.map(r => ({
+        label: r.label, pct: r.pct, detail: r.detail, color: r.color,
+      })),
+      allocatedPct,
+      unallocatedPct,
+    },
+    investments: {
+      monthlyAmount: investmentsAmount,
+      totalPct: investmentsPct,
+      items: reportInvestments,
+    },
+    savingsGoals: summary.goals.savings.map(g => ({
+      name: g.name,
+      target: g.target_amount,
+      current: g.current_amount,
+      allocationPct: Math.round(g.allocation_pct),
+      progressPct: g.progress,
+    })),
+    accounts: { assets, liabilities, totalAssets, totalLiabilities, netWorth },
+  })
+
   return (
     <div className="flex flex-col min-h-full">
-      <TopNav title="Dashboard" />
+      <TopNav
+        title="Dashboard"
+        action={
+          <ExportMenu
+            unlocked={learningReady && allTracksComplete()}
+            buildReport={reportForExport}
+          />
+        }
+      />
 
       <div className="flex-1 px-4 sm:px-8 pb-10 flex flex-col gap-6">
         {/* ── This Month ──────────────────────────────────────────────────── */}
@@ -432,6 +513,109 @@ export default function DashboardPage() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* ── Accounts ────────────────────────────────────────────────────────
+            What is owned against what is owed. The dashboard had every flow but
+            no stock, so the one number a learner is really after — what they are
+            worth today — lived only on the Accounts page. */}
+        <div className="bg-surface-container-lowest rounded-2xl shadow-card p-4 sm:p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Landmark size={16} className="text-on-surface-variant" />
+            <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">Accounts</p>
+          </div>
+
+          {!hasAccounts ? (
+            <div className="rounded-2xl border border-dashed border-outline-variant px-5 py-8 text-center flex flex-col items-center gap-3">
+              <p className="text-body-md text-on-surface-variant">
+                You have not recorded any accounts yet.
+              </p>
+              <Link href="/accounts" className="text-label-md font-semibold text-secondary hover:underline">
+                Add your accounts
+              </Link>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-5">
+              {/* Net worth — the whole point of the section, stated first. */}
+              <div
+                className="rounded-2xl p-4"
+                style={{ background: netWorth >= 0 ? 'rgba(26,107,58,0.08)' : 'rgba(186,26,26,0.08)' }}
+              >
+                <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">Net worth</p>
+                <p
+                  className="text-headline-md font-bold tabular-nums mt-0.5"
+                  style={{ color: netWorth >= 0 ? '#1a6b3a' : '#ba1a1a' }}
+                >
+                  {netWorth < 0 && '-'}${Math.abs(Math.round(netWorth)).toLocaleString()}
+                </p>
+                <p className="text-label-sm text-on-surface-variant mt-0.5 tabular-nums">
+                  ${Math.round(totalAssets).toLocaleString()} in assets
+                  {' − '}
+                  ${Math.round(totalLiabilities).toLocaleString()} in liabilities
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                {/* Assets */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">
+                      Assets ({assets.length})
+                    </p>
+                    <p className="text-title-md font-bold text-on-surface tabular-nums">
+                      ${Math.round(totalAssets).toLocaleString()}
+                    </p>
+                  </div>
+                  {assets.length === 0 ? (
+                    <p className="text-body-sm text-on-surface-variant">None recorded.</p>
+                  ) : (
+                    <ul className="flex flex-col divide-y divide-outline-variant/25">
+                      {assets.map((acc, i) => (
+                        <li key={`asset-${i}`} className="flex items-center justify-between gap-3 py-2.5 first:pt-0">
+                          <div className="min-w-0">
+                            <p className="text-body-md text-on-surface truncate">{acc.name}</p>
+                            <p className="text-label-sm text-on-surface-variant capitalize truncate">{acc.kind}</p>
+                          </div>
+                          <p className="text-body-md text-on-surface tabular-nums shrink-0">
+                            ${Math.round(acc.balance).toLocaleString()}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                {/* Liabilities */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">
+                      Liabilities ({liabilities.length})
+                    </p>
+                    <p className="text-title-md font-bold tabular-nums" style={{ color: '#ba1a1a' }}>
+                      ${Math.round(totalLiabilities).toLocaleString()}
+                    </p>
+                  </div>
+                  {liabilities.length === 0 ? (
+                    <p className="text-body-sm text-on-surface-variant">None recorded.</p>
+                  ) : (
+                    <ul className="flex flex-col divide-y divide-outline-variant/25">
+                      {liabilities.map((acc, i) => (
+                        <li key={`debt-${i}`} className="flex items-center justify-between gap-3 py-2.5 first:pt-0">
+                          <div className="min-w-0">
+                            <p className="text-body-md text-on-surface truncate">{acc.name}</p>
+                            <p className="text-label-sm text-on-surface-variant capitalize truncate">{acc.kind}</p>
+                          </div>
+                          <p className="text-body-md tabular-nums shrink-0" style={{ color: '#ba1a1a' }}>
+                            ${Math.round(acc.balance).toLocaleString()}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
       </div>

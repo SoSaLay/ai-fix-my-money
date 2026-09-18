@@ -129,6 +129,8 @@ interface LearningContextValue {
   isTrackUnlocked: (trackId: TrackId) => boolean
   /** Hard gate: the tool opens only once the final quiz is passed. */
   isToolUnlocked: (trackId: TrackId) => boolean
+  /** Every track passed — the whole app is open. Tracks with no content yet don't count. */
+  allTracksComplete: () => boolean
 
   trackCompletion: (trackId: TrackId) => { done: number; total: number; pct: number }
   currentTrackId: () => TrackId
@@ -458,6 +460,18 @@ export function LearningProvider({ children }: { children: ReactNode }) {
     [isTrackComplete],
   )
 
+  // The finish line for the whole app. Because the tracks unlock in order, in
+  // practice this turns true when the last final quiz — Investing — is passed.
+  const allTracksComplete = useCallback(
+    () => TRACK_ORDER.every(id => {
+      const t = getTrack(id)
+      // A track with no content yet cannot be owed.
+      if (!t || t.lessons.length === 0) return true
+      return isTrackComplete(id)
+    }),
+    [isTrackComplete],
+  )
+
   const trackCompletion = useCallback(
     (trackId: TrackId) => {
       const track = getTrack(trackId)
@@ -599,6 +613,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
         isTrackComplete,
         isTrackUnlocked,
         isToolUnlocked,
+        allTracksComplete,
         trackCompletion,
         currentTrackId,
         reviewQueue,
