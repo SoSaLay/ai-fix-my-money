@@ -62,17 +62,20 @@ export function CircularDial({
   const thumbX        = cx + radius * Math.cos(thumbRad)
   const thumbY        = cy + radius * Math.sin(thumbRad)
 
+  // The dial scales down on narrow screens, so the rendered box and the
+  // viewBox no longer share units. Measure the angle off the rendered box.
   const getAngleFromEvent = useCallback(
     (clientX: number, clientY: number): number => {
       if (!svgRef.current) return 0
       const rect  = svgRef.current.getBoundingClientRect()
-      const x     = clientX - rect.left - cx
-      const y     = clientY - rect.top - cy
+      if (!rect.width || !rect.height) return 0
+      const x     = clientX - rect.left - rect.width / 2
+      const y     = clientY - rect.top - rect.height / 2
       let angle   = Math.atan2(y, x) * (180 / Math.PI) + 90
       if (angle < 0) angle += 360
       return angle
     },
-    [cx, cy],
+    [],
   )
 
   const handlePointerDown = useCallback(
@@ -107,13 +110,16 @@ export function CircularDial({
     '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 
   return (
-    <div className="flex items-center justify-center" style={{ width: size, height: size }}>
+    <div
+      className="w-full flex items-center justify-center"
+      style={{ maxWidth: size }}
+    >
       <svg
         ref={svgRef}
-        width={size}
-        height={size}
         viewBox={`0 0 ${size} ${size}`}
+        className="w-full h-auto block"
         style={{
+          aspectRatio: '1 / 1',
           cursor: maxFreePct > 0 ? 'pointer' : 'default',
           userSelect: 'none',
           touchAction: 'none',

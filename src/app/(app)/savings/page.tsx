@@ -56,9 +56,9 @@ function SavingsPageTool() {
       <div className="flex flex-col min-h-full">
         <TopNav title="Savings Strategy" />
         <div className="flex-1 px-4 sm:px-8 pb-10 flex flex-col gap-6">
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <div className="h-96 bg-surface-container-lowest rounded-2xl animate-pulse" />
-            <div className="h-96 bg-surface-container-lowest rounded-2xl animate-pulse" />
+            <div className="hidden lg:block h-96 bg-surface-container-lowest rounded-2xl animate-pulse" />
           </div>
         </div>
       </div>
@@ -105,16 +105,16 @@ function SavingsPageTool() {
       <TopNav title="Savings Strategy" />
 
       <div className="flex-1 px-4 sm:px-8 pb-10 flex flex-col gap-6">
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-start">
           {/* Left: allocation panel */}
-          <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6 flex flex-col items-center gap-6">
+          <div className="bg-surface-container-lowest rounded-2xl shadow-card p-4 sm:p-6 flex flex-col items-center gap-5 sm:gap-6 min-w-0">
             {/* Header row with net cash flow + corner lock/unlock */}
-            <div className="w-full flex items-start justify-between">
-              <div>
+            <div className="w-full flex items-start justify-between gap-3">
+              <div className="min-w-0">
                 <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">
                   Monthly Income
                 </p>
-                <p className="text-display-sm font-bold text-on-surface mt-1">
+                <p className="text-headline-lg sm:text-display-sm font-bold text-on-surface mt-1 tabular-nums">
                   ${Math.round(monthlyIncome).toLocaleString()}
                 </p>
               </div>
@@ -123,20 +123,20 @@ function SavingsPageTool() {
               {isLocked ? (
                 <button
                   onClick={handleUnlock}
-                  className="flex items-center gap-1.5 text-label-sm font-semibold px-3 py-1.5 rounded-lg transition-all hover:opacity-80 flex-shrink-0 ml-4"
+                  className="flex items-center gap-1.5 text-label-md font-semibold px-4 min-h-11 rounded-full transition-all hover:opacity-80 flex-shrink-0"
                   style={{ background: 'rgba(28,27,31,0.06)', color: '#49454f' }}
                 >
-                  <Unlock size={13} />
+                  <Unlock size={14} />
                   Unlock
                 </button>
               ) : hasUnsavedChanges ? (
                 <button
                   onClick={handleLockIn}
                   disabled={updating}
-                  className="flex items-center gap-1.5 text-label-sm font-semibold px-3 py-1.5 rounded-lg transition-all hover:opacity-80 active:scale-95 flex-shrink-0 ml-4 disabled:opacity-50"
+                  className="flex items-center gap-1.5 text-label-md font-semibold px-4 min-h-11 rounded-full transition-all hover:opacity-80 active:scale-95 flex-shrink-0 disabled:opacity-50"
                   style={{ background: '#1c1b1f', color: '#ffffff' }}
                 >
-                  <Lock size={13} />
+                  <Lock size={14} />
                   {updating ? 'Locking…' : 'Lock In'}
                 </button>
               ) : null}
@@ -154,12 +154,12 @@ function SavingsPageTool() {
             {/* Legend — always shows both tiers so users can see the two-part split */}
             <div className="w-full flex flex-col gap-2">
               {/* Savings Goals — lighter green locked arc */}
-              <div className="flex items-center justify-between text-label-sm">
-                <div className="flex items-center gap-2">
-                  <span className="inline-block w-3 h-3 rounded-full" style={{ background: GOALS_COLOR }} />
+              <div className="flex items-center justify-between gap-3 flex-wrap text-label-md">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="inline-block w-3 h-3 rounded-full shrink-0" style={{ background: GOALS_COLOR }} />
                   <span className="text-on-surface-variant">Savings Goals</span>
                 </div>
-                <span className="font-semibold text-on-surface">
+                <span className="font-semibold text-on-surface tabular-nums text-right">
                   {goalsAllocationPct > 0
                     ? `${goalsAllocationPct}% · $${goalsAmount.toLocaleString()}`
                     : <span className="text-on-surface-variant font-normal">Not set — add a goal →</span>
@@ -168,12 +168,12 @@ function SavingsPageTool() {
               </div>
 
               {/* General Savings — draggable dark green arc */}
-              <div className="flex items-center justify-between text-label-sm">
-                <div className="flex items-center gap-2">
-                  <span className="inline-block w-3 h-3 rounded-full" style={{ background: GENERAL_COLOR }} />
+              <div className="flex items-center justify-between gap-3 flex-wrap text-label-md">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="inline-block w-3 h-3 rounded-full shrink-0" style={{ background: GENERAL_COLOR }} />
                   <span className="text-on-surface-variant">General Savings</span>
                 </div>
-                <span className="font-semibold text-on-surface">
+                <span className="font-semibold text-on-surface tabular-nums text-right">
                   {generalSavingsPct > 0
                     ? `${generalSavingsPct}% · $${generalAmount.toLocaleString()}`
                     : <span className="text-on-surface-variant font-normal">Drag the dial to set</span>
@@ -183,9 +183,9 @@ function SavingsPageTool() {
 
               {/* Total */}
               {totalAllocationPct > 0 && (
-                <div className="flex items-center justify-between text-label-sm pt-2 border-t border-outline-variant/30 mt-1">
+                <div className="flex items-center justify-between gap-3 flex-wrap text-label-md pt-2 border-t border-outline-variant/30 mt-1">
                   <span className="text-on-surface-variant">Total Savings</span>
-                  <span className="font-semibold text-on-surface">
+                  <span className="font-semibold text-on-surface tabular-nums text-right">
                     {totalAllocationPct}% · ${totalSavingsAmount.toLocaleString()}
                   </span>
                 </div>
@@ -247,7 +247,7 @@ function CommittedAllocations({
 
   return (
     <div className="w-full border-t border-outline-variant/30 pt-4">
-      <table className="w-full text-label-sm">
+      <table className="w-full text-label-md">
         <tbody>
           {spendingPct > 0 && (
             <tr>

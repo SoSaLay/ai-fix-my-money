@@ -116,7 +116,7 @@ function GoalRow({
 
   if (editing) {
     return (
-      <div className="flex flex-col gap-5 bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] shadow-card p-5 sm:p-6">
+      <div className="flex flex-col gap-5 bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] shadow-card p-4 sm:p-6">
         <div className="flex flex-col gap-1.5">
           <label htmlFor={`${fieldId}-name`} className="text-label-md text-on-surface-variant">Goal name</label>
           <input
@@ -172,25 +172,27 @@ function GoalRow({
           </div>
         )}
 
-        <div className="flex items-center gap-3 flex-wrap">
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="btn-action items-center justify-center gap-1.5 disabled:opacity-40"
-          >
-            <Check size={15} />
-            {saving ? 'Saving…' : 'Save'}
-          </button>
-          <button
-            onClick={handleCancel}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-label-lg text-on-surface-variant hover:text-on-surface hover:bg-on-surface/[0.06] transition-colors"
-          >
-            <X size={15} />
-            Cancel
-          </button>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="btn-action flex-1 sm:flex-none items-center justify-center gap-1.5 disabled:opacity-40"
+            >
+              <Check size={15} />
+              {saving ? 'Saving…' : 'Save'}
+            </button>
+            <button
+              onClick={handleCancel}
+              className="flex flex-1 sm:flex-none min-h-11 items-center justify-center gap-1.5 px-4 rounded-full text-label-lg text-on-surface-variant hover:text-on-surface hover:bg-on-surface/[0.06] transition-colors"
+            >
+              <X size={15} />
+              Cancel
+            </button>
+          </div>
           <button
             onClick={() => setConfirmingDelete(true)}
-            className="ml-auto flex items-center gap-1.5 px-4 py-2.5 rounded-full text-label-lg text-error hover:bg-error/[0.08] transition-colors"
+            className="flex sm:ml-auto min-h-11 items-center justify-center gap-1.5 px-4 rounded-full text-label-lg text-error hover:bg-error/[0.08] transition-colors"
           >
             <Trash2 size={15} />
             Delete
@@ -210,20 +212,22 @@ function GoalRow({
   }
 
   return (
-    <div className="flex flex-col gap-2 group">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-base leading-none">💰</span>
-          <p className="text-label-lg font-medium text-on-surface">{goal.name}</p>
+    <div className="flex flex-col gap-2.5 group">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-start gap-2 min-w-0">
+          <span className="text-base leading-tight shrink-0">💰</span>
+          <p className="text-body-lg font-medium text-on-surface break-words">{goal.name}</p>
         </div>
-        <div className="flex items-center gap-3">
-          <p className="text-label-lg font-semibold text-on-surface">{pct}%</p>
+        <div className="flex items-center gap-1 shrink-0">
+          <p className="text-body-lg font-semibold text-on-surface tabular-nums">{pct}%</p>
+          {/* Always reachable: a phone has no hover to reveal it with. */}
           <button
             onClick={() => setEditing(true)}
-            className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-surface-container text-on-surface-variant"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface"
+            aria-label={`Edit ${goal.name}`}
             title="Edit goal"
           >
-            <Pencil size={14} />
+            <Pencil size={16} />
           </button>
         </div>
       </div>
@@ -233,12 +237,12 @@ function GoalRow({
           style={{ width: `${pct}%`, backgroundColor: '#4c49c9' }}
         />
       </div>
-      <div className="flex items-center justify-between">
-        <p className="text-label-sm text-on-surface-variant">
+      <div className="flex items-center justify-between gap-x-3 gap-y-1 flex-wrap">
+        <p className="text-label-md text-on-surface-variant tabular-nums">
           ${goal.current_amount.toLocaleString()} of ${goal.target_amount.toLocaleString()}
         </p>
-        <div className="flex items-center gap-1.5 text-label-sm text-on-surface-variant">
-          <span className="font-medium text-on-surface">
+        <div className="flex items-center gap-1.5 text-label-md text-on-surface-variant">
+          <span className="font-medium text-on-surface tabular-nums">
             +${monthlyContribution.toLocaleString()}/mo
           </span>
           {monthsRemaining !== null && monthsRemaining > 0 && (
@@ -284,7 +288,7 @@ function NewGoalForm({
   }
 
   return (
-    <div className="flex flex-col gap-5 bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] shadow-card p-5 sm:p-6">
+    <div className="flex flex-col gap-5 bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] shadow-card p-4 sm:p-6">
       <p className="text-title-md text-on-surface">{label}</p>
 
       <div className="flex flex-col gap-1.5">
@@ -343,18 +347,18 @@ function NewGoalForm({
         </div>
       )}
 
-      <div className="flex items-center gap-3 flex-wrap">
+      <div className="flex items-center gap-2 sm:gap-3">
         <button
           onClick={handleCreate}
           disabled={saving || !form.name.trim()}
-          className="btn-action items-center justify-center gap-1.5 disabled:opacity-40"
+          className="btn-action flex-1 sm:flex-none items-center justify-center gap-1.5 disabled:opacity-40"
         >
           <Check size={15} />
           {saving ? 'Creating…' : 'Create goal'}
         </button>
         <button
           onClick={() => onClose()}
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-label-lg text-on-surface-variant hover:text-on-surface hover:bg-on-surface/[0.06] transition-colors"
+          className="flex flex-1 sm:flex-none min-h-11 items-center justify-center gap-1.5 px-4 rounded-full text-label-lg text-on-surface-variant hover:text-on-surface hover:bg-on-surface/[0.06] transition-colors"
         >
           <X size={15} />
           Cancel
@@ -374,6 +378,7 @@ function NewFolderForm({
   onCreate: (name: string) => void
 }) {
   const [name, setName] = useState('')
+  const fieldId = useId()
 
   const handleCreate = () => {
     if (!name.trim()) return
@@ -382,7 +387,7 @@ function NewFolderForm({
   }
 
   return (
-    <div className="flex flex-col gap-5 bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] shadow-card p-5 sm:p-6">
+    <div className="flex flex-col gap-5 bg-surface-container-lowest rounded-3xl border border-on-surface/[0.06] shadow-card p-4 sm:p-6">
       <div className="flex flex-col gap-1.5">
         <p className="text-title-md text-on-surface">New parent goal</p>
         <p className="text-body-md text-on-surface-variant leading-relaxed">
@@ -390,27 +395,33 @@ function NewFolderForm({
         </p>
       </div>
 
-      <input
-        className="w-full rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-4 py-3 text-body-lg text-on-surface outline-none transition-colors focus:border-on-surface/40"
-        value={name}
-        onChange={e => setName(e.target.value)}
-        placeholder="Project name (e.g. Home Renovation)"
-        autoFocus
-        onKeyDown={e => e.key === 'Enter' && handleCreate()}
-      />
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor={`${fieldId}-folder`} className="text-label-md text-on-surface-variant">
+          Project name
+        </label>
+        <input
+          id={`${fieldId}-folder`}
+          className="w-full rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-4 py-3.5 text-body-lg text-on-surface outline-none transition-colors focus:border-on-surface/40"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          placeholder="e.g. Home Renovation"
+          autoFocus
+          onKeyDown={e => e.key === 'Enter' && handleCreate()}
+        />
+      </div>
 
-      <div className="flex items-center gap-3 flex-wrap">
+      <div className="flex items-center gap-2 sm:gap-3">
         <button
           onClick={handleCreate}
           disabled={!name.trim()}
-          className="btn-action items-center justify-center gap-1.5 disabled:opacity-40"
+          className="btn-action flex-1 sm:flex-none items-center justify-center gap-1.5 disabled:opacity-40"
         >
           <Check size={15} />
           Create project
         </button>
         <button
           onClick={onClose}
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-label-lg text-on-surface-variant hover:text-on-surface hover:bg-on-surface/[0.06] transition-colors"
+          className="flex flex-1 sm:flex-none min-h-11 items-center justify-center gap-1.5 px-4 rounded-full text-label-lg text-on-surface-variant hover:text-on-surface hover:bg-on-surface/[0.06] transition-colors"
         >
           <X size={15} />
           Cancel
@@ -462,31 +473,35 @@ function FolderSection({
   return (
     <div className="flex flex-col rounded-3xl border border-on-surface/[0.06] bg-surface-container-lowest shadow-card overflow-hidden">
       {/* Folder header */}
-      <div className="flex items-center gap-3 px-5 py-4 bg-surface-container-low">
+      <div className="flex items-center gap-2 px-4 sm:px-5 py-3 sm:py-4 bg-surface-container-low">
         <button
           onClick={() => setCollapsed(c => !c)}
-          className="flex items-center gap-2.5 flex-1 text-left min-w-0"
+          className="flex items-start gap-2.5 flex-1 text-left min-w-0 py-1"
+          aria-expanded={!collapsed}
         >
           {collapsed
-            ? <ChevronRight size={16} className="text-on-surface-variant shrink-0" />
-            : <ChevronDown size={16} className="text-on-surface-variant shrink-0" />}
-          <span className="text-base leading-none shrink-0">🎯</span>
-          <p className="text-title-md text-on-surface truncate">{folder.name}</p>
-          <span className="text-label-md text-on-surface-variant shrink-0">
-            {goals.length} goal{goals.length === 1 ? '' : 's'}
+            ? <ChevronRight size={18} className="text-on-surface-variant shrink-0 mt-0.5" />
+            : <ChevronDown size={18} className="text-on-surface-variant shrink-0 mt-0.5" />}
+          <span className="text-base leading-tight shrink-0">🎯</span>
+          <span className="flex flex-col gap-0.5 min-w-0">
+            <span className="text-title-md text-on-surface break-words">{folder.name}</span>
+            <span className="flex items-center gap-2 text-label-md text-on-surface-variant">
+              <span>{goals.length} goal{goals.length === 1 ? '' : 's'}</span>
+              {goals.length > 0 && (
+                <span className="rounded-full bg-surface-container-lowest border border-on-surface/[0.06] px-2 py-0.5 text-on-surface tabular-nums">
+                  {overallPct}%
+                </span>
+              )}
+            </span>
           </span>
         </button>
-        {goals.length > 0 && (
-          <span className="rounded-full bg-surface-container-lowest border border-on-surface/[0.06] px-3 py-1 text-label-md text-on-surface tabular-nums shrink-0">
-            {overallPct}%
-          </span>
-        )}
         <button
           onClick={() => setConfirmingDelete(true)}
           className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-on-surface-variant hover:text-error hover:bg-error/[0.08] transition-colors"
+          aria-label={`Remove ${folder.name}`}
           title="Remove project"
         >
-          <Trash2 size={15} />
+          <Trash2 size={16} />
         </button>
       </div>
 
@@ -500,12 +515,12 @@ function FolderSection({
       />
 
       {!collapsed && (
-        <div className="flex flex-col gap-4 px-5 py-4">
+        <div className="flex flex-col gap-4 px-4 sm:px-5 py-4">
           {goals.length > 1 && (
             <div className="flex flex-col gap-2 pb-3 border-b border-on-surface/[0.07]">
-              <div className="flex items-baseline justify-between gap-3">
+              <div className="flex items-baseline justify-between gap-2 flex-wrap">
                 <p className="text-label-lg text-on-surface-variant">Overall</p>
-                <p className="text-title-md text-on-surface tabular-nums">
+                <p className="text-title-md text-on-surface tabular-nums text-right">
                   ${totalCurrent.toLocaleString()} / ${totalTarget.toLocaleString()}
                 </p>
               </div>
@@ -544,9 +559,9 @@ function FolderSection({
           ) : (
             <button
               onClick={() => setAddingGoal(true)}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-on-surface/15 text-label-lg text-on-surface hover:bg-on-surface/[0.06] transition-colors self-start"
+              className="flex w-full sm:w-auto sm:self-start min-h-11 items-center justify-center gap-1.5 px-4 rounded-full border border-on-surface/15 text-label-lg text-on-surface hover:bg-on-surface/[0.06] transition-colors"
             >
-              <Plus size={15} />
+              <Plus size={16} />
               Add goal to project
             </button>
           )}
@@ -568,38 +583,47 @@ function AddMenu({
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) onClose()
+    const handler = (e: Event) => {
+      const target = e.target as Node | null
+      if (!ref.current || !target) return
+      if (ref.current.contains(target)) return
+      // The toggle closes the menu itself; closing here too would let its
+      // click re-open what this handler just shut.
+      if (target instanceof Element && target.closest('[data-add-menu-toggle]')) return
+      onClose()
     }
     document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
+    document.addEventListener('touchstart', handler)
+    return () => {
+      document.removeEventListener('mousedown', handler)
+      document.removeEventListener('touchstart', handler)
+    }
   }, [onClose])
 
   return (
     <div
       ref={ref}
-      className="absolute right-0 top-full mt-1 z-10 bg-surface-container-lowest rounded-xl shadow-lg border border-surface-container-high overflow-hidden"
-      style={{ minWidth: 220 }}
+      className="absolute right-0 top-full mt-1.5 z-20 w-[min(17rem,calc(100vw-3rem))] bg-surface-container-lowest rounded-2xl shadow-float border border-surface-container-high overflow-hidden"
     >
       <button
         onClick={() => onSelect('folder')}
-        className="flex items-start gap-3 w-full px-4 py-3 hover:bg-surface-container transition-colors text-left"
+        className="flex items-start gap-3 w-full px-4 py-3.5 hover:bg-surface-container transition-colors text-left"
       >
-        <span className="text-base leading-none mt-0.5 shrink-0">🎯</span>
-        <div>
-          <p className="text-label-md font-semibold text-on-surface">Parent Goal</p>
-          <p className="text-label-sm text-on-surface-variant">Group items under one project</p>
+        <span className="text-base leading-tight mt-0.5 shrink-0">🎯</span>
+        <div className="min-w-0">
+          <p className="text-label-lg font-semibold text-on-surface">Parent Goal</p>
+          <p className="text-label-md text-on-surface-variant">Group items under one project</p>
         </div>
       </button>
       <div className="h-px bg-surface-container-high mx-3" />
       <button
         onClick={() => onSelect('goal')}
-        className="flex items-start gap-3 w-full px-4 py-3 hover:bg-surface-container transition-colors text-left"
+        className="flex items-start gap-3 w-full px-4 py-3.5 hover:bg-surface-container transition-colors text-left"
       >
-        <span className="text-base leading-none mt-0.5 shrink-0">💰</span>
-        <div>
-          <p className="text-label-md font-semibold text-on-surface">Individual Goal</p>
-          <p className="text-label-sm text-on-surface-variant">A single standalone goal</p>
+        <span className="text-base leading-tight mt-0.5 shrink-0">💰</span>
+        <div className="min-w-0">
+          <p className="text-label-lg font-semibold text-on-surface">Individual Goal</p>
+          <p className="text-label-md text-on-surface-variant">A single standalone goal</p>
         </div>
       </button>
     </div>
@@ -668,16 +692,18 @@ export function GoalsList({
   )
 
   return (
-    <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6 flex flex-col gap-5">
-      <div className="flex items-center justify-between">
+    <div className="bg-surface-container-lowest rounded-2xl shadow-card p-4 sm:p-6 flex flex-col gap-5 min-w-0">
+      <div className="flex items-center justify-between gap-3">
         <h3 className="text-headline-sm text-on-surface">Savings Goals</h3>
         {addingType === null && (
-          <div className="relative">
+          <div className="relative shrink-0">
             <button
               onClick={() => setShowAddMenu(m => !m)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-label-md font-medium text-secondary hover:bg-secondary/8 transition-colors"
+              className="flex min-h-11 items-center gap-1.5 px-3 rounded-full text-label-lg font-medium text-secondary hover:bg-secondary/8 transition-colors"
+              aria-expanded={showAddMenu}
+              data-add-menu-toggle
             >
-              <Plus size={15} />
+              <Plus size={16} />
               Add Goal
             </button>
             {showAddMenu && (
