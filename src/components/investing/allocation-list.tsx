@@ -108,7 +108,7 @@ function AddCustom({ onAdd }: { onAdd: (name: string) => void }) {
   }
 
   return (
-    <div className="rounded-2xl border border-on-surface/15 px-4 py-2.5 flex items-center gap-3 focus-within:border-on-surface/40 transition-colors">
+    <div className="rounded-2xl border border-on-surface/15 pl-4 pr-2 py-1.5 flex items-center gap-2 focus-within:border-on-surface/40 transition-colors">
       <input
         type="text"
         value={name}
@@ -122,9 +122,9 @@ function AddCustom({ onAdd }: { onAdd: (name: string) => void }) {
       <button
         onClick={add}
         disabled={!name.trim()}
-        className="shrink-0 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-label-md text-on-surface hover:bg-on-surface/[0.06] transition-colors disabled:opacity-40"
+        className="shrink-0 inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-label-lg text-on-surface hover:bg-on-surface/[0.06] transition-colors disabled:opacity-40"
       >
-        <Plus size={14} /> Add
+        <Plus size={16} /> Add
       </button>
     </div>
   )
@@ -187,9 +187,9 @@ function AllocationRow({
         boxShadow: active ? undefined : 'inset 0 0 0 1px rgba(45,47,51,0.15)',
       }}
     >
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <p className="text-body-md font-semibold text-on-surface truncate">{name}</p>
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 min-w-0">
+          <p className="text-body-md font-semibold text-on-surface break-words">{name}</p>
           <span
             className="text-label-sm font-semibold shrink-0 px-2.5 py-0.5 rounded-full"
             style={{ color: shade.stripe, backgroundColor: active ? 'rgba(255,255,255,0.6)' : shade.tint }}
@@ -198,13 +198,13 @@ function AllocationRow({
           </span>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1 shrink-0">
           {active && (
             <div className="text-right">
               <span className="text-body-md font-semibold text-on-surface tabular-nums">
                 {pct}%
               </span>
-              <span className="block text-label-sm text-on-surface-variant tabular-nums">
+              <span className="block text-label-md text-on-surface-variant tabular-nums">
                 ${amount.toLocaleString()}/mo
               </span>
             </div>
@@ -214,11 +214,11 @@ function AllocationRow({
             <button
               onClick={() => setOpen(true)}
               className={active
-                ? 'p-1.5 rounded-full text-on-surface-variant hover:bg-on-surface/[0.06] transition-colors'
-                : 'inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-label-md text-on-surface hover:bg-on-surface/[0.06] transition-colors'}
-              aria-label={active ? `Edit ${name}` : undefined}
+                ? 'inline-flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-on-surface/[0.06] transition-colors'
+                : 'inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-label-lg text-on-surface hover:bg-on-surface/[0.06] transition-colors'}
+              aria-label={active ? `Edit ${name}` : `Select ${name}`}
             >
-              {active ? <Pencil size={14} /> : <><Plus size={14} /> Select</>}
+              {active ? <Pencil size={16} /> : <><Plus size={16} /> Select</>}
             </button>
           )}
         </div>
@@ -228,7 +228,7 @@ function AllocationRow({
         // Drag it or type it — the same value either way. A percentage is
         // easier to feel on a slider and easier to be exact about in a field,
         // and there is no reason to make someone pick one.
-        <div className="flex items-center gap-3 pt-1">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-1">
           <input
             type="range"
             min={0}
@@ -236,15 +236,15 @@ function AllocationRow({
             step={1}
             value={pct}
             onChange={e => set(Number(e.target.value))}
-            className="flex-1 min-w-0 h-1.5 cursor-pointer accent-secondary"
+            className="w-full sm:flex-1 min-w-0 h-1.5 cursor-pointer accent-secondary"
             aria-label={`Percent of income for ${name}`}
           />
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-1.5 sm:shrink-0">
             {/* The field sits on a tinted row and on a plain one, so it carries
                 its own ground and its own outline rather than borrowing the
                 row's. White on white is invisible on a row nobody has funded
                 yet, which is exactly when the field matters most. */}
-            <div className="flex items-center gap-0.5 rounded-xl border border-on-surface/20 bg-white pl-1.5 pr-2 py-1 focus-within:border-on-surface/45 transition-colors">
+            <div className="flex flex-1 sm:flex-none items-center gap-0.5 rounded-xl border border-on-surface/20 bg-white pl-1.5 pr-2 py-1.5 focus-within:border-on-surface/45 transition-colors">
               <input
                 type="number"
                 min={0}
@@ -260,7 +260,7 @@ function AllocationRow({
                 // arrows inside the right edge of the field, so right-aligned
                 // digits end up underneath them. Centring puts clear space on
                 // both sides of the number.
-                className="w-16 bg-transparent text-body-md text-on-surface tabular-nums text-center outline-none"
+                className="w-full sm:w-16 bg-transparent text-body-md text-on-surface tabular-nums text-center outline-none"
                 aria-label={`Percent of income for ${name}, typed`}
               />
               <span className="text-label-sm text-on-surface-variant">%</span>
@@ -269,10 +269,10 @@ function AllocationRow({
             <button
               onMouseDown={e => e.preventDefault()}
               onClick={confirm}
-              className="p-1.5 rounded-full bg-[#17171c] text-white hover:bg-black transition-colors"
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#17171c] text-white hover:bg-black transition-colors"
               aria-label={`Confirm ${name}`}
             >
-              <Check size={15} />
+              <Check size={16} />
             </button>
 
             {(active || onRemove) && (
@@ -281,10 +281,10 @@ function AllocationRow({
                   if (onRemove) onRemove()
                   else { set(0); setOpen(false) }
                 }}
-                className="p-1.5 rounded-full text-on-surface-variant hover:bg-on-surface/[0.06] transition-colors"
+                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-on-surface-variant hover:bg-on-surface/[0.06] transition-colors"
                 aria-label={onRemove ? `Remove ${name}` : `Clear ${name}`}
               >
-                <X size={15} />
+                <X size={16} />
               </button>
             )}
           </div>

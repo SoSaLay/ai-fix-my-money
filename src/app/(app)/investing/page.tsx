@@ -54,9 +54,9 @@ function InvestingPageTool() {
       <div className="flex flex-col min-h-full">
         <TopNav title="Investing" />
         <div className="flex-1 px-4 sm:px-8 pb-10 flex flex-col gap-6">
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <div className="h-96 bg-surface-container-lowest rounded-2xl animate-pulse" />
-            <div className="h-96 bg-surface-container-lowest rounded-2xl animate-pulse" />
+            <div className="hidden lg:block h-96 bg-surface-container-lowest rounded-2xl animate-pulse" />
           </div>
         </div>
       </div>
@@ -130,15 +130,15 @@ function InvestingPageTool() {
       <TopNav title="Investing" />
 
       <div className="flex-1 px-4 sm:px-8 pb-10 flex flex-col gap-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-start">
           {/* Left: the allocation panel */}
-          <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6 flex flex-col items-center gap-6">
-            <div className="w-full flex items-start justify-between">
-              <div>
+          <div className="bg-surface-container-lowest rounded-2xl shadow-card p-4 sm:p-6 flex flex-col items-center gap-5 sm:gap-6 min-w-0">
+            <div className="w-full flex items-start justify-between gap-3">
+              <div className="min-w-0">
                 <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">
                   Monthly Income
                 </p>
-                <p className="text-display-sm font-bold text-on-surface mt-1">
+                <p className="text-headline-lg sm:text-display-sm font-bold text-on-surface mt-1 tabular-nums">
                   ${Math.round(monthlyIncome).toLocaleString()}
                 </p>
                 <p className="text-label-sm text-on-surface-variant mt-0.5">
@@ -149,20 +149,20 @@ function InvestingPageTool() {
               {isLocked ? (
                 <button
                   onClick={handleUnlock}
-                  className="flex items-center gap-1.5 text-label-sm font-semibold px-3 py-1.5 rounded-lg transition-all hover:opacity-80 flex-shrink-0 ml-4"
+                  className="flex items-center gap-1.5 text-label-md font-semibold px-4 min-h-11 rounded-full transition-all hover:opacity-80 flex-shrink-0"
                   style={{ background: 'rgba(28,27,31,0.06)', color: '#49454f' }}
                 >
-                  <Unlock size={13} />
+                  <Unlock size={14} />
                   Unlock
                 </button>
               ) : hasUnsavedChanges ? (
                 <button
                   onClick={handleLockIn}
                   disabled={updating}
-                  className="flex items-center gap-1.5 text-label-sm font-semibold px-3 py-1.5 rounded-lg transition-all hover:opacity-80 active:scale-95 flex-shrink-0 ml-4 disabled:opacity-50"
+                  className="flex items-center gap-1.5 text-label-md font-semibold px-4 min-h-11 rounded-full transition-all hover:opacity-80 active:scale-95 flex-shrink-0 disabled:opacity-50"
                   style={{ background: '#1c1b1f', color: '#ffffff' }}
                 >
-                  <Lock size={13} />
+                  <Lock size={14} />
                   {updating ? 'Locking…' : 'Lock In'}
                 </button>
               ) : null}
@@ -180,12 +180,12 @@ function InvestingPageTool() {
             />
 
             <div className="w-full flex flex-col gap-2">
-              <div className="flex items-center justify-between text-label-sm">
-                <div className="flex items-center gap-2">
-                  <span className="inline-block w-3 h-3 rounded-full" style={{ background: CATEGORIES_COLOR }} />
+              <div className="flex items-center justify-between gap-3 flex-wrap text-label-md">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="inline-block w-3 h-3 rounded-full shrink-0" style={{ background: CATEGORIES_COLOR }} />
                   <span className="text-on-surface-variant">Selected investments</span>
                 </div>
-                <span className="font-semibold text-on-surface">
+                <span className="font-semibold text-on-surface tabular-nums text-right">
                   {totalInvestingPct > 0
                     ? `${totalInvestingPct}% · $${totalInvestingAmount.toLocaleString()}/mo`
                     : <span className="text-on-surface-variant font-normal">Not set — select one →</span>
@@ -202,7 +202,7 @@ function InvestingPageTool() {
           </div>
 
           {/* Right: the instruments */}
-          <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6">
+          <div className="bg-surface-container-lowest rounded-2xl shadow-card p-4 sm:p-6 min-w-0">
             <AllocationList
               allocations={allocations}
               custom={custom}
@@ -236,7 +236,7 @@ function CommittedAllocations({
 
   return (
     <div className="w-full border-t border-outline-variant/30 pt-4">
-      <table className="w-full text-label-sm">
+      <table className="w-full text-label-md">
         <tbody>
           {spendingPct > 0 && (
             <tr>
