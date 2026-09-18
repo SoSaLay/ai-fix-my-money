@@ -19,7 +19,7 @@ export function RankButton() {
     <Link
       href="/learning/rank"
       title={next ? `${pointsToNext} points to ${next.name}` : 'Top rank reached'}
-      className={`inline-flex items-center justify-center gap-1.5 shrink-0 h-[31px] px-[11px] rounded-lg whitespace-nowrap text-[13px] font-medium text-[#0F1111] backdrop-blur-sm transition-[filter] hover:brightness-95 ${
+      className={`inline-flex items-center justify-center gap-1.5 shrink-0 h-10 sm:h-[31px] px-[11px] rounded-lg whitespace-nowrap text-[13px] font-medium text-[#0F1111] backdrop-blur-sm transition-[filter] hover:brightness-95 ${
         top ? 'rank-shimmer' : ''
       }`}
       style={{

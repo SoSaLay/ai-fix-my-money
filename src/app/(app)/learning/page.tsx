@@ -35,8 +35,8 @@ export default function LearningPage() {
           {/* Header. The review queue sits beside it rather than as its own band —
               it is a standing prompt, not news, and it should not push the tracks
               down the page every time something falls due. */}
-          <header className="flex items-start justify-end gap-6">
-            <div className="flex items-center gap-3 shrink-0">
+          <header className="flex items-start justify-end">
+            <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3 sm:shrink-0">
               <RankButton />
 
               {/* Always here. Review is somewhere to test yourself whenever you
@@ -51,7 +51,7 @@ export default function LearningPage() {
                 }
                 className="btn-action items-center justify-center gap-1.5 shrink-0"
               >
-                <RotateCcw size={13} aria-hidden />
+                <RotateCcw size={14} aria-hidden />
                 Go to review mode
                 {due.length > 0 && (
                   <span className="tabular-nums font-semibold">({due.length})</span>

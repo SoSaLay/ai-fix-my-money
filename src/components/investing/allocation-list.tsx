@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Check, Pencil, Plus, X } from 'lucide-react'
 
 import {
@@ -33,11 +33,93 @@ interface AllocationListProps {
   onCustomChange: (custom: CustomAllocation[]) => void
 }
 
+/** A row's place in the list: funded first, biggest share first within that. */
+function rankKeys(rows: Array<{ key: string; pct: number }>): string[] {
+  return rows
+    .map((row, i) => ({ ...row, i }))
+    .sort((a, b) =>
+      (b.pct > 0 ? 1 : 0) - (a.pct > 0 ? 1 : 0) ||  // funded rises above unfunded
+      b.pct - a.pct ||                              // then the larger share leads
+      a.i - b.i)                                    // then the catalog's own order
+    .map(row => row.key)
+}
+
+interface Row {
+  key: string
+  name: string
+  badge: string
+  shade: RiskShade
+  pct: number
+  startOpen?: boolean
+  onSet: (pct: number) => void
+  onRemove?: () => void
+}
+
 export function AllocationList({
   allocations, custom, monthlyIncome, headroomPct, disabled, onChange, onCustomChange,
 }: AllocationListProps) {
   const setCustomPct = (id: string, pct: number) =>
     onCustomChange(custom.map(c => (c.id === id ? { ...c, pct } : c)))
+
+  // Only a write-in the learner just typed opens ready to set. Restoring a
+  // saved plan with its rows already open would hold the order still (below)
+  // for as long as they stayed open.
+  const justAdded = useRef<Set<string>>(new Set())
+
+  // Which rows have their controls out. The order is held still while any of
+  // them do — see the list below.
+  const [openKeys, setOpenKeys] = useState<string[]>([])
+  const handleOpenChange = useCallback((key: string, isOpen: boolean) => {
+    setOpenKeys(prev => {
+      if (prev.includes(key) === isOpen) return prev
+      return isOpen ? [...prev, key] : prev.filter(k => k !== key)
+    })
+  }, [])
+  const interacting = openKeys.length > 0
+
+  // Catalog order, then write-ins: what a row falls back to once nothing is
+  // funded, and the tiebreak rankKeys sorts against.
+  const rows: Row[] = [
+    ...INVESTMENT_CATEGORIES.map(category => ({
+      key: category.id,
+      name: category.name,
+      badge: RISK_LABEL[category.tier],
+      shade: RISK_RAMP[category.tier],
+      pct: allocations[category.id] ?? 0,
+      onSet: (pct: number) => onChange(category.id, pct),
+    })),
+    ...custom.map(entry => ({
+      key: entry.id,
+      name: entry.name,
+      badge: 'Your own',
+      shade: CUSTOM_SHADE,
+      pct: entry.pct,
+      startOpen: justAdded.current.has(entry.id),
+      onSet: (pct: number) => setCustomPct(entry.id, pct),
+      onRemove: () => onCustomChange(custom.filter(c => c.id !== entry.id)),
+    })),
+  ]
+
+  const [order, setOrder] = useState<string[]>(() => rankKeys(rows))
+  const signature = rows.map(r => `${r.key}:${r.pct}`).join('|')
+
+  // Re-rank only once every row is closed. Sorting the moment a slider passes
+  // zero moved the row out from under the pointer mid-drag, which is why this
+  // list used to be left in a fixed order.
+  useEffect(() => {
+    if (interacting) return
+    setOrder(rankKeys(rows))
+    // rows is rebuilt every render; `signature` is what actually changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [interacting, signature])
+
+  const byKey = new Map(rows.map(row => [row.key, row]))
+  const ordered: Row[] = [
+    // Ranked rows, minus any that have since been removed.
+    ...order.map(key => byKey.get(key)).filter((row): row is Row => row !== undefined),
+    // A row added while the order was held still sits at the end until it is.
+    ...rows.filter(row => !order.includes(row.key)),
+  ]
 
   return (
     <div className="flex flex-col gap-5">
@@ -45,54 +127,47 @@ export function AllocationList({
         <h2 className="text-headline-sm text-on-surface font-bold">Where it goes</h2>
         <p className="text-body-md text-on-surface-variant mt-1 leading-relaxed">
           Select the investments you want and set the share of your monthly income behind
-          each one. Drag the slider or type the number. Not listed? Add your own under Other.
+          each one. Drag the slider or type the number. Whatever you fund moves to the top.
+          Not listed? Add your own at the bottom.
         </p>
       </div>
 
-      {/* One list in a fixed order. Splitting funded rows into their own group
-          moved a row the moment it was funded, which tore the slider out from
-          under the pointer mid-drag. */}
+      {/* Catalog rows and write-ins rank together, so a write-in you fund
+          rises past the listed investments you have not. */}
       <div className="flex flex-col gap-2.5">
-        {INVESTMENT_CATEGORIES.map(category => (
+        {ordered.map(row => (
           <AllocationRow
-            key={category.id}
-            name={category.name}
-            badge={RISK_LABEL[category.tier]}
-            shade={RISK_RAMP[category.tier]}
-            pct={allocations[category.id] ?? 0}
+            key={row.key}
+            rowKey={row.key}
+            name={row.name}
+            badge={row.badge}
+            shade={row.shade}
+            pct={row.pct}
             monthlyIncome={monthlyIncome}
             headroomPct={headroomPct}
             disabled={disabled}
-            onSet={pct => onChange(category.id, pct)}
+            startOpen={row.startOpen}
+            onOpenChange={handleOpenChange}
+            onSet={row.onSet}
+            onRemove={row.onRemove}
           />
         ))}
       </div>
 
-      <div className="flex flex-col gap-2.5">
-        <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">Other</p>
-        {custom.map(entry => (
-          <AllocationRow
-            key={entry.id}
-            name={entry.name}
-            badge="Your own"
-            shade={CUSTOM_SHADE}
-            pct={entry.pct}
-            monthlyIncome={monthlyIncome}
-            headroomPct={headroomPct}
-            disabled={disabled}
-            startOpen
-            onSet={pct => setCustomPct(entry.id, pct)}
-            onRemove={() => onCustomChange(custom.filter(c => c.id !== entry.id))}
-          />
-        ))}
-        {!disabled && (
+      {!disabled && (
+        <div className="flex flex-col gap-2.5">
+          <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">
+            Not listed
+          </p>
           <AddCustom
-            onAdd={name =>
-              onCustomChange([...custom, { id: `custom_${Date.now()}`, name, pct: 0 }])
-            }
+            onAdd={name => {
+              const id = `custom_${Date.now()}`
+              justAdded.current.add(id)
+              onCustomChange([...custom, { id, name, pct: 0 }])
+            }}
           />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -131,8 +206,11 @@ function AddCustom({ onAdd }: { onAdd: (name: string) => void }) {
 }
 
 function AllocationRow({
-  name, badge, shade, pct, monthlyIncome, headroomPct, disabled, startOpen = false, onSet, onRemove,
+  rowKey, name, badge, shade, pct, monthlyIncome, headroomPct, disabled,
+  startOpen = false, onOpenChange, onSet, onRemove,
 }: {
+  /** Identifies this row to the list, which ranks by it. */
+  rowKey: string
   name: string
   badge: string
   shade: RiskShade
@@ -142,6 +220,8 @@ function AllocationRow({
   disabled?: boolean
   /** A row the learner just wrote in opens ready to set. */
   startOpen?: boolean
+  /** The list holds its order still while any row's controls are out. */
+  onOpenChange: (key: string, open: boolean) => void
   onSet: (pct: number) => void
   /** Deletes the row itself, not just its share. Other entries only. */
   onRemove?: () => void
@@ -178,6 +258,13 @@ function AllocationRow({
 
   const showControls = open && !disabled
 
+  useEffect(() => {
+    onOpenChange(rowKey, showControls)
+  }, [rowKey, showControls, onOpenChange])
+
+  // A row removed while open would otherwise hold the order still for good.
+  useEffect(() => () => onOpenChange(rowKey, false), [rowKey, onOpenChange])
+
   return (
     <div
       className="rounded-2xl px-4 py-3 flex flex-col gap-2 transition-colors"
@@ -187,7 +274,10 @@ function AllocationRow({
         boxShadow: active ? undefined : 'inset 0 0 0 1px rgba(45,47,51,0.15)',
       }}
     >
-      <div className="flex items-start justify-between gap-2">
+      {/* Height is held while the controls are out: the percent and amount
+          appear the moment the value passes zero, and without this the header
+          grew and shunted the slider down under the pointer mid-drag. */}
+      <div className={`flex items-start justify-between gap-2 ${showControls ? 'min-h-10' : ''}`}>
         <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 min-w-0">
           <p className="text-body-md font-semibold text-on-surface break-words">{name}</p>
           <span
