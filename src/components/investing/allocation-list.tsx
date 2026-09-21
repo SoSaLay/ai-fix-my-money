@@ -269,10 +269,18 @@ function AllocationRow({
     setOpen(false)
   }
 
-  const clearOrRemove = () => {
+  // The X closes a row nobody has funded, clears one that is funded, and
+  // deletes a write-in outright. A row that was opened by mistake needs a way
+  // back out either way — leaving only the tick made "put it away" look like
+  // "commit to it".
+  const dismiss = () => {
     if (onRemove) setConfirmingRemove(true)
-    else { set(0); setOpen(false) }
+    else { if (active) set(0); setOpen(false) }
   }
+
+  const dismissLabel = onRemove
+    ? `Remove ${name}`
+    : active ? `Clear ${name}` : `Close ${name}`
 
   const showControls = open && !disabled
 
@@ -397,24 +405,26 @@ function AllocationRow({
               <span className="text-label-sm text-on-surface-variant">/mo</span>
             </div>
 
-            <button
-              onMouseDown={e => e.preventDefault()}
-              onClick={confirm}
-              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#17171c] text-white hover:bg-black transition-colors"
-              aria-label={`Confirm ${name}`}
-            >
-              <Check size={16} />
-            </button>
-
-            {(active || onRemove) && (
+            {/* Nothing set yet means nothing to confirm, so the tick waits
+                until the slider or the fields have put a figure in. */}
+            {active && (
               <button
-                onClick={clearOrRemove}
-                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-on-surface-variant hover:bg-on-surface/[0.06] transition-colors"
-                aria-label={onRemove ? `Remove ${name}` : `Clear ${name}`}
+                onMouseDown={e => e.preventDefault()}
+                onClick={confirm}
+                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#17171c] text-white hover:bg-black transition-colors"
+                aria-label={`Confirm ${name}`}
               >
-                <X size={16} />
+                <Check size={16} />
               </button>
             )}
+
+            <button
+              onClick={dismiss}
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-on-surface-variant hover:bg-on-surface/[0.06] transition-colors"
+              aria-label={dismissLabel}
+            >
+              <X size={16} />
+            </button>
           </div>
         </div>
       )}

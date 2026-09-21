@@ -6,7 +6,7 @@ import { TopNav } from '@/components/layout/top-nav'
 import { EmptyState } from '@/components/layout/empty-state'
 import { CircularDial } from '@/components/savings/circular-dial'
 import { GoalsList } from '@/components/savings/goals-list'
-import { PctAmountFields } from '@/components/ui/pct-amount-fields'
+import { MonthlyAmountField } from '@/components/ui/monthly-amount-field'
 import { useDashboardSummary, useSavingsGoals } from '@/hooks/use-data'
 import { useFinancialData } from '@/contexts/financial-data-context'
 import { SectionGate } from '@/components/learning/section-gate'
@@ -155,11 +155,9 @@ function SavingsPageTool() {
             {/* Type it instead of dragging it. The dial is quick; a number is
                 exact, and someone who knows they want $400 a month should be
                 able to say so. */}
-            <div className="w-full">
-              <p className="text-label-md text-on-surface-variant mb-2">
-                Or set general savings by number
-              </p>
-              <PctAmountFields
+            <div className="w-full flex flex-col gap-2">
+              <p className="text-label-md text-on-surface-variant">Enter manually</p>
+              <MonthlyAmountField
                 pct={generalSavingsPct}
                 monthlyIncome={monthlyIncome}
                 maxPct={maxGeneralPct}
@@ -169,8 +167,11 @@ function SavingsPageTool() {
               />
             </div>
 
-            {/* Legend — always shows both tiers so users can see the two-part split */}
-            <div className="w-full flex flex-col gap-2">
+            {/* Legend — always shows both tiers so users can see the two-part
+                split. Ruled off from the dial and the field above it: what you
+                are setting is one thing, what it adds up to is another, and
+                stacked together they read as one wall of figures. */}
+            <div className="w-full flex flex-col gap-3 border-t border-outline-variant/30 pt-6 mt-2">
               {/* Savings Goals — lighter green locked arc */}
               <div className="flex items-center justify-between gap-3 flex-wrap text-label-md">
                 <div className="flex items-center gap-2 min-w-0">
