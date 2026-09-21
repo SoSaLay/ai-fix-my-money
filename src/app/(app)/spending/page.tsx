@@ -21,24 +21,41 @@ function SpendingPageTool() {
   // than the nearest whole percent of income.
   const [spendingLimitPct, setSpendingLimitPct] = useState(0)
   const [isLocked, setIsLocked] = useState(false)
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const initializedRef = useRef(false)
 
-  // Initialize once from saved data — guard prevents re-running on every render
-  // (spendingLimitData is a new object reference each render, so without this guard
-  //  the effect would re-lock immediately after the user clicks Unlock)
+  // Figures the page is built from. Derived before the guards below because
+  // the effect that seeds the slider reads them.
+  const monthlyIncome = summary?.spending.monthly_income ?? 0
+  const monthlySpending = summary?.spending.monthly_spending ?? 0
+  const netCashFlow = summary?.spending.net_cash_flow ?? 0
+
+  // Cross-category: locked savings and investing as % of income
+  const lockedSavingsPct = Math.round(summary?.goals.savings_total_allocated || 0)
+  const lockedInvestingPct = Math.round(summary?.goals.investing?.allocation_pct || 0)
+  const maxSpendingPct = Math.max(0, 100 - lockedSavingsPct - lockedInvestingPct)
+
+  /** What they spend today, as a share of income. */
+  const spendingPctOfIncome = monthlyIncome > 0 ? (monthlySpending / monthlyIncome) * 100 : 0
+
+  // Seed the slider once: a saved limit if there is one, otherwise what they
+  // already spend. An empty bar asks someone to invent a number; their own
+  // spending is the figure the rest of the page is arguing with, so the
+  // calculator opens there and every move is read against it.
+  //
+  // The guard prevents re-running on every render (spendingLimitData is a new
+  // object reference each render, so without it the effect would re-lock
+  // immediately after the user clicks Unlock).
   useEffect(() => {
-    if (initializedRef.current) return
-    if (spendingLimitData?.hasLimit && spendingLimitData.limit && summary) {
-      const income = summary.spending.monthly_income
-      if (income > 0) {
-        const pct = (spendingLimitData.limit.amount / income) * 100
-        setSpendingLimitPct(Math.min(pct, 100))
-        setIsLocked(true)
-        initializedRef.current = true
-      }
+    if (initializedRef.current || !summary || monthlyIncome <= 0) return
+    if (spendingLimitData?.hasLimit && spendingLimitData.limit) {
+      const pct = (spendingLimitData.limit.amount / monthlyIncome) * 100
+      setSpendingLimitPct(Math.min(pct, 100))
+      setIsLocked(true)
+    } else {
+      setSpendingLimitPct(Math.min(spendingPctOfIncome, maxSpendingPct))
     }
-  }, [spendingLimitData, summary])
+    initializedRef.current = true
+  }, [spendingLimitData, summary, monthlyIncome, spendingPctOfIncome, maxSpendingPct])
 
   // Show loading state
   if (summaryLoading) {
@@ -72,39 +89,32 @@ function SpendingPageTool() {
     )
   }
 
-  // Extract data
-  const monthlyIncome = summary.spending.monthly_income
-  const monthlySpending = summary.spending.monthly_spending
-  const netCashFlow = summary.spending.net_cash_flow
-
-  // Cross-category: locked savings and investing as % of income
-  const lockedSavingsPct = Math.round(summary.goals.savings_total_allocated || 0)
-  const lockedInvestingPct = Math.round(summary.goals.investing?.allocation_pct || 0)
-  const maxSpendingPct = Math.max(0, 100 - lockedSavingsPct - lockedInvestingPct)
-
   // Limit based on monthly income — the true ceiling
   const spendingLimitAmount = Math.round((monthlyIncome * spendingLimitPct) / 100)
   const budgetPct = spendingLimitAmount > 0
     ? Math.round((monthlySpending / spendingLimitAmount) * 100)
     : 0
 
+  // The slider moves in whole percents of income, so a limit within half a
+  // percent of current spending is the same figure — a note there would be
+  // arguing with a rounding difference.
+  const alignmentTolerance = Math.max(monthlyIncome * 0.005, 1)
+  const offSpending =
+    monthlySpending > 0 && Math.abs(spendingLimitAmount - monthlySpending) > alignmentTolerance
+
   const handleLockIn = async () => {
     const success = await updateLimit(spendingLimitAmount, 'monthly')
-    if (success) {
-      setHasUnsavedChanges(false)
-      setIsLocked(true)
-    }
+    if (success) setIsLocked(true)
   }
 
-  const handleUnlock = () => {
-    setIsLocked(false)
-    setHasUnsavedChanges(false)
-  }
+  const handleUnlock = () => setIsLocked(false)
 
   const handleBarChange = (newPct: number) => {
     setSpendingLimitPct(Math.min(newPct, maxSpendingPct))
-    setHasUnsavedChanges(true)
   }
+
+  /** Back to the figure the calculator opened on. */
+  const matchSpending = () => handleBarChange(spendingPctOfIncome)
 
   // Typing a figure keeps that exact figure — the percentage carries decimals.
   const handleAmountChange = (amount: number) => {
@@ -195,6 +205,17 @@ function SpendingPageTool() {
               disabled={isLocked}
             />
 
+            {/* Moved off what they actually spend — say so, and say what it
+                would take. It never blocks the lock-in: the figure is theirs
+                to set, the note is only what it costs. */}
+            {offSpending && (
+              <AlignmentNote
+                limit={spendingLimitAmount}
+                spending={monthlySpending}
+                onMatch={isLocked ? undefined : matchSpending}
+              />
+            )}
+
             {/* What the cap leaves over, and what that money is for */}
             <ProjectedNet leftover={monthlyIncome - spendingLimitAmount} />
 
@@ -202,12 +223,9 @@ function SpendingPageTool() {
             {!isLocked && (
               <button
                 onClick={handleLockIn}
-                disabled={!hasUnsavedChanges || updating}
+                disabled={updating}
                 className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl font-semibold text-label-lg transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{
-                  background: hasUnsavedChanges ? '#1c1b1f' : 'rgba(28,27,31,0.06)',
-                  color: hasUnsavedChanges ? '#ffffff' : '#49454f',
-                }}
+                style={{ background: '#1c1b1f', color: '#ffffff' }}
               >
                 {updating ? 'Locking in…' : <><Lock size={16} /> Lock In Spending Limit</>}
               </button>
@@ -215,6 +233,44 @@ function SpendingPageTool() {
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+/**
+ * The gap between the chosen limit and what they spend today, and what closing
+ * it would take. Advisory only — the lock-in below stays available either way.
+ */
+function AlignmentNote({
+  limit, spending, onMatch,
+}: {
+  limit: number
+  spending: number
+  /** Absent while the limit is locked, when there is no slider to move. */
+  onMatch?: () => void
+}) {
+  const under = limit < spending
+  const money = (n: number) => `$${Math.abs(Math.round(n)).toLocaleString('en-US')}`
+
+  return (
+    <div className="rounded-xl px-4 py-3 flex flex-col gap-1.5" style={{ background: 'rgba(255,152,23,0.12)' }}>
+      <p className="text-label-md text-on-surface leading-relaxed">
+        <span className="font-semibold">
+          {money(limit - spending)} {under ? 'below' : 'above'} what you spend now
+          {' '}({money(spending)}).
+        </span>{' '}
+        {under
+          ? 'Living inside it means cutting that much somewhere. Lock it in as a target if that is the plan.'
+          : 'Is there a bill you have not recorded yet? Lock it in either way.'}
+      </p>
+      {onMatch && (
+        <button
+          onClick={onMatch}
+          className="w-fit -ml-1 inline-flex min-h-11 items-center px-1 text-label-md font-semibold text-secondary hover:opacity-80 transition-opacity"
+        >
+          Match my spending
+        </button>
+      )}
     </div>
   )
 }
@@ -241,13 +297,13 @@ function ProjectedNet({ leftover }: { leftover: number }) {
     <p className="text-body-lg sm:text-title-lg text-on-surface-variant leading-loose">
       {short ? (
         <>
-          At this limit you would spend {figure(leftover)} more than you earn each month.
-          That is {figure(leftover * 12)} over a year.
+          At this limit you would spend {figure(leftover)}/month, or {figure(leftover * 12)}/year,
+          more than you earn.
         </>
       ) : (
         <>
-          Stay within this limit and you will have {figure(leftover)} left each month to save,
-          invest, travel, or put toward anything else. That is {figure(leftover * 12)} over a year.
+          Stay within this limit and have {figure(leftover)}/month or {figure(leftover * 12)}/year
+          for free spending, saving, or investing.
         </>
       )}
     </p>
