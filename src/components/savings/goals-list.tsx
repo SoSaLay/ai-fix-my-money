@@ -86,6 +86,9 @@ function GoalRow({
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
+  /** A share bigger than the income left. Saving it silently at the ceiling
+      looked like the figure had been accepted. */
+  const [shareTooBig, setShareTooBig] = useState(false)
   const [form, setForm] = useState<EditingState>({
     name: goal.name,
     target_amount: String(goal.target_amount),
@@ -94,10 +97,13 @@ function GoalRow({
   // Unique per row, so each edit form's labels point at their own fields.
   const fieldId = useId()
 
-  const pct =
+  /** How far along the goal is — drawn as the bar below. */
+  const progressPct =
     goal.target_amount > 0
       ? Math.min(Math.round((goal.current_amount / goal.target_amount) * 100), 100)
       : 0
+  /** What it takes from each month's income — the figure the edit form sets. */
+  const sharePct = Math.round(Number(goal.allocation_pct) || 0)
 
   const monthlyContribution = Math.round((Number(goal.allocation_pct) / 100) * monthlyIncome)
   const monthsRemaining =
@@ -106,15 +112,23 @@ function GoalRow({
       : null
 
   const handleSave = async () => {
-    setSaving(true)
     const targetNum = parseFloat(form.target_amount.replace(/,/g, ''))
     const allocNum = parseFloat(form.allocation_pct)
-    if (isNaN(targetNum) || targetNum <= 0) { setSaving(false); return }
+    if (isNaN(targetNum) || targetNum <= 0) return
+
+    // More than there is: the form stays open, the field empties, and the
+    // ceiling turns red — which is where the answer was all along.
+    if (!isNaN(allocNum) && allocNum > maxPct) {
+      setShareTooBig(true)
+      setForm(f => ({ ...f, allocation_pct: '' }))
+      return
+    }
+
+    setSaving(true)
     const success = await onUpdate(goal.id, {
       name: form.name.trim() || goal.name,
       target_amount: targetNum,
-      // Bound by what is actually free, not by 100.
-      allocation_pct: isNaN(allocNum) ? goal.allocation_pct : Math.max(0, Math.min(maxPct, allocNum)),
+      allocation_pct: isNaN(allocNum) ? goal.allocation_pct : Math.max(0, allocNum),
     })
     setSaving(false)
     if (success) setEditing(false)
@@ -131,6 +145,7 @@ function GoalRow({
       target_amount: String(goal.target_amount),
       allocation_pct: String(goal.allocation_pct),
     })
+    setShareTooBig(false)
     setEditing(false)
   }
 
@@ -166,21 +181,26 @@ function GoalRow({
           </div>
           <div className="flex flex-col gap-1.5">
             <label htmlFor={`${fieldId}-share`} className="text-label-md text-on-surface-variant">Share of monthly income</label>
-            <div className="flex items-center gap-1 rounded-2xl border border-on-surface/15 px-4 py-3 focus-within:border-on-surface/40 transition-colors">
+            <div className={`flex items-center gap-1 rounded-2xl border px-4 py-3 transition-colors ${
+              shareTooBig
+                ? 'border-error'
+                : 'border-on-surface/15 focus-within:border-on-surface/40'
+            }`}>
               <input
                 id={`${fieldId}-share`}
                 type="number"
                 min="0"
                 max={maxPct}
                 step="1"
+                aria-invalid={shareTooBig}
                 className="w-full bg-transparent text-body-lg text-on-surface tabular-nums outline-none"
                 value={form.allocation_pct}
-                onChange={e => setForm(f => ({ ...f, allocation_pct: e.target.value }))}
+                onChange={e => { setShareTooBig(false); setForm(f => ({ ...f, allocation_pct: e.target.value })) }}
                 placeholder="10"
               />
               <span className="text-body-lg text-on-surface-variant">%</span>
             </div>
-            <p className="text-label-sm text-on-surface-variant">
+            <p className={`text-label-sm ${shareTooBig ? 'text-error font-semibold' : 'text-on-surface-variant'}`}>
               Up to {maxPct}% · ${Math.round((maxPct / 100) * monthlyIncome).toLocaleString()}/mo
             </p>
           </div>
@@ -242,7 +262,12 @@ function GoalRow({
           <p className="text-body-lg font-medium text-on-surface break-words">{goal.name}</p>
         </div>
         <div className="flex items-center gap-1 shrink-0">
-          <p className="text-body-lg font-semibold text-on-surface tabular-nums">{pct}%</p>
+          {/* Labelled, because a bare percentage next to a savings goal reads
+              as progress — and the progress is the bar underneath. */}
+          <p className="text-body-lg font-semibold text-on-surface tabular-nums">
+            {sharePct}%
+            <span className="text-label-sm font-normal text-on-surface-variant"> of income</span>
+          </p>
 
           {/* Always reachable: a phone has no hover to reveal it with. */}
           <button
@@ -258,7 +283,7 @@ function GoalRow({
       <div className="h-2 bg-surface-container-low rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-500"
-          style={{ width: `${pct}%`, backgroundColor: '#4c49c9' }}
+          style={{ width: `${progressPct}%`, backgroundColor: '#4c49c9' }}
         />
       </div>
       <div className="flex items-center justify-between gap-x-3 gap-y-1 flex-wrap">
@@ -296,6 +321,7 @@ function NewGoalForm({
 }) {
   const [form, setForm] = useState({ name: '', target_amount: '', allocation_pct: '0' })
   const [saving, setSaving] = useState(false)
+  const [shareTooBig, setShareTooBig] = useState(false)
   const fieldId = useId()
 
   const monthlyContrib = Math.round((parseFloat(form.allocation_pct || '0') / 100) * monthlyIncome)
@@ -304,11 +330,19 @@ function NewGoalForm({
     const targetNum = parseFloat(form.target_amount.replace(/,/g, ''))
     const allocNum = parseFloat(form.allocation_pct)
     if (!form.name.trim() || isNaN(targetNum) || targetNum <= 0) return
+
+    // More than there is — say so rather than quietly saving the ceiling.
+    if (!isNaN(allocNum) && allocNum > maxPct) {
+      setShareTooBig(true)
+      setForm(f => ({ ...f, allocation_pct: '' }))
+      return
+    }
+
     setSaving(true)
     const result = await onCreate({
       name: form.name.trim(),
       target_amount: targetNum,
-      allocation_pct: isNaN(allocNum) ? 0 : Math.max(0, Math.min(maxPct, allocNum)),
+      allocation_pct: isNaN(allocNum) ? 0 : Math.max(0, allocNum),
     })
     setSaving(false)
     if (result) onClose(result)
@@ -348,20 +382,23 @@ function NewGoalForm({
         </div>
         <div className="flex flex-col gap-1.5">
           <label htmlFor={`${fieldId}-share`} className="text-label-md text-on-surface-variant">Share of monthly income</label>
-          <div className="flex items-center gap-1 rounded-2xl border border-on-surface/15 px-4 py-3 focus-within:border-on-surface/40 transition-colors">
+          <div className={`flex items-center gap-1 rounded-2xl border px-4 py-3 transition-colors ${
+            shareTooBig ? 'border-error' : 'border-on-surface/15 focus-within:border-on-surface/40'
+          }`}>
             <input
               id={`${fieldId}-share`}
               type="number"
               min="0"
               max={maxPct}
               step="1"
+              aria-invalid={shareTooBig}
               className="w-full bg-transparent text-body-lg text-on-surface tabular-nums outline-none"
               value={form.allocation_pct}
-              onChange={e => setForm(f => ({ ...f, allocation_pct: e.target.value }))}
+              onChange={e => { setShareTooBig(false); setForm(f => ({ ...f, allocation_pct: e.target.value })) }}
             />
             <span className="text-body-lg text-on-surface-variant">%</span>
           </div>
-          <p className="text-label-sm text-on-surface-variant">
+          <p className={`text-label-sm ${shareTooBig ? 'text-error font-semibold' : 'text-on-surface-variant'}`}>
             Up to {maxPct}% · ${Math.round((maxPct / 100) * monthlyIncome).toLocaleString()}/mo
           </p>
         </div>
