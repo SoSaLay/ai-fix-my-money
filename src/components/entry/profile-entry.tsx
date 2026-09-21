@@ -1,8 +1,8 @@
 'use client'
 
-import { useCallback, useId, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import {
-  Plus, X, Trash2, Pencil, Check, CircleDollarSign, MoreHorizontal, CalendarCheck,
+  Plus, X, Trash2, Pencil, Check, CircleDollarSign, MoreHorizontal, CalendarCheck, ChevronDown,
   Home, Zap, Smartphone, Wifi, Shield, Car, Landmark, Tv, Baby, Dumbbell, Music,
   ShoppingCart, UtensilsCrossed, Fuel, Bus, ShoppingBag, Clapperboard,
   HeartPulse, Plane, PawPrint, Scissors,
@@ -99,7 +99,7 @@ export function ProfileEntry({ section }: { section: Section }) {
   const [editDraft, setEditDraft] = useState({ name: '', amount: '' })
   /** A delete waits here until it is confirmed. */
   const [pendingDelete, setPendingDelete] = useState<number | null>(null)
-  /** Names offered to the yearly form — select one or type your own. */
+  /** Ties the yearly form's label to its name field. */
   const suggestionsId = useId()
 
   const copy = COPY[section]
@@ -374,19 +374,19 @@ export function ProfileEntry({ section }: { section: Section }) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-[1fr_140px] gap-2">
-            <label className="flex flex-col gap-1.5 min-w-0">
-              <span className="text-label-sm text-on-surface-variant">What did you pay for?</span>
-              <input
-                autoFocus
-                list={suggestionsId}
+            <div className="flex flex-col gap-1.5 min-w-0">
+              <label htmlFor={suggestionsId} className="text-label-sm text-on-surface-variant">
+                What did you pay for?
+              </label>
+              <NameCombobox
+                inputId={suggestionsId}
                 value={name}
-                onChange={e => setName(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') addYearly() }}
+                onChange={setName}
+                onSubmit={addYearly}
+                options={(TEMPLATES.fixed ?? []).map(t => t.name)}
                 placeholder="Car insurance"
-                className="rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-4 py-2.5 text-body-md text-on-surface outline-none transition-colors focus:border-on-surface/40 min-w-0"
-                aria-label="What did you pay for"
               />
-            </label>
+            </div>
 
             <label className="flex flex-col gap-1.5 min-w-0">
               {/* Named on the field itself, not only in the hint: this is the
@@ -403,11 +403,6 @@ export function ProfileEntry({ section }: { section: Section }) {
               />
             </label>
           </div>
-
-          {/* Suggestions for the name — pick one or type your own. */}
-          <datalist id={suggestionsId}>
-            {(TEMPLATES.fixed ?? []).map(t => <option key={t.name} value={t.name} />)}
-          </datalist>
 
           <p className="text-label-sm text-on-surface-variant">
             {yearlyPreview
@@ -526,6 +521,93 @@ export function ProfileEntry({ section }: { section: Section }) {
         }}
         onCancel={() => setPendingDelete(null)}
       />
+    </div>
+  )
+}
+
+/**
+ * A name field with common bills behind a chevron.
+ *
+ * This was a native `datalist`, which on iOS opens the whole list over the
+ * form the moment the field takes focus — the form disappeared behind a menu
+ * nobody had asked for. Here the box is just a box until the chevron is
+ * pressed, and the list drops in under it rather than over everything.
+ */
+function NameCombobox({
+  inputId, value, onChange, onSubmit, options, placeholder,
+}: {
+  inputId: string
+  value: string
+  onChange: (value: string) => void
+  /** Enter in the field commits the whole entry, as the amount field does. */
+  onSubmit: () => void
+  options: string[]
+  placeholder: string
+}) {
+  const [open, setOpen] = useState(false)
+  const wrapRef = useRef<HTMLDivElement>(null)
+  const listId = `${inputId}-list`
+
+  // A tap anywhere else puts the list away.
+  useEffect(() => {
+    if (!open) return
+    const onPointerDown = (e: PointerEvent) => {
+      if (!wrapRef.current?.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('pointerdown', onPointerDown)
+    return () => document.removeEventListener('pointerdown', onPointerDown)
+  }, [open])
+
+  return (
+    <div ref={wrapRef} className="relative min-w-0">
+      <div className="flex items-center gap-1 rounded-2xl border border-on-surface/15 bg-surface-container-lowest pl-4 pr-1 focus-within:border-on-surface/40 transition-colors">
+        <input
+          id={inputId}
+          value={value}
+          onChange={e => { onChange(e.target.value); setOpen(false) }}
+          onKeyDown={e => {
+            if (e.key === 'Enter') { setOpen(false); onSubmit() }
+            if (e.key === 'Escape') setOpen(false)
+          }}
+          placeholder={placeholder}
+          role="combobox"
+          aria-expanded={open}
+          aria-controls={listId}
+          aria-autocomplete="list"
+          className="flex-1 min-w-0 bg-transparent py-2.5 text-body-md text-on-surface outline-none"
+        />
+        <button
+          type="button"
+          onClick={() => setOpen(o => !o)}
+          aria-label={open ? 'Hide common bills' : 'Show common bills'}
+          aria-expanded={open}
+          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-on-surface-variant hover:bg-on-surface/[0.06] transition-colors"
+        >
+          <ChevronDown size={16} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
+        </button>
+      </div>
+
+      {open && (
+        <ul
+          id={listId}
+          role="listbox"
+          className="absolute z-20 mt-1 w-full max-h-56 overflow-auto rounded-2xl border border-on-surface/15 bg-surface-container-lowest shadow-float py-1"
+        >
+          {options.map(option => (
+            <li key={option}>
+              <button
+                type="button"
+                role="option"
+                aria-selected={option === value}
+                onClick={() => { onChange(option); setOpen(false) }}
+                className="w-full text-left px-4 py-2.5 text-body-md text-on-surface hover:bg-on-surface/[0.06] transition-colors"
+              >
+                {option}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }
