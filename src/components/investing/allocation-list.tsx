@@ -223,41 +223,81 @@ function AllocationRow({
   /** The same share, typed as dollars a month rather than as a percent. */
   const [amountDraft, setAmountDraft] = useState('')
   const [confirmingRemove, setConfirmingRemove] = useState(false)
+  /** A figure larger than the income left. Quietly keeping the ceiling instead
+      looked like the number typed had been accepted. */
+  const [tooBig, setTooBig] = useState(false)
+  /** Which field the figure was last typed into — the tick commits that one. */
+  const lastEdited = useRef<'pct' | 'amount'>('pct')
   const active = pct > 0
   const amount = Math.round((pct / 100) * monthlyIncome)
 
   /** This row's own share plus whatever is still free. */
   const ceiling = pct + headroomPct
 
+  /** Something worth confirming: a share already set, or one being typed. */
+  const typedPct = parseFloat(draft)
+  const typedAmount = parseFloat(amountDraft.replace(/[^0-9.]/g, ''))
+  const hasFigure = !tooBig && (
+    active ||
+    (!isNaN(typedPct) && typedPct > 0) ||
+    (!isNaN(typedAmount) && typedAmount > 0)
+  )
+
   // A row clamped from outside — because another row took the headroom — has to
   // show the value that was actually kept, not the one that was typed.
   useEffect(() => {
     setDraft(String(pct || ''))
     setAmountDraft(pct > 0 ? String(Math.round((pct / 100) * monthlyIncome)) : '')
+    setTooBig(false)
   }, [pct, monthlyIncome])
 
   const set = (value: number) => {
     onSet(Math.max(0, Math.min(Math.round(value), ceiling)))
   }
 
-  const commitTyped = () => {
+  /** Both fields empty and the ceiling in red: the figure asked for is gone,
+      and what can be had is on screen to be typed again. */
+  const refuse = () => {
+    setTooBig(true)
+    setDraft('')
+    setAmountDraft('')
+  }
+
+  const clearRefusal = () => setTooBig(false)
+
+  const commitTyped = (): boolean => {
     const parsed = parseFloat(draft)
+    if (!isNaN(parsed) && Math.round(parsed) > ceiling) { refuse(); return false }
     set(isNaN(parsed) ? 0 : parsed)
+    return true
   }
 
   // Dollars a month, for anyone who knows the figure they want to put in
   // rather than the share of income it works out to.
-  const commitAmount = () => {
-    if (monthlyIncome <= 0) return
+  const commitAmount = (): boolean => {
+    if (monthlyIncome <= 0) return false
     const parsed = parseFloat(amountDraft.replace(/[^0-9.]/g, ''))
-    set(isNaN(parsed) ? 0 : (parsed / monthlyIncome) * 100)
+    const asPct = isNaN(parsed) ? 0 : (parsed / monthlyIncome) * 100
+    if (Math.round(asPct) > ceiling) { refuse(); return false }
+    set(asPct)
+    return true
   }
 
   // The tick confirms the row and puts the controls away. Without this it
   // committed a value the row already held, so it looked like nothing happened.
+  /** Whatever was typed last, whichever field it went in. */
+  const commitDraft = (): boolean => {
+    if (lastEdited.current === 'amount' && amountDraft.trim() !== '') return commitAmount()
+    if (draft.trim() !== '') return commitTyped()
+    if (amountDraft.trim() !== '') return commitAmount()
+    set(0)
+    return true
+  }
+
   const confirm = () => {
-    commitTyped()
-    setOpen(false)
+    // A refused figure keeps the row open: there is nothing to confirm yet.
+    if (tooBig) return
+    if (commitDraft()) setOpen(false)
   }
 
   // The X closes a row nobody has funded, clears one that is funded, and
@@ -335,7 +375,8 @@ function AllocationRow({
         // Drag it or type it — the same value either way. A percentage is
         // easier to feel on a slider and easier to be exact about in a field,
         // and there is no reason to make someone pick one.
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-1">
+        <div className="flex flex-col gap-1.5 pt-1">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           <input
             type="range"
             min={0}
@@ -351,13 +392,15 @@ function AllocationRow({
                 its own ground and its own outline rather than borrowing the
                 row's. White on white is invisible on a row nobody has funded
                 yet, which is exactly when the field matters most. */}
-            <div className="flex flex-1 sm:flex-none items-center gap-0.5 rounded-xl border border-on-surface/20 bg-white pl-1.5 pr-2 py-1.5 focus-within:border-on-surface/45 transition-colors">
+            <div className={`flex flex-1 sm:flex-none items-center gap-0.5 rounded-xl border bg-white pl-1.5 pr-2 py-1.5 transition-colors ${
+              tooBig ? 'border-error' : 'border-on-surface/20 focus-within:border-on-surface/45'
+            }`}>
               <input
                 type="number"
                 min={0}
                 max={ceiling}
                 value={draft}
-                onChange={e => setDraft(e.target.value)}
+                onChange={e => { clearRefusal(); lastEdited.current = 'pct'; setDraft(e.target.value) }}
                 onBlur={commitTyped}
                 onKeyDown={e => {
                   if (e.key === 'Enter') confirm()
@@ -376,12 +419,14 @@ function AllocationRow({
             {/* The same share in dollars a month. A percent is the unit the
                 plan is kept in; a monthly figure is the one people actually
                 think in, so either one can be typed. */}
-            <div className="flex flex-1 sm:flex-none items-center gap-0.5 rounded-xl border border-on-surface/20 bg-white pl-2 pr-1.5 py-1.5 focus-within:border-on-surface/45 transition-colors">
+            <div className={`flex flex-1 sm:flex-none items-center gap-0.5 rounded-xl border bg-white pl-2 pr-1.5 py-1.5 transition-colors ${
+              tooBig ? 'border-error' : 'border-on-surface/20 focus-within:border-on-surface/45'
+            }`}>
               <span className="text-label-sm text-on-surface-variant">$</span>
               <input
                 inputMode="decimal"
                 value={amountDraft}
-                onChange={e => setAmountDraft(e.target.value)}
+                onChange={e => { clearRefusal(); lastEdited.current = 'amount'; setAmountDraft(e.target.value) }}
                 onBlur={commitAmount}
                 onKeyDown={e => {
                   if (e.key === 'Enter') { commitAmount(); setOpen(false) }
@@ -398,7 +443,7 @@ function AllocationRow({
 
             {/* Nothing set yet means nothing to confirm, so the tick waits
                 until the slider or the fields have put a figure in. */}
-            {active && (
+            {hasFigure && (
               <button
                 onMouseDown={e => e.preventDefault()}
                 onClick={confirm}
@@ -417,6 +462,13 @@ function AllocationRow({
               <X size={16} />
             </button>
           </div>
+        </div>
+
+        {/* What this row may still take. Red once a figure oversteps it — the
+            answer is the same line either way. */}
+        <p className={`text-label-sm ${tooBig ? 'text-error font-semibold' : 'text-on-surface-variant'}`}>
+          Up to {ceiling}% · ${Math.round((ceiling / 100) * monthlyIncome).toLocaleString()}/mo
+        </p>
         </div>
       )}
 
