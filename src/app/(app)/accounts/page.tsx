@@ -1,14 +1,16 @@
 'use client'
 
 import { useCallback, useId, useState } from 'react'
-import { CreditCard, AlertCircle, Upload, Trash2, Pencil, Check, X } from 'lucide-react'
-import Link from 'next/link'
+import { CreditCard, AlertCircle, Trash2, Pencil, Check, X } from 'lucide-react'
 import { TopNav } from '@/components/layout/top-nav'
 import { useAccounts, useDebts, type Account } from '@/hooks/use-data'
 import { useFinancialData } from '@/contexts/financial-data-context'
 import { SectionGate } from '@/components/learning/section-gate'
 import { AddAccountForm } from '@/components/entry/add-account-form'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+
+const money = (n: number) =>
+  `$${Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
 // ─── Inline edit form ──────────────────────────────────────────────────────────
 
@@ -44,7 +46,8 @@ function EditForm({
 
   return (
     <div className="flex flex-col gap-3 pt-3 border-t border-outline-variant/20 mt-3">
-      <div className="grid grid-cols-2 gap-3">
+      {/* Two fields side by side only once there is room for them. */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="flex flex-col gap-1">
           <label htmlFor={`${fieldId}-name`} className="text-label-sm text-on-surface-variant uppercase tracking-wider">Name</label>
           <input
@@ -71,6 +74,7 @@ function EditForm({
                 inputMode="decimal"
                 value={balance}
                 onChange={e => { setBalance(e.target.value); setError('') }}
+                onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') onCancel() }}
                 className="w-full rounded-xl pl-7 pr-3 py-2 text-body-sm outline-none border transition-all focus:border-secondary"
                 style={{ backgroundColor: 'var(--color-surface-container)', borderColor: error ? '#ba1a1a' : 'rgba(172,173,177,0.35)', color: 'var(--color-on-surface)' }}
               />
@@ -98,89 +102,94 @@ function EditForm({
   )
 }
 
-// ─── Account card ──────────────────────────────────────────────────────────────
+// ─── Account row ──────────────────────────────────────────────────────────────
 
-function AccountCard({
+/**
+ * One account on one line: what it is on the left, what it holds on the right,
+ * its two controls in the corner. Cards gave every account a screen of its own
+ * and most of that screen was empty — seven accounts became a long scroll for
+ * seven numbers nobody could compare.
+ */
+function AccountRow({
   account,
+  owed,
+  isEditing,
   onEdit,
   onRemove,
-  isEditing,
   onEditSave,
   onEditCancel,
   balanceReadOnly,
 }: {
   account: Account
+  /** Debts read as a magnitude, coloured as what they cost. */
+  owed?: boolean
+  isEditing: boolean
   onEdit: () => void
   onRemove: () => void
-  isEditing: boolean
   onEditSave: (name: string, balance: number) => void
   onEditCancel: () => void
   balanceReadOnly?: boolean
 }) {
-  return (
-    <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6">
-      <div className="flex flex-wrap items-center gap-3 sm:flex-nowrap sm:gap-5">
-        <div className="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant flex-shrink-0">
-          <CreditCard size={22} />
-        </div>
+  const balance = Math.abs(Number(account.current_balance))
+  const name = account.name || account.official_name || 'Account'
 
-        <div className="w-full sm:flex-1 min-w-0">
-          {account.institution_name && (
-            <p className="text-label-sm text-on-surface-variant">{account.institution_name}</p>
-          )}
-          <p className="text-headline-sm font-semibold text-on-surface">
-            {account.name || account.official_name}
+  return (
+    <div className="px-3 sm:px-4 py-2.5">
+      <div className="flex items-center gap-2.5 sm:gap-3">
+        <span
+          className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+            owed ? 'bg-sunset/12 text-sunset' : 'bg-surface-container text-on-surface-variant'
+          }`}
+          aria-hidden
+        >
+          {owed ? <AlertCircle size={16} /> : <CreditCard size={16} />}
+        </span>
+
+        <div className="min-w-0 flex-1">
+          <p className="text-body-md font-semibold text-on-surface truncate">
+            {name}
             {account.mask && (
-              <span className="text-label-md text-on-surface-variant font-normal ml-2">···{account.mask}</span>
+              <span className="text-label-sm text-on-surface-variant font-normal ml-1.5">···{account.mask}</span>
             )}
           </p>
-          <p className="text-label-sm text-on-surface-variant mt-0.5 capitalize">
+          <p className="text-label-sm text-on-surface-variant capitalize truncate">
             {account.subtype ?? account.type}
+            {!account.is_active && <span className="normal-case"> · inactive</span>}
           </p>
         </div>
 
-        <div className="flex-1 sm:flex-initial text-left sm:text-right flex-shrink-0">
-          <p className="text-label-sm text-on-surface-variant">Current Balance</p>
-          <p className="text-headline-sm font-bold text-on-surface mt-0.5">
-            ${Number(account.current_balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </p>
-          {account.available_balance && Number(account.available_balance) !== Number(account.current_balance) && (
-            <p className="text-label-sm text-on-surface-variant mt-0.5">
-              Available: ${Number(account.available_balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </p>
-          )}
-        </div>
+        <p
+          className={`text-body-md font-bold tabular-nums shrink-0 ${owed ? 'text-sunset' : 'text-on-surface'}`}
+        >
+          {money(balance)}
+        </p>
 
-        <div
-          className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-          style={{ backgroundColor: account.is_active ? '#1a6b3a' : '#acadb1' }}
-          title={account.is_active ? 'Active' : 'Inactive'}
-        />
-
-        <div className="flex gap-1 flex-shrink-0">
+        <div className="flex items-center shrink-0 -mr-1">
           <button
             onClick={onEdit}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-on-surface-variant hover:text-secondary hover:bg-secondary/8 transition-colors"
-            title="Edit account"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-on-surface-variant/70 hover:text-secondary hover:bg-on-surface/[0.06] transition-colors"
+            aria-label={`Edit ${name}`}
+            title="Edit"
           >
-            <Pencil size={15} />
+            <Pencil size={14} />
           </button>
           <button
             onClick={onRemove}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-on-surface-variant hover:text-error hover:bg-error/8 transition-colors"
-            title="Remove account"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-on-surface-variant/70 hover:text-error hover:bg-error/[0.08] transition-colors"
+            aria-label={`Remove ${name}`}
+            title="Remove"
           >
-            <Trash2 size={15} />
+            <Trash2 size={14} />
           </button>
         </div>
       </div>
 
       {isEditing && (
         <EditForm
-          initial={{ name: account.name || account.official_name || '', balance: String(Math.abs(Number(account.current_balance))) }}
+          initial={{ name: account.name || account.official_name || '', balance: String(balance) }}
           onSave={onEditSave}
           onCancel={onEditCancel}
-          balanceLabel="Current Balance"
+          balanceLabel={owed ? 'Amount owed' : 'Current balance'}
           balanceReadOnly={balanceReadOnly}
         />
       )}
@@ -188,88 +197,17 @@ function AccountCard({
   )
 }
 
-// ─── Debt card ────────────────────────────────────────────────────────────────
-
-function DebtCard({
-  debt,
-  onEdit,
-  onRemove,
-  isEditing,
-  onEditSave,
-  onEditCancel,
-  balanceReadOnly,
-}: {
-  debt: Account
-  onEdit: () => void
-  onRemove: () => void
-  isEditing: boolean
-  onEditSave: (name: string, balance: number) => void
-  onEditCancel: () => void
-  balanceReadOnly?: boolean
-}) {
+/** A section's name, how many it holds, and what they come to. */
+function SectionHeader({ title, count, total, tone }: { title: string; count: number; total: number; tone?: 'debt' }) {
   return (
-    <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6">
-      <div className="flex flex-wrap items-center gap-3 sm:flex-nowrap sm:gap-5">
-        <div className="w-12 h-12 rounded-full bg-sunset/12 flex items-center justify-center text-sunset flex-shrink-0">
-          <AlertCircle size={22} />
-        </div>
-
-        <div className="w-full sm:flex-1 min-w-0">
-          {debt.institution_name && (
-            <p className="text-label-sm text-on-surface-variant">{debt.institution_name}</p>
-          )}
-          <p className="text-headline-sm font-semibold text-on-surface">
-            {debt.name || debt.official_name}
-            {debt.mask && (
-              <span className="text-label-md text-on-surface-variant font-normal ml-2">···{debt.mask}</span>
-            )}
-          </p>
-          <p className="text-label-sm text-on-surface-variant mt-0.5 capitalize">
-            {debt.subtype ?? debt.type}
-          </p>
-        </div>
-
-        <div className="flex-1 sm:flex-initial text-left sm:text-right flex-shrink-0 sm:min-w-[200px]">
-          <p className="text-label-sm text-on-surface-variant">Amount Owed</p>
-          <p className="text-headline-sm font-bold text-sunset mt-0.5">
-            ${Math.abs(Number(debt.current_balance)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </p>
-          <p className="text-label-sm text-on-surface-variant mt-0.5">Credit account</p>
-        </div>
-
-        <div
-          className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-          style={{ backgroundColor: debt.is_active ? '#1a6b3a' : '#acadb1' }}
-          title={debt.is_active ? 'Active' : 'Inactive'}
-        />
-
-        <div className="flex gap-1 flex-shrink-0">
-          <button
-            onClick={onEdit}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-on-surface-variant hover:text-secondary hover:bg-secondary/8 transition-colors"
-            title="Edit account"
-          >
-            <Pencil size={15} />
-          </button>
-          <button
-            onClick={onRemove}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-on-surface-variant hover:text-error hover:bg-error/8 transition-colors"
-            title="Remove account"
-          >
-            <Trash2 size={15} />
-          </button>
-        </div>
-      </div>
-
-      {isEditing && (
-        <EditForm
-          initial={{ name: debt.name || debt.official_name || '', balance: String(Math.abs(Number(debt.current_balance))) }}
-          onSave={onEditSave}
-          onCancel={onEditCancel}
-          balanceLabel="Amount Owed"
-          balanceReadOnly={balanceReadOnly}
-        />
-      )}
+    <div className="flex items-baseline justify-between gap-3 px-1">
+      <h3 className="text-title-md font-semibold text-on-surface">
+        {title}{' '}
+        <span className="text-label-md font-normal text-on-surface-variant tabular-nums">({count})</span>
+      </h3>
+      <p className={`text-title-md font-bold tabular-nums ${tone === 'debt' ? 'text-sunset' : 'text-on-surface'}`}>
+        {money(total)}
+      </p>
     </div>
   )
 }
@@ -364,94 +302,78 @@ function AccountsPageTool() {
     <div className="flex flex-col min-h-full">
       <TopNav title="Accounts" />
 
-      <div className="flex-1 px-4 sm:px-8 pb-10 flex flex-col gap-6">
-        {/* Header row. Wraps, so the open add form takes a line of its own. */}
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-body-md text-on-surface-variant">
-            {depositoryAccounts.length} account{depositoryAccounts.length !== 1 ? 's' : ''} · click <Pencil size={12} className="inline mb-0.5" /> to edit
-          </p>
+      <div className="flex-1 px-4 sm:px-8 pb-10 flex flex-col gap-5">
+        <div className="flex justify-end">
           <AddAccountForm />
         </div>
 
-        {/* Asset account cards */}
-        {depositoryAccounts.length > 0 ? (
-          <div className="flex flex-col gap-4">
-            {depositoryAccounts.map(account => (
-              <AccountCard
-                key={account.id}
-                account={account}
-                onEdit={getEditHandler(account)}
-                onRemove={() => setPendingRemove(account)}
-                isEditing={editingId === account.id}
-                onEditSave={getSaveHandler(account)}
-                onEditCancel={() => setEditingId(null)}
-                balanceReadOnly={isReadOnly(account.id)}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="bg-surface-container-lowest rounded-2xl shadow-card p-12 text-center">
-            <CreditCard size={48} className="mx-auto text-on-surface-variant mb-4" />
-            <p className="text-headline-sm text-on-surface mb-2">No accounts yet</p>
-            <p className="text-body-md text-on-surface-variant mb-6">
-              Add each account by hand — that is how you find the ones you forgot about.
-            </p>
-          </div>
-        )}
-
-        {/* Debts section */}
-        <div className="flex flex-col gap-4">
-          <div>
-            <h3 className="text-headline-sm font-semibold text-on-surface">Debts Owed</h3>
-            <p className="text-body-md text-on-surface-variant mt-1">
-              {debts.length} debt account{debts.length !== 1 ? 's' : ''}
-            </p>
-          </div>
-          {debts.length > 0 ? (
-            debts.map(debt => (
-              <DebtCard
-                key={debt.id}
-                debt={debt}
-                onEdit={getEditHandler(debt)}
-                onRemove={() => setPendingRemove(debt)}
-                isEditing={editingId === debt.id}
-                onEditSave={getSaveHandler(debt)}
-                onEditCancel={() => setEditingId(null)}
-                balanceReadOnly={isReadOnly(debt.id)}
-              />
-            ))
+        {/* Assets — one list, one line each, so the balances stack into a
+            column that can be read down. */}
+        <div className="flex flex-col gap-2">
+          <SectionHeader title="Accounts" count={depositoryAccounts.length} total={totalAssets} />
+          {depositoryAccounts.length > 0 ? (
+            <div className="bg-surface-container-lowest rounded-2xl shadow-card divide-y divide-outline-variant/25 overflow-hidden">
+              {depositoryAccounts.map(account => (
+                <AccountRow
+                  key={account.id}
+                  account={account}
+                  isEditing={editingId === account.id}
+                  onEdit={getEditHandler(account)}
+                  onRemove={() => setPendingRemove(account)}
+                  onEditSave={getSaveHandler(account)}
+                  onEditCancel={() => setEditingId(null)}
+                  balanceReadOnly={isReadOnly(account.id)}
+                />
+              ))}
+            </div>
           ) : (
-            <div className="bg-surface-container-lowest rounded-2xl shadow-card p-8 text-center">
-              <p className="text-body-md text-on-surface-variant">No debt accounts found</p>
+            <div className="bg-surface-container-lowest rounded-2xl shadow-card px-5 py-8 text-center">
+              <p className="text-body-md text-on-surface mb-1">No accounts yet</p>
+              <p className="text-body-sm text-on-surface-variant">
+                Add each one by hand — that is how you find the ones you forgot about.
+              </p>
             </div>
           )}
         </div>
 
-        {/* Summary totals */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6">
-            <p className="text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Total Assets</p>
-            <p className="text-display-sm font-bold text-on-surface">
-              ${totalAssets.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </p>
-          </div>
-          <div className="bg-surface-container-lowest rounded-2xl shadow-card p-6">
-            <p className="text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Total Debt</p>
-            <p className="text-display-sm font-bold text-sunset">
-              ${totalDebts.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </p>
-          </div>
-
-          {/* The one subtraction the two totals above exist for */}
-          <div className="col-span-2 bg-surface-container-lowest rounded-2xl shadow-card p-6 flex items-end justify-between gap-4 flex-wrap">
-            <div>
-              <p className="text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Net Worth</p>
-              <p className={`text-display-sm font-bold tabular-nums ${netWorth < 0 ? 'text-error' : 'text-success'}`}>
-                {netWorth < 0 ? '−' : ''}${Math.abs(netWorth).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </p>
+        {/* Debts */}
+        <div className="flex flex-col gap-2">
+          <SectionHeader title="Debts owed" count={debts.length} total={totalDebts} tone="debt" />
+          {debts.length > 0 ? (
+            <div className="bg-surface-container-lowest rounded-2xl shadow-card divide-y divide-outline-variant/25 overflow-hidden">
+              {debts.map(debt => (
+                <AccountRow
+                  key={debt.id}
+                  account={debt}
+                  owed
+                  isEditing={editingId === debt.id}
+                  onEdit={getEditHandler(debt)}
+                  onRemove={() => setPendingRemove(debt)}
+                  onEditSave={getSaveHandler(debt)}
+                  onEditCancel={() => setEditingId(null)}
+                  balanceReadOnly={isReadOnly(debt.id)}
+                />
+              ))}
             </div>
-            <p className="text-body-md text-on-surface-variant">Total assets − total debt</p>
+          ) : (
+            <div className="bg-surface-container-lowest rounded-2xl shadow-card px-5 py-6 text-center">
+              <p className="text-body-sm text-on-surface-variant">Nothing owed.</p>
+            </div>
+          )}
+        </div>
+
+        {/* The one subtraction the two lists exist for. Their totals are in the
+            headers above, so this states the result and how it was reached. */}
+        <div className="bg-surface-container-lowest rounded-2xl shadow-card p-5 flex items-end justify-between gap-4 flex-wrap">
+          <div>
+            <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">Net worth</p>
+            <p className={`text-headline-lg sm:text-display-sm font-bold tabular-nums mt-0.5 ${netWorth < 0 ? 'text-error' : 'text-success'}`}>
+              {netWorth < 0 ? '−' : ''}{money(netWorth)}
+            </p>
           </div>
+          <p className="text-label-md text-on-surface-variant tabular-nums">
+            {money(totalAssets)} assets − {money(totalDebts)} debt
+          </p>
         </div>
       </div>
 
