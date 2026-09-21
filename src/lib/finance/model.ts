@@ -12,7 +12,14 @@ export interface IncomeSource {
 export interface FixedExpense {
   name: string
   category?: string
+  /** What it costs a month. A yearly bill is carried here as a twelfth. */
   amount: number
+  /**
+   * Set when the cost was paid for the whole year at once: the figure the user
+   * actually handed over. `amount` is this over twelve, so every total on the
+   * site stays monthly, and this is what the row shows and edits.
+   */
+  yearly_amount?: number
 }
 
 export interface VariableExpense {
@@ -156,6 +163,9 @@ export function normalizeProfile(raw: unknown): FinancialProfile | null {
       name: str(r.name),
       amount: num(r.amount),
       ...(typeof r.category === 'string' ? { category: r.category } : {}),
+      ...(typeof r.yearly_amount === 'number' && isFinite(r.yearly_amount)
+        ? { yearly_amount: r.yearly_amount }
+        : {}),
     }))
 
   // Legacy: recurring charges kept apart from fixed costs.

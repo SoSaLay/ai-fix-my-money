@@ -1,8 +1,8 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useId, useState } from 'react'
 import {
-  Plus, X, Trash2, Pencil, Check, CircleDollarSign, MoreHorizontal,
+  Plus, X, Trash2, Pencil, Check, CircleDollarSign, MoreHorizontal, CalendarCheck,
   Home, Zap, Smartphone, Wifi, Shield, Car, Landmark, Tv, Baby, Dumbbell, Music,
   ShoppingCart, UtensilsCrossed, Fuel, Bus, ShoppingBag, Clapperboard,
   HeartPulse, Plane, PawPrint, Scissors,
@@ -78,8 +78,11 @@ const TEMPLATES: Partial<Record<Section, { name: string; Icon: LucideIcon }[]>> 
   ],
 }
 
-/** Closed, picking a common entry, or filling in the amount. */
-type AddStep = 'hidden' | 'picking' | 'amount'
+/** Closed, picking a common entry, filling in the amount, or the yearly form. */
+type AddStep = 'hidden' | 'picking' | 'amount' | 'paid-in-full'
+
+/** A yearly bill is held as a twelfth of itself, so the totals stay monthly. */
+const perMonth = (yearly: number) => yearly / 12
 
 /** Rows of name + monthly amount, written straight onto the profile. */
 export function ProfileEntry({ section }: { section: Section }) {
@@ -96,6 +99,8 @@ export function ProfileEntry({ section }: { section: Section }) {
   const [editDraft, setEditDraft] = useState({ name: '', amount: '' })
   /** A delete waits here until it is confirmed. */
   const [pendingDelete, setPendingDelete] = useState<number | null>(null)
+  /** Names offered to the yearly form — select one or type your own. */
+  const suggestionsId = useId()
 
   const copy = COPY[section]
   const templates = TEMPLATES[section]
@@ -113,14 +118,24 @@ export function ProfileEntry({ section }: { section: Section }) {
     reset()
   }, [name, amount, section, saveProfile, reset])
 
+  /** The yearly figure goes in; a twelfth of it joins the monthly costs. */
+  const addYearly = useCallback(() => {
+    const yearly = parseFloat(amount)
+    if (!name.trim() || isNaN(yearly)) return
+    saveProfile(profile => writeRow(profile, section, name.trim(), perMonth(yearly), yearly))
+    reset()
+  }, [name, amount, section, saveProfile, reset])
+
   const remove = useCallback((index: number) => {
     saveProfile(profile => removeRow(profile, section, index))
   }, [section, saveProfile])
 
   // ── Editing a row already recorded ──────────────────────────────────────
   const startEdit = (index: number) => {
+    const row = rows[index]
+    // A row paid for the year shows, and takes back, the figure that was paid.
     setEditingIndex(index)
-    setEditDraft({ name: rows[index].name, amount: String(rows[index].amount) })
+    setEditDraft({ name: row.name, amount: String(row.yearly ?? row.amount) })
   }
 
   const cancelEdit = () => {
@@ -134,7 +149,10 @@ export function ProfileEntry({ section }: { section: Section }) {
     const trimmed = editDraft.name.trim()
     if (!trimmed || isNaN(value)) return
     const index = editingIndex
-    saveProfile(profile => updateRow(profile, section, index, trimmed, value))
+    const yearly = rows[index].yearly !== undefined
+    saveProfile(profile => yearly
+      ? updateRow(profile, section, index, trimmed, perMonth(value), value)
+      : updateRow(profile, section, index, trimmed, value))
     cancelEdit()
   }
 
@@ -160,8 +178,16 @@ export function ProfileEntry({ section }: { section: Section }) {
   }
 
   const backToPicking = () => {
-    setStep('picking'); setName(''); setPrefilled(false); setEditingName(false)
+    setStep('picking'); setName(''); setAmount(''); setPrefilled(false); setEditingName(false)
   }
+
+  const openYearly = () => {
+    setStep('paid-in-full'); setName(''); setAmount(''); setPrefilled(false); setEditingName(false)
+  }
+
+  /** What the figure being typed into the yearly form works out to a month. */
+  const yearlyDraft = parseFloat(amount)
+  const yearlyPreview = !isNaN(yearlyDraft) && yearlyDraft > 0
 
   const pendingRow = pendingDelete !== null ? rows[pendingDelete] : undefined
 
@@ -207,9 +233,16 @@ export function ProfileEntry({ section }: { section: Section }) {
                       inputMode="decimal"
                       placeholder="0.00"
                       className="rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-4 py-2.5 text-body-md text-on-surface tabular-nums outline-none transition-colors focus:border-on-surface/40 w-full min-w-0"
-                      aria-label={`Monthly amount for ${row.name}`}
+                      aria-label={row.yearly !== undefined
+                        ? `Yearly amount for ${row.name}`
+                        : `Monthly amount for ${row.name}`}
                     />
                   </div>
+                  {row.yearly !== undefined && (
+                    <p className="text-label-sm text-on-surface-variant">
+                      Yearly amount — we divide it by 12.
+                    </p>
+                  )}
                   <div className="flex items-center gap-2">
                     <button
                       onClick={saveEdit}
@@ -229,8 +262,18 @@ export function ProfileEntry({ section }: { section: Section }) {
               ) : (
                 <div className="flex items-center justify-between gap-3">
                   <span className="flex items-center gap-2.5 min-w-0">
-                    <RowIcon section={section} name={row.name} />
-                    <span className="text-body-md text-on-surface truncate">{row.name}</span>
+                    <RowIcon section={section} name={row.name} yearly={row.yearly !== undefined} />
+                    <span className="min-w-0">
+                      <span className="block text-body-md text-on-surface truncate">{row.name}</span>
+                      {/* The monthly figure on the right is a twelfth of a bill
+                          that was paid in one go — without this it reads as a
+                          suspiciously cheap monthly cost. */}
+                      {row.yearly !== undefined && (
+                        <span className="block text-label-sm text-on-surface-variant truncate">
+                          Paid in full · ${row.yearly.toLocaleString('en-US', { maximumFractionDigits: 2 })}/yr
+                        </span>
+                      )}
+                    </span>
                   </span>
                   <div className="flex items-center gap-1 shrink-0">
                     <span className="text-body-md text-on-surface tabular-nums mr-1">
@@ -278,6 +321,21 @@ export function ProfileEntry({ section }: { section: Section }) {
           </div>
 
           <div className="grid grid-cols-2 gap-2">
+            {/* Ahead of the monthly list: a bill settled for the year is the
+                one thing on this panel that is not a monthly figure. */}
+            {section === 'fixed' && (
+              <button
+                onClick={openYearly}
+                className="col-span-2 flex items-center gap-2 rounded-xl px-3 py-2.5 text-label-md font-medium text-secondary text-left hover:opacity-80 active:scale-[0.98] transition-all bg-secondary/10"
+              >
+                <CalendarCheck size={14} className="shrink-0" />
+                <span className="truncate">I paid in full</span>
+                <span className="ml-auto text-label-sm font-normal text-on-surface-variant shrink-0">
+                  yearly bill
+                </span>
+              </button>
+            )}
+
             {templates.map(({ name: templateName, Icon }) => (
               <button
                 key={templateName}
@@ -295,6 +353,81 @@ export function ProfileEntry({ section }: { section: Section }) {
             >
               <MoreHorizontal size={14} className="shrink-0" />
               <span className="truncate">Something else</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {step === 'paid-in-full' && (
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">
+              Paid in full
+            </p>
+            <button
+              onClick={reset}
+              className="text-on-surface-variant/60 hover:text-on-surface transition-colors"
+              aria-label="Cancel"
+            >
+              <X size={15} />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-[1fr_140px] gap-2">
+            <label className="flex flex-col gap-1.5 min-w-0">
+              <span className="text-label-sm text-on-surface-variant">What did you pay for?</span>
+              <input
+                autoFocus
+                list={suggestionsId}
+                value={name}
+                onChange={e => setName(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') addYearly() }}
+                placeholder="Car insurance"
+                className="rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-4 py-2.5 text-body-md text-on-surface outline-none transition-colors focus:border-on-surface/40 min-w-0"
+                aria-label="What did you pay for"
+              />
+            </label>
+
+            <label className="flex flex-col gap-1.5 min-w-0">
+              {/* Named on the field itself, not only in the hint: this is the
+                  one amount on the page that is not a monthly figure. */}
+              <span className="text-label-sm text-on-surface-variant">Yearly amount</span>
+              <input
+                value={amount}
+                onChange={e => setAmount(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') addYearly() }}
+                inputMode="decimal"
+                placeholder="0.00"
+                className="rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-4 py-2.5 text-body-md text-on-surface tabular-nums outline-none transition-colors focus:border-on-surface/40 w-full min-w-0"
+                aria-label="Yearly amount"
+              />
+            </label>
+          </div>
+
+          {/* Suggestions for the name — pick one or type your own. */}
+          <datalist id={suggestionsId}>
+            {(TEMPLATES.fixed ?? []).map(t => <option key={t.name} value={t.name} />)}
+          </datalist>
+
+          <p className="text-label-sm text-on-surface-variant">
+            {yearlyPreview
+              ? `$${yearlyDraft.toLocaleString('en-US', { maximumFractionDigits: 2 })}/yr ÷ 12 = $${perMonth(yearlyDraft).toLocaleString('en-US', { maximumFractionDigits: 2 })}/mo`
+              : 'Enter what you paid for the whole year. We divide it by 12 and add it to your fixed costs.'}
+          </p>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={addYearly}
+              disabled={!name.trim() || isNaN(yearlyDraft)}
+              className="btn-action items-center justify-center disabled:opacity-35"
+            >
+              Add
+            </button>
+            <button
+              onClick={backToPicking}
+              className="text-label-lg text-on-surface-variant hover:text-on-surface px-2 py-2.5 transition-colors"
+            >
+              Back
             </button>
           </div>
         </div>
@@ -401,33 +534,50 @@ export function ProfileEntry({ section }: { section: Section }) {
  * The template icon for a row, when its name matches one. Anything written in
  * by hand wears a plain money mark — not a pencil, which reads as "edit me".
  */
-function RowIcon({ section, name }: { section: Section; name: string }) {
+function RowIcon({ section, name, yearly }: { section: Section; name: string; yearly?: boolean }) {
   const match = TEMPLATES[section]?.find(t => t.name.toLowerCase() === name.trim().toLowerCase())
-  const Icon = match?.Icon ?? CircleDollarSign
+  const Icon = yearly ? CalendarCheck : match?.Icon ?? CircleDollarSign
   return <Icon size={14} className="text-on-surface-variant/70 shrink-0" />
 }
 
 // ─── Profile read/write ──────────────────────────────────────────────────────
 
-function readRows(profile: FinancialProfile | null, section: Section): { name: string; amount: number }[] {
+interface Row {
+  name: string
+  amount: number
+  /** Present on a fixed cost that was paid for the year in one go. */
+  yearly?: number
+}
+
+function readRows(profile: FinancialProfile | null, section: Section): Row[] {
   if (!profile) return []
   if (section === 'income') return profile.income.sources
-  if (section === 'fixed') return profile.expenses_fixed.map(e => ({ name: e.name, amount: e.amount }))
+  if (section === 'fixed') {
+    return profile.expenses_fixed.map(e => ({
+      name: e.name,
+      amount: e.amount,
+      ...(e.yearly_amount !== undefined ? { yearly: e.yearly_amount } : {}),
+    }))
+  }
   return profile.expenses_variable.map(e => ({ name: e.category, amount: e.amount }))
 }
 
-function writeRow(profile: FinancialProfile, section: Section, name: string, amount: number): FinancialProfile {
+function writeRow(
+  profile: FinancialProfile, section: Section, name: string, amount: number, yearly?: number,
+): FinancialProfile {
   if (section === 'income') {
     return { ...profile, income: { ...profile.income, sources: [...profile.income.sources, { name, amount }] } }
   }
   if (section === 'fixed') {
-    return { ...profile, expenses_fixed: [...profile.expenses_fixed, { name, amount }] }
+    const entry = { name, amount, ...(yearly !== undefined ? { yearly_amount: yearly } : {}) }
+    return { ...profile, expenses_fixed: [...profile.expenses_fixed, entry] }
   }
   return { ...profile, expenses_variable: [...profile.expenses_variable, { category: name, amount }] }
 }
 
 function updateRow(
   profile: FinancialProfile, section: Section, index: number, name: string, amount: number,
+  yearly?: number,
 ): FinancialProfile {
   if (section === 'income') {
     return {
@@ -441,7 +591,8 @@ function updateRow(
   if (section === 'fixed') {
     return {
       ...profile,
-      expenses_fixed: profile.expenses_fixed.map((e, i) => (i === index ? { ...e, name, amount } : e)),
+      expenses_fixed: profile.expenses_fixed.map((e, i) =>
+        i === index ? { ...e, name, amount, ...(yearly !== undefined ? { yearly_amount: yearly } : {}) } : e),
     }
   }
   return {
