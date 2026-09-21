@@ -19,6 +19,11 @@ interface GoalFolder {
 
 const FOLDERS_KEY    = 'llg_goal_folders'
 const FOLDER_MAP_KEY = 'llg_goal_folder_map'
+/** The shown order of the top level, holding both kinds of card. */
+const LAYOUT_KEY     = 'llg_goal_layout'
+
+const folderKey = (id: string) => `folder:${id}`
+const goalKey   = (id: string) => `goal:${id}`
 
 function readLocal<T>(key: string, fallback: T): T {
   if (typeof window === 'undefined') return fallback
@@ -518,8 +523,16 @@ function FolderSection({
           <span className="text-base leading-tight shrink-0">🎯</span>
           <span className="flex flex-col gap-0.5 min-w-0">
             <span className="text-title-md text-on-surface break-words">{folder.name}</span>
-            <span className="flex items-center gap-2 text-label-md text-on-surface-variant">
+            <span className="flex items-center gap-2 flex-wrap text-label-md text-on-surface-variant">
               <span>{goals.length} goal{goals.length === 1 ? '' : 's'}</span>
+              {/* Shut, this is all anyone can see of the project — so it
+                  carries what the project is worth, not only how far along
+                  it is. Open, the figures below say it already. */}
+              {collapsed && totalTarget > 0 && (
+                <span className="font-semibold text-on-surface tabular-nums">
+                  ${totalTarget.toLocaleString()}
+                </span>
+              )}
               {goals.length > 0 && (
                 <span className="rounded-full bg-surface-container-lowest border border-on-surface/[0.06] px-2 py-0.5 text-on-surface tabular-nums">
                   {overallPct}%
@@ -572,18 +585,23 @@ function FolderSection({
             </p>
           )}
 
-          <SortableGoals
-            goals={goals}
+          <SortableList
+            keys={goals.map(g => g.id)}
+            labelFor={id => goals.find(g => g.id === id)?.name ?? 'Goal'}
             onReorder={onReorder}
-            renderGoal={goal => (
-              <GoalRow
-                goal={goal}
-                monthlyIncome={monthlyIncome}
-                maxPct={ceilingFor(goal)}
-                onUpdate={onUpdate}
-                onDelete={onDelete}
-              />
-            )}
+            renderItem={id => {
+              const goal = goals.find(g => g.id === id)
+              if (!goal) return null
+              return (
+                <GoalRow
+                  goal={goal}
+                  monthlyIncome={monthlyIncome}
+                  maxPct={ceilingFor(goal)}
+                  onUpdate={onUpdate}
+                  onDelete={onDelete}
+                />
+              )
+            }}
           />
 
           {addingGoal ? (
@@ -669,7 +687,9 @@ function AddMenu({
 }
 
 /**
- * Goals as cards that can be picked up and moved.
+ * Cards that can be picked up and moved — a project or a single goal, since
+ * both are cards and neither outranks the other in a list someone is ordering
+ * by what matters to them.
  *
  * Hold one for a moment — mouse or finger — and it lifts; drag it past its
  * neighbours and they step aside; let go and the order is kept. A hold rather
@@ -677,23 +697,22 @@ function AddMenu({
  * scrolled by swiping across it, which is also why a move of more than a few
  * pixels before the hold lands cancels it.
  *
- * Nothing is on screen to grab, by design, so the gesture is named in a line
- * above the list, and Alt with the arrow keys does the same thing for anyone
- * not using a pointer.
+ * Nothing is on screen to grab, by design, so the gesture is named above the
+ * list, and Alt with the arrow keys does the same thing without a pointer.
  */
 const HOLD_MS = 350
 const SCROLL_SLOP_PX = 8
 
-function SortableGoals({
-  goals, onReorder, renderGoal,
+function SortableList({
+  keys, labelFor, onReorder, renderItem,
 }: {
-  goals: SavingsGoal[]
-  /** The ids in the order they should now be kept. */
-  onReorder: (orderedIds: string[]) => void
-  renderGoal: (goal: SavingsGoal) => ReactNode
+  keys: string[]
+  labelFor: (key: string) => string
+  /** The keys in the order they should now be kept. */
+  onReorder: (orderedKeys: string[]) => void
+  renderItem: (key: string) => ReactNode
 }) {
-  const ids = goals.map(g => g.id)
-  const [dragId, setDragId] = useState<string | null>(null)
+  const [dragKey, setDragKey] = useState<string | null>(null)
   const [preview, setPreview] = useState<string[] | null>(null)
 
   const itemRefs = useRef(new Map<string, HTMLDivElement>())
@@ -703,16 +722,15 @@ function SortableGoals({
   const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const armed = useRef(false)
 
-  const shown = preview ?? ids
-  const byId = new Map(goals.map(g => [g.id, g]))
+  const shown = preview ?? keys
 
   // A drag must not scroll the page under itself.
   useEffect(() => {
-    if (!dragId) return
+    if (!dragKey) return
     const block = (e: TouchEvent) => e.preventDefault()
     document.addEventListener('touchmove', block, { passive: false })
     return () => document.removeEventListener('touchmove', block)
-  }, [dragId])
+  }, [dragKey])
 
   useEffect(() => () => { if (holdTimer.current) clearTimeout(holdTimer.current) }, [])
 
@@ -721,11 +739,15 @@ function SortableGoals({
     armed.current = false
   }
 
-  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>, id: string) => {
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>, key: string) => {
+    // A goal inside a project sits in a list inside a list. Whichever card was
+    // pressed is the one being moved, so the press stops here rather than
+    // arming the project card around it too.
+    e.stopPropagation()
     if (e.button !== 0) return
-    // The pencil, and anything else you can press, is not a handle.
+    // The pencil, the collapse arrow, and anything else pressable is not a handle.
     if ((e.target as HTMLElement).closest('button, input, a, label')) return
-    if (goals.length < 2) return
+    if (keys.length < 2) return
 
     startY.current = e.clientY
     armed.current = true
@@ -735,18 +757,19 @@ function SortableGoals({
     holdTimer.current = setTimeout(() => {
       holdTimer.current = null
       if (!armed.current) return
-      slots.current = shown.map(rowId => {
-        const rect = itemRefs.current.get(rowId)?.getBoundingClientRect()
+      slots.current = shown.map(rowKey => {
+        const rect = itemRefs.current.get(rowKey)?.getBoundingClientRect()
         return { top: rect?.top ?? 0, height: rect?.height ?? 0 }
       })
       try { el.setPointerCapture(pointerId) } catch {}
-      setDragId(id)
+      setDragKey(key)
       setPreview(shown)
     }, HOLD_MS)
   }
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!dragId) {
+    e.stopPropagation()
+    if (!dragKey) {
       // Moved before the hold landed — they were scrolling, not lifting.
       if (armed.current && Math.abs(e.clientY - startY.current) > SCROLL_SLOP_PX) cancelHold()
       return
@@ -756,8 +779,8 @@ function SortableGoals({
     if (target === -1) target = slots.current.length - 1
 
     setPreview(prev => {
-      const current = prev ?? ids
-      const from = current.indexOf(dragId)
+      const current = prev ?? keys
+      const from = current.indexOf(dragKey)
       if (from === -1 || from === target) return current
       const next = [...current]
       next.splice(target, 0, ...next.splice(from, 1))
@@ -765,64 +788,57 @@ function SortableGoals({
     })
   }
 
-  const handlePointerUp = () => {
+  const handlePointerUp = (e?: React.PointerEvent<HTMLDivElement>) => {
+    e?.stopPropagation()
     cancelHold()
-    if (dragId && preview && preview.some((id, i) => ids[i] !== id)) onReorder(preview)
-    setDragId(null)
+    if (dragKey && preview && preview.some((key, i) => keys[i] !== key)) onReorder(preview)
+    setDragKey(null)
     setPreview(null)
   }
 
   /** The same move, for anyone on a keyboard. */
-  const nudge = (id: string, direction: -1 | 1) => {
-    const from = ids.indexOf(id)
+  const nudge = (key: string, direction: -1 | 1) => {
+    const from = keys.indexOf(key)
     const to = from + direction
-    if (from === -1 || to < 0 || to >= ids.length) return
-    const next = [...ids]
-    next[from] = ids[to]
-    next[to] = ids[from]
+    if (from === -1 || to < 0 || to >= keys.length) return
+    const next = [...keys]
+    next[from] = keys[to]
+    next[to] = keys[from]
     onReorder(next)
   }
 
   return (
     <div className="flex flex-col gap-4">
-      {goals.length > 1 && (
-        <p className="text-label-sm text-on-surface-variant">
-          Hold a goal to move it up or down.
-        </p>
-      )}
-
-      {shown.map(id => {
-        const goal = byId.get(id)
-        if (!goal) return null
-        const dragging = dragId === id
+      {shown.map(key => {
+        const dragging = dragKey === key
 
         return (
           <div
-            key={id}
-            ref={el => { if (el) itemRefs.current.set(id, el); else itemRefs.current.delete(id) }}
+            key={key}
+            ref={el => { if (el) itemRefs.current.set(key, el); else itemRefs.current.delete(key) }}
             tabIndex={0}
-            aria-label={`${goal.name}. Hold to move, or press Alt with the up and down arrows.`}
-            onPointerDown={e => handlePointerDown(e, id)}
+            aria-label={`${labelFor(key)}. Hold to move, or press Alt with the up and down arrows.`}
+            onPointerDown={e => handlePointerDown(e, key)}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerCancel={handlePointerUp}
             onKeyDown={e => {
               if (!e.altKey) return
-              if (e.key === 'ArrowUp') { e.preventDefault(); nudge(id, -1) }
-              if (e.key === 'ArrowDown') { e.preventDefault(); nudge(id, 1) }
+              if (e.key === 'ArrowUp') { e.preventDefault(); nudge(key, -1) }
+              if (e.key === 'ArrowDown') { e.preventDefault(); nudge(key, 1) }
             }}
             className={`rounded-2xl outline-none transition-[transform,box-shadow] duration-150 focus-visible:ring-2 focus-visible:ring-secondary/60 ${
               dragging
                 // The padding and the margin cancel out: the lifted card grows
                 // a border of white around what it holds without shifting it.
                 ? 'p-3 -m-3 scale-[1.02] shadow-[0_12px_32px_rgba(0,0,0,0.16)] bg-surface-container-lowest relative z-10 cursor-grabbing'
-                : dragId
+                : dragKey
                   ? 'opacity-60'
                   : ''
             }`}
             style={{ touchAction: dragging ? 'none' : undefined }}
           >
-            {renderGoal(goal)}
+            {renderItem(key)}
           </div>
         )
       })}
@@ -845,6 +861,7 @@ export function GoalsList({
 }: GoalsListProps) {
   const [folders, setFolders] = useState<GoalFolder[]>(() => readLocal(FOLDERS_KEY, []))
   const [goalFolderMap, setGoalFolderMap] = useState<Record<string, string>>(() => readLocal(FOLDER_MAP_KEY, {}))
+  const [layout, setLayout] = useState<string[]>(() => readLocal(LAYOUT_KEY, []))
   const [showAddMenu, setShowAddMenu] = useState(false)
   const [addingType, setAddingType] = useState<'folder' | 'goal' | null>(null)
 
@@ -926,88 +943,131 @@ export function GoalsList({
     g => !goalFolderMap[g.id] || !folders.find(f => f.id === goalFolderMap[g.id]),
   )
 
-  return (
-    <div className="bg-surface-container-lowest rounded-2xl shadow-card p-4 sm:p-6 flex flex-col gap-5 min-w-0">
-      <div className="flex items-center justify-between gap-3">
-        <h3 className="text-headline-sm text-on-surface">Savings Goals</h3>
-        {addingType === null && (
-          <div className="relative shrink-0">
-            <button
-              onClick={() => setShowAddMenu(m => !m)}
-              className="flex min-h-11 items-center gap-1.5 px-3 rounded-full text-label-lg font-medium text-secondary hover:bg-secondary/8 transition-colors"
-              aria-expanded={showAddMenu}
-              data-add-menu-toggle
-            >
-              <Plus size={16} />
-              Add Goal
-            </button>
-            {showAddMenu && (
-              <AddMenu
-                onSelect={handleMenuSelect}
-                onClose={() => setShowAddMenu(false)}
-              />
-            )}
-          </div>
-        )}
-      </div>
+  // Projects and single goals are cards of the same standing, so they share
+  // one order: a goal can sit above a project, or between two of them. The
+  // stored order is filtered to what still exists, and anything made since —
+  // a new goal, a new project — joins the end.
+  const presentKeys = [
+    ...folders.map(f => folderKey(f.id)),
+    ...standaloneGoals.map(g => goalKey(g.id)),
+  ]
+  const orderedKeys = [
+    ...layout.filter(key => presentKeys.includes(key)),
+    ...presentKeys.filter(key => !layout.includes(key)),
+  ]
 
-      <div className="flex flex-col gap-4">
-        {goals.length === 0 && folders.length === 0 && addingType === null && (
-          <p className="text-body-md text-on-surface-variant text-center py-4">
-            No goals yet. Add one to start tracking your savings progress.
+  const handleReorder = (next: string[]) => {
+    setLayout(next)
+    writeLocal(LAYOUT_KEY, next)
+  }
+
+  const labelFor = (key: string) => {
+    if (key.startsWith('folder:')) {
+      return folders.find(f => folderKey(f.id) === key)?.name ?? 'Project'
+    }
+    return goals.find(g => goalKey(g.id) === key)?.name ?? 'Goal'
+  }
+
+  return (
+    <div className="flex flex-col gap-4 min-w-0">
+      <div className="bg-surface-container-lowest rounded-2xl shadow-card p-4 sm:p-6 flex flex-col gap-4 min-w-0">
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-headline-sm text-on-surface">Savings Goals</h3>
+          {addingType === null && (
+            <div className="relative shrink-0">
+              <button
+                onClick={() => setShowAddMenu(m => !m)}
+                className="flex min-h-11 items-center gap-1.5 px-3 rounded-full text-label-lg font-medium text-secondary hover:bg-secondary/8 transition-colors"
+                aria-expanded={showAddMenu}
+                data-add-menu-toggle
+              >
+                <Plus size={16} />
+                Add Goal
+              </button>
+              {showAddMenu && (
+                <AddMenu
+                  onSelect={handleMenuSelect}
+                  onClose={() => setShowAddMenu(false)}
+                />
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Named once, at the top, for every card below it. */}
+        {orderedKeys.length > 1 && (
+          <p className="text-label-sm text-on-surface-variant -mt-2">
+            Hold a card to move it up or down.
           </p>
         )}
 
-        {folders.map(folder => (
-          <FolderSection
-            key={folder.id}
-            folder={folder}
-            goals={folderGoals(folder.id)}
-            monthlyIncome={monthlyIncome}
-            ceilingFor={ceilingFor}
-            freePct={Math.round(freePct)}
-            onUpdate={onUpdate}
-            onDelete={onDelete}
-            onCreate={onCreate}
-            onDeleteFolder={handleDeleteFolder}
-            onGoalCreated={handleGoalCreated}
-            onReorder={reorderWithin(folderGoals(folder.id))}
-          />
-        ))}
+        <div className="flex flex-col gap-4">
+          {goals.length === 0 && folders.length === 0 && addingType === null && (
+            <p className="text-body-md text-on-surface-variant text-center py-4">
+              No goals yet. Add one to start tracking your savings progress.
+            </p>
+          )}
 
-        <SortableGoals
-          goals={standaloneGoals}
-          onReorder={reorderWithin(standaloneGoals)}
-          renderGoal={goal => (
-            <GoalRow
-              goal={goal}
-              monthlyIncome={monthlyIncome}
-              maxPct={ceilingFor(goal)}
-              onUpdate={onUpdate}
-              onDelete={onDelete}
+          <SortableList
+            keys={orderedKeys}
+            labelFor={labelFor}
+            onReorder={handleReorder}
+            renderItem={key => {
+              if (key.startsWith('folder:')) {
+                const folder = folders.find(f => folderKey(f.id) === key)
+                if (!folder) return null
+                return (
+                  <FolderSection
+                    folder={folder}
+                    goals={folderGoals(folder.id)}
+                    monthlyIncome={monthlyIncome}
+                    ceilingFor={ceilingFor}
+                    freePct={Math.round(freePct)}
+                    onUpdate={onUpdate}
+                    onDelete={onDelete}
+                    onCreate={onCreate}
+                    onDeleteFolder={handleDeleteFolder}
+                    onGoalCreated={handleGoalCreated}
+                    onReorder={reorderWithin(folderGoals(folder.id))}
+                  />
+                )
+              }
+
+              const goal = goals.find(g => goalKey(g.id) === key)
+              if (!goal) return null
+              return (
+                <GoalRow
+                  goal={goal}
+                  monthlyIncome={monthlyIncome}
+                  maxPct={ceilingFor(goal)}
+                  onUpdate={onUpdate}
+                  onDelete={onDelete}
+                />
+              )
+            }}
+          />
+
+          {addingType === 'folder' && (
+            <NewFolderForm
+              onCreate={handleCreateFolder}
+              onClose={() => setAddingType(null)}
             />
           )}
-        />
-
-        {addingType === 'folder' && (
-          <NewFolderForm
-            onCreate={handleCreateFolder}
-            onClose={() => setAddingType(null)}
-          />
-        )}
-        {addingType === 'goal' && (
-          <NewGoalForm
-            monthlyIncome={monthlyIncome}
-            maxPct={Math.round(freePct)}
-            onCreate={onCreate}
-            onClose={() => setAddingType(null)}
-          />
-        )}
+          {addingType === 'goal' && (
+            <NewGoalForm
+              monthlyIncome={monthlyIncome}
+              maxPct={Math.round(freePct)}
+              onCreate={onCreate}
+              onClose={() => setAddingType(null)}
+            />
+          )}
+        </div>
       </div>
 
-      {/* Everything on the list, added up. */}
+      {/* Everything on the list, added up — its own card, so it reads as the
+          sum of the list rather than another item on it. */}
       {goals.length > 0 && (
-        <div className="flex items-baseline justify-between gap-3 rounded-2xl bg-surface-container-low px-4 py-4 sm:px-5">
+        <div className="bg-surface-container-lowest rounded-2xl shadow-card px-4 py-4 sm:px-6 flex items-baseline justify-between gap-3">
           <p className="text-title-md text-on-surface font-semibold">All goals</p>
           <p className="text-title-md font-bold text-on-surface tabular-nums">
             ${totalTarget.toLocaleString()}
