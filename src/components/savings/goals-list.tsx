@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect, useId, useRef } from 'react'
+import { useState, useEffect, useId, useRef, type ReactNode } from 'react'
 import {
   Pencil, Trash2, Check, X, Plus,
-  ChevronDown, ChevronRight, ChevronUp, Target,
+  ChevronDown, ChevronRight, Target,
 } from 'lucide-react'
 import type { SavingsGoal } from '@/hooks/use-data'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
@@ -48,7 +48,7 @@ interface GoalsListProps {
   maxTotalSavingsPct: number
   /** What general savings already holds, which goals cannot have. */
   generalSavingsPct: number
-  /** Moves a goal past its neighbour. The stored order is the shown order. */
+  /** Swaps two goals in storage. A move is carried out as adjacent swaps. */
   onSwap: (idA: string, idB: string) => void
   onUpdate: (id: string, updates: { name?: string; target_amount?: number; allocation_pct?: number }) => Promise<boolean>
   onDelete: (id: string) => Promise<boolean>
@@ -70,8 +70,6 @@ function GoalRow({
   maxPct,
   onUpdate,
   onDelete,
-  onMoveUp,
-  onMoveDown,
 }: {
   goal: SavingsGoal
   monthlyIncome: number
@@ -79,9 +77,6 @@ function GoalRow({
   maxPct: number
   onUpdate: GoalsListProps['onUpdate']
   onDelete: GoalsListProps['onDelete']
-  /** Absent at the ends of the list, and when there is only one goal. */
-  onMoveUp?: () => void
-  onMoveDown?: () => void
 }) {
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -243,30 +238,6 @@ function GoalRow({
         </div>
         <div className="flex items-center gap-1 shrink-0">
           <p className="text-body-lg font-semibold text-on-surface tabular-nums">{pct}%</p>
-
-          {/* Order is the learner's to set: what matters most goes on top. */}
-          {(onMoveUp || onMoveDown) && (
-            <span className="flex flex-col">
-              <button
-                onClick={onMoveUp}
-                disabled={!onMoveUp}
-                className="inline-flex h-6 w-8 items-center justify-center rounded text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface disabled:opacity-25 disabled:hover:bg-transparent"
-                aria-label={`Move ${goal.name} up`}
-                title="Move up"
-              >
-                <ChevronUp size={15} />
-              </button>
-              <button
-                onClick={onMoveDown}
-                disabled={!onMoveDown}
-                className="inline-flex h-6 w-8 items-center justify-center rounded text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface disabled:opacity-25 disabled:hover:bg-transparent"
-                aria-label={`Move ${goal.name} down`}
-                title="Move down"
-              >
-                <ChevronDown size={15} />
-              </button>
-            </span>
-          )}
 
           {/* Always reachable: a phone has no hover to reveal it with. */}
           <button
@@ -498,7 +469,7 @@ function FolderSection({
   onCreate,
   onDeleteFolder,
   onGoalCreated,
-  onSwap,
+  onReorder,
 }: {
   folder: GoalFolder
   goals: SavingsGoal[]
@@ -512,7 +483,7 @@ function FolderSection({
   onCreate: GoalsListProps['onCreate']
   onDeleteFolder: (id: string) => void
   onGoalCreated: (goalId: string, folderId: string) => void
-  onSwap: GoalsListProps['onSwap']
+  onReorder: (orderedIds: string[]) => void
 }) {
   const [collapsed, setCollapsed] = useState(false)
   const [addingGoal, setAddingGoal] = useState(false)
@@ -601,18 +572,19 @@ function FolderSection({
             </p>
           )}
 
-          {goals.map((goal, i) => (
-            <GoalRow
-              key={goal.id}
-              goal={goal}
-              monthlyIncome={monthlyIncome}
-              maxPct={ceilingFor(goal)}
-              onUpdate={onUpdate}
-              onDelete={onDelete}
-              onMoveUp={i > 0 ? () => onSwap(goal.id, goals[i - 1].id) : undefined}
-              onMoveDown={i < goals.length - 1 ? () => onSwap(goal.id, goals[i + 1].id) : undefined}
-            />
-          ))}
+          <SortableGoals
+            goals={goals}
+            onReorder={onReorder}
+            renderGoal={goal => (
+              <GoalRow
+                goal={goal}
+                monthlyIncome={monthlyIncome}
+                maxPct={ceilingFor(goal)}
+                onUpdate={onUpdate}
+                onDelete={onDelete}
+              />
+            )}
+          />
 
           {addingGoal ? (
             <NewGoalForm
@@ -696,64 +668,165 @@ function AddMenu({
   )
 }
 
-/** A stretch of months, said the way someone would say it out loud. */
-function humanMonths(months: number): string {
-  if (months < 24) return `${months} month${months === 1 ? '' : 's'}`
-  const years = Math.floor(months / 12)
-  const rest = months % 12
-  if (rest === 0) return `${years} years`
-  return `${years} years ${rest} month${rest === 1 ? '' : 's'}`
-}
-
 /**
- * How long the list takes to fund, in a sentence — the arithmetic done for
- * them rather than left as three figures to multiply in their head. It moves
- * as the allocations move, so a share dragged here is answered here.
+ * Goals as cards that can be picked up and moved.
  *
- * It counts what is earmarked for the goals. Before anything is, it offers
- * what the spending limit left free, which is the figure they would be
- * choosing from anyway.
+ * Hold one for a moment — mouse or finger — and it lifts; drag it past its
+ * neighbours and they step aside; let go and the order is kept. A hold rather
+ * than a straight drag so that a list taller than the screen can still be
+ * scrolled by swiping across it, which is also why a move of more than a few
+ * pixels before the hold lands cancels it.
+ *
+ * Nothing is on screen to grab, by design, so the gesture is named in a line
+ * above the list, and Alt with the arrow keys does the same thing for anyone
+ * not using a pointer.
  */
-function TimeToFund({
-  remaining, monthlyToGoals, monthlyFree,
+const HOLD_MS = 350
+const SCROLL_SLOP_PX = 8
+
+function SortableGoals({
+  goals, onReorder, renderGoal,
 }: {
-  remaining: number
-  monthlyToGoals: number
-  monthlyFree: number
+  goals: SavingsGoal[]
+  /** The ids in the order they should now be kept. */
+  onReorder: (orderedIds: string[]) => void
+  renderGoal: (goal: SavingsGoal) => ReactNode
 }) {
-  const money = (n: number) => `$${Math.round(n).toLocaleString()}`
-  const figure = (text: string) => (
-    <span className="font-bold text-on-surface tabular-nums whitespace-nowrap">{text}</span>
-  )
+  const ids = goals.map(g => g.id)
+  const [dragId, setDragId] = useState<string | null>(null)
+  const [preview, setPreview] = useState<string[] | null>(null)
 
-  let sentence: React.ReactNode
+  const itemRefs = useRef(new Map<string, HTMLDivElement>())
+  /** The slots as they were when the drag began — what the pointer is tested against. */
+  const slots = useRef<{ top: number; height: number }[]>([])
+  const startY = useRef(0)
+  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const armed = useRef(false)
 
-  if (remaining <= 0) {
-    sentence = <>Every goal on this list is funded.</>
-  } else if (monthlyToGoals > 0) {
-    sentence = (
-      <>
-        At {figure(`${money(monthlyToGoals)}/mo`)}, everything on this list is saved for in{' '}
-        {figure(humanMonths(Math.ceil(remaining / monthlyToGoals)))}.
-      </>
-    )
-  } else if (monthlyFree > 0) {
-    sentence = (
-      <>
-        Your spending limit leaves {figure(`${money(monthlyFree)}/mo`)} free. All of it toward these
-        goals would cover them in {figure(humanMonths(Math.ceil(remaining / monthlyFree)))}.
-      </>
-    )
-  } else {
-    sentence = (
-      <>Your income is fully committed — lower the spending limit to put something toward these.</>
-    )
+  const shown = preview ?? ids
+  const byId = new Map(goals.map(g => [g.id, g]))
+
+  // A drag must not scroll the page under itself.
+  useEffect(() => {
+    if (!dragId) return
+    const block = (e: TouchEvent) => e.preventDefault()
+    document.addEventListener('touchmove', block, { passive: false })
+    return () => document.removeEventListener('touchmove', block)
+  }, [dragId])
+
+  useEffect(() => () => { if (holdTimer.current) clearTimeout(holdTimer.current) }, [])
+
+  const cancelHold = () => {
+    if (holdTimer.current) { clearTimeout(holdTimer.current); holdTimer.current = null }
+    armed.current = false
+  }
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>, id: string) => {
+    if (e.button !== 0) return
+    // The pencil, and anything else you can press, is not a handle.
+    if ((e.target as HTMLElement).closest('button, input, a, label')) return
+    if (goals.length < 2) return
+
+    startY.current = e.clientY
+    armed.current = true
+    const el = e.currentTarget
+    const pointerId = e.pointerId
+
+    holdTimer.current = setTimeout(() => {
+      holdTimer.current = null
+      if (!armed.current) return
+      slots.current = shown.map(rowId => {
+        const rect = itemRefs.current.get(rowId)?.getBoundingClientRect()
+        return { top: rect?.top ?? 0, height: rect?.height ?? 0 }
+      })
+      try { el.setPointerCapture(pointerId) } catch {}
+      setDragId(id)
+      setPreview(shown)
+    }, HOLD_MS)
+  }
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragId) {
+      // Moved before the hold landed — they were scrolling, not lifting.
+      if (armed.current && Math.abs(e.clientY - startY.current) > SCROLL_SLOP_PX) cancelHold()
+      return
+    }
+
+    let target = slots.current.findIndex(slot => e.clientY < slot.top + slot.height / 2)
+    if (target === -1) target = slots.current.length - 1
+
+    setPreview(prev => {
+      const current = prev ?? ids
+      const from = current.indexOf(dragId)
+      if (from === -1 || from === target) return current
+      const next = [...current]
+      next.splice(target, 0, ...next.splice(from, 1))
+      return next
+    })
+  }
+
+  const handlePointerUp = () => {
+    cancelHold()
+    if (dragId && preview && preview.some((id, i) => ids[i] !== id)) onReorder(preview)
+    setDragId(null)
+    setPreview(null)
+  }
+
+  /** The same move, for anyone on a keyboard. */
+  const nudge = (id: string, direction: -1 | 1) => {
+    const from = ids.indexOf(id)
+    const to = from + direction
+    if (from === -1 || to < 0 || to >= ids.length) return
+    const next = [...ids]
+    next[from] = ids[to]
+    next[to] = ids[from]
+    onReorder(next)
   }
 
   return (
-    <p className="text-body-md text-on-surface-variant leading-relaxed pt-2 border-t border-on-surface/[0.07]">
-      {sentence}
-    </p>
+    <div className="flex flex-col gap-4">
+      {goals.length > 1 && (
+        <p className="text-label-sm text-on-surface-variant">
+          Hold a goal to move it up or down.
+        </p>
+      )}
+
+      {shown.map(id => {
+        const goal = byId.get(id)
+        if (!goal) return null
+        const dragging = dragId === id
+
+        return (
+          <div
+            key={id}
+            ref={el => { if (el) itemRefs.current.set(id, el); else itemRefs.current.delete(id) }}
+            tabIndex={0}
+            aria-label={`${goal.name}. Hold to move, or press Alt with the up and down arrows.`}
+            onPointerDown={e => handlePointerDown(e, id)}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            onKeyDown={e => {
+              if (!e.altKey) return
+              if (e.key === 'ArrowUp') { e.preventDefault(); nudge(id, -1) }
+              if (e.key === 'ArrowDown') { e.preventDefault(); nudge(id, 1) }
+            }}
+            className={`rounded-2xl outline-none transition-[transform,box-shadow] duration-150 focus-visible:ring-2 focus-visible:ring-secondary/60 ${
+              dragging
+                // The padding and the margin cancel out: the lifted card grows
+                // a border of white around what it holds without shifting it.
+                ? 'p-3 -m-3 scale-[1.02] shadow-[0_12px_32px_rgba(0,0,0,0.16)] bg-surface-container-lowest relative z-10 cursor-grabbing'
+                : dragId
+                  ? 'opacity-60'
+                  : ''
+            }`}
+            style={{ touchAction: dragging ? 'none' : undefined }}
+          >
+            {renderGoal(goal)}
+          </div>
+        )
+      })}
+    </div>
   )
 }
 
@@ -825,9 +898,26 @@ export function GoalsList({
 
   // ── What the whole list comes to ────────────────────────────────────────
   const totalTarget = goals.reduce((sum, g) => sum + Number(g.target_amount || 0), 0)
-  const totalSaved = goals.reduce((sum, g) => sum + Number(g.current_amount || 0), 0)
-  const totalMonthly = Math.round((allocatedToGoals / 100) * monthlyIncome)
-  const remaining = Math.max(0, totalTarget - totalSaved)
+
+  /**
+   * Storage holds one flat list; a folder shows a slice of it. Walking the
+   * move as adjacent swaps keeps the goals this list cannot see where they
+   * are, whichever slice was reordered.
+   */
+  const reorderWithin = (visible: SavingsGoal[]) => (orderedIds: string[]) => {
+    const working = visible.map(g => g.id)
+    orderedIds.forEach((id, target) => {
+      const from = working.indexOf(id)
+      if (from === -1 || from === target) return
+      const step = from < target ? 1 : -1
+      for (let i = from; i !== target; i += step) {
+        onSwap(working[i], working[i + step])
+        const held = working[i]
+        working[i] = working[i + step]
+        working[i + step] = held
+      }
+    })
+  }
 
   const folderGoals = (folderId: string) =>
     goals.filter(g => goalFolderMap[g.id] === folderId)
@@ -881,26 +971,23 @@ export function GoalsList({
             onCreate={onCreate}
             onDeleteFolder={handleDeleteFolder}
             onGoalCreated={handleGoalCreated}
-            onSwap={onSwap}
+            onReorder={reorderWithin(folderGoals(folder.id))}
           />
         ))}
 
-        {/* A goal swaps with the one shown next to it, not with whatever sits
-            beside it in storage — folders take goals out of this list. */}
-        {standaloneGoals.map((goal, i) => (
-          <GoalRow
-            key={goal.id}
-            goal={goal}
-            monthlyIncome={monthlyIncome}
-            maxPct={ceilingFor(goal)}
-            onUpdate={onUpdate}
-            onDelete={onDelete}
-            onMoveUp={i > 0 ? () => onSwap(goal.id, standaloneGoals[i - 1].id) : undefined}
-            onMoveDown={i < standaloneGoals.length - 1
-              ? () => onSwap(goal.id, standaloneGoals[i + 1].id)
-              : undefined}
-          />
-        ))}
+        <SortableGoals
+          goals={standaloneGoals}
+          onReorder={reorderWithin(standaloneGoals)}
+          renderGoal={goal => (
+            <GoalRow
+              goal={goal}
+              monthlyIncome={monthlyIncome}
+              maxPct={ceilingFor(goal)}
+              onUpdate={onUpdate}
+              onDelete={onDelete}
+            />
+          )}
+        />
 
         {addingType === 'folder' && (
           <NewFolderForm
@@ -918,40 +1005,13 @@ export function GoalsList({
         )}
       </div>
 
-      {/* Everything on the list, added up. One goal at a time says nothing
-          about whether the whole list is payable; this does. */}
+      {/* Everything on the list, added up. */}
       {goals.length > 0 && (
-        <div className="flex flex-col gap-2 rounded-2xl bg-surface-container-low px-4 py-4 sm:px-5">
-          <div className="flex items-baseline justify-between gap-3">
-            <p className="text-title-md text-on-surface font-semibold">
-              All goals
-              <span className="text-label-md font-normal text-on-surface-variant"> ({goals.length})</span>
-            </p>
-            <p className="text-title-md font-bold text-on-surface tabular-nums">
-              ${totalTarget.toLocaleString()}
-            </p>
-          </div>
-
-          <dl className="flex flex-col gap-1.5 text-label-md">
-            <div className="flex items-baseline justify-between gap-3">
-              <dt className="text-on-surface-variant">Saved so far</dt>
-              <dd className="text-on-surface tabular-nums">
-                ${totalSaved.toLocaleString()} of ${totalTarget.toLocaleString()}
-              </dd>
-            </div>
-            <div className="flex items-baseline justify-between gap-3">
-              <dt className="text-on-surface-variant">Going in each month</dt>
-              <dd className="font-semibold text-on-surface tabular-nums">
-                {Math.round(allocatedToGoals)}% · ${totalMonthly.toLocaleString()}/mo
-              </dd>
-            </div>
-          </dl>
-
-          <TimeToFund
-            remaining={remaining}
-            monthlyToGoals={totalMonthly}
-            monthlyFree={Math.round((freePct / 100) * monthlyIncome)}
-          />
+        <div className="flex items-baseline justify-between gap-3 rounded-2xl bg-surface-container-low px-4 py-4 sm:px-5">
+          <p className="text-title-md text-on-surface font-semibold">All goals</p>
+          <p className="text-title-md font-bold text-on-surface tabular-nums">
+            ${totalTarget.toLocaleString()}
+          </p>
         </div>
       )}
     </div>
