@@ -201,17 +201,28 @@ function InvestingPageTool() {
                   <span className="text-on-surface-variant">Not set — select one →</span>
                 </div>
               ) : (
-                funded.map(item => (
-                  <div key={item.id} className="flex items-center justify-between gap-3 text-label-md">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="inline-block w-3 h-3 rounded-full shrink-0" style={{ background: CATEGORIES_COLOR }} />
-                      <span className="text-on-surface-variant truncate">{item.name}</span>
+                <>
+                  {funded.map(item => (
+                    <div key={item.id} className="flex items-center justify-between gap-3 text-label-md">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="inline-block w-3 h-3 rounded-full shrink-0" style={{ background: CATEGORIES_COLOR }} />
+                        <span className="text-on-surface-variant truncate">{item.name}</span>
+                      </div>
+                      <span className="font-semibold text-on-surface tabular-nums text-right shrink-0">
+                        {item.pct}% · ${Math.round((item.pct / 100) * monthlyIncome).toLocaleString()}/mo
+                      </span>
                     </div>
+                  ))}
+
+                  {/* What the named investments come to together — the figure
+                      the dial is drawing, said in words and money. */}
+                  <div className="flex items-center justify-between gap-3 text-label-md pt-2 border-t border-outline-variant/30 mt-1">
+                    <span className="text-on-surface-variant">Total investing</span>
                     <span className="font-semibold text-on-surface tabular-nums text-right shrink-0">
-                      {item.pct}% · ${Math.round((item.pct / 100) * monthlyIncome).toLocaleString()}/mo
+                      {totalInvestingPct}% · ${totalInvestingAmount.toLocaleString()}/mo
                     </span>
                   </div>
-                ))
+                </>
               )}
             </div>
 
