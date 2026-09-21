@@ -256,12 +256,11 @@ function AlignmentNote({
     <div className="rounded-xl px-4 py-3 flex flex-col gap-1.5" style={{ background: 'rgba(255,152,23,0.12)' }}>
       <p className="text-label-md text-on-surface leading-relaxed">
         <span className="font-semibold">
-          {money(limit - spending)} {under ? 'below' : 'above'} what you spend now
-          {' '}({money(spending)}).
+          {money(limit - spending)} {under ? 'below' : 'above'} your current spending.
         </span>{' '}
         {under
-          ? 'Living inside it means cutting that much somewhere. Lock it in as a target if that is the plan.'
-          : 'Is there a bill you have not recorded yet? Lock it in either way.'}
+          ? `Hitting this target means cutting ${money(limit - spending)} somewhere.`
+          : 'Missing a bill?'}
       </p>
       {onMatch && (
         <button
