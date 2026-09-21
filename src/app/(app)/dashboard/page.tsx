@@ -12,14 +12,50 @@ import { useLearning } from '@/contexts/learning-context'
 import { INVESTMENT_CATEGORIES, knownAllocations } from '@/lib/investing/categories'
 import { RISK_LABEL, RISK_RAMP } from '@/lib/investing/risk-ramp'
 import { buildReport, type FinancialReport, type ReportAccount } from '@/lib/export/report'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+
+/** A category that can be cleared on its own, plus all of them together. */
+type ResetTarget = 'spending' | 'saving' | 'investing' | 'all'
 
 export default function DashboardPage() {
   const {
-    hasData, resetAllocations, financialData, investingGoal, assetAccounts, debtAccounts,
+    hasData, resetAllocations, resetSpendingAllocation, resetSavingsAllocation,
+    resetInvestingAllocation, financialData, investingGoal, assetAccounts, debtAccounts,
   } = useFinancialData()
   const { ready: learningReady, allTracksComplete } = useLearning()
-  const [showResetConfirm, setShowResetConfirm] = useState(false)
+  const [resetTarget, setResetTarget] = useState<ResetTarget | null>(null)
   const { data: summary, loading, error, refresh } = useDashboardSummary()
+
+  // What each reset clears, and what to say before clearing it. A share locked
+  // in against one income keeps that percentage after the income changes, so
+  // every category has a way to be cleared on its own rather than all four at
+  // once.
+  const resets: Record<ResetTarget, { title: string; body: string; confirmLabel: string; run: () => void }> = {
+    spending: {
+      title: 'Reset your spending limit?',
+      body: 'The locked limit is cleared. Your income and spending entries are untouched — set a new limit on Income vs. Spending.',
+      confirmLabel: 'Reset spending limit',
+      run: resetSpendingAllocation,
+    },
+    saving: {
+      title: 'Reset your savings share?',
+      body: 'General savings and every goal go back to 0% of income. The goals themselves, and what they have saved, stay as they are.',
+      confirmLabel: 'Reset saving',
+      run: resetSavingsAllocation,
+    },
+    investing: {
+      title: 'Reset your investing share?',
+      body: 'Every investment you picked, and the share of income behind it, is cleared. Choose them again on the Investing page.',
+      confirmLabel: 'Reset investing',
+      run: resetInvestingAllocation,
+    },
+    all: {
+      title: 'Reset every allocation?',
+      body: 'Spending, saving and investing all go back to zero, so you can set them again against your current income.',
+      confirmLabel: 'Reset all',
+      run: resetAllocations,
+    },
+  }
 
   const [showRecurring, setShowRecurring] = useState(false)
 
@@ -114,22 +150,34 @@ export default function DashboardPage() {
 
   // The four slices of income, read the same way by the phone list and the
   // wide-screen pillars below.
-  const allocationRows = [
+  const allocationRows: Array<{
+    key: string
+    label: string
+    color: string | null
+    pct: number
+    detail: string
+    /** The category this row can be cleared with, if it holds anything. */
+    reset: ResetTarget | null
+  }> = [
     {
       key: 'spending', label: 'Spending Limit', color: '#ff9817', pct: spendingPct,
       detail: spendingLimit > 0 ? `$${Math.round(spendingAmount).toLocaleString()} limit` : 'Not set',
+      reset: spendingLimit > 0 ? 'spending' : null,
     },
     {
       key: 'saving', label: 'Saving', color: '#1a6b3a', pct: savingsPct,
       detail: savingsAmount > 0 ? `$${Math.round(savingsAmount).toLocaleString()} locked` : 'Not set',
+      reset: savingsPct > 0 ? 'saving' : null,
     },
     {
       key: 'investing', label: 'Investing', color: '#4c49c9', pct: investingPct,
       detail: investingAmount > 0 ? `$${Math.round(investingAmount).toLocaleString()} locked` : 'Not set',
+      reset: investingPct > 0 ? 'investing' : null,
     },
     {
       key: 'unallocated', label: 'Unallocated', color: null, pct: unallocatedPct,
       detail: `$${Math.round(unallocatedAmount).toLocaleString()} free`,
+      reset: null,
     },
   ]
 
@@ -411,36 +459,24 @@ export default function DashboardPage() {
               <p className="text-label-md text-on-surface-variant tabular-nums">
                 {allocatedPct}% allocated · {unallocatedPct}% free
               </p>
-              {/* Reset allocation */}
-              {showResetConfirm ? (
-                <div className="flex items-center gap-2 flex-wrap bg-error/8 rounded-lg px-3 py-1.5">
-                  <span className="text-label-sm text-error font-medium">Reset all to 0?</span>
-                  <button
-                    onClick={() => { resetAllocations(); setShowResetConfirm(false) }}
-                    className="text-label-sm font-semibold text-error hover:underline"
-                  >
-                    Confirm
-                  </button>
-                  <span className="text-on-surface-variant text-label-sm">·</span>
-                  <button
-                    onClick={() => setShowResetConfirm(false)}
-                    className="text-label-sm text-on-surface-variant hover:underline"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setShowResetConfirm(true)}
-                  className="flex items-center gap-1.5 text-label-sm text-on-surface-variant hover:text-error transition-colors px-2 py-1 rounded-lg hover:bg-error/8"
-                  title="Reset all allocations to zero"
-                >
-                  <RotateCcw size={13} />
-                  Reset
-                </button>
-              )}
+              {/* Everything at once. Each category below also clears on its own. */}
+              <ResetButton label="all allocations" onClick={() => setResetTarget('all')} text="Reset all" />
             </div>
           </div>
+
+          {/* Percentages locked in against an earlier income keep that
+              percentage, so a plan can end up claiming more than there is.
+              Saying which figures no longer fit is what makes the resets
+              below mean something. */}
+          {allocatedPct > 100 && (
+            <div className="rounded-xl bg-error/[0.08] px-4 py-3 mb-5">
+              <p className="text-label-md text-on-surface leading-relaxed">
+                Your locked plan adds up to {allocatedPct}% of your income — more than you take
+                home. These shares were set against an income you have since changed. Reset the
+                ones that no longer fit and set them again.
+              </p>
+            </div>
+          )}
 
           {/* Segmented bar */}
           <div className="flex h-4 rounded-full overflow-hidden gap-0.5 mb-5">
@@ -490,9 +526,17 @@ export default function DashboardPage() {
                   />
                   <p className="text-body-md text-on-surface-variant">{row.label}</p>
                 </div>
-                <div className="text-right shrink-0">
-                  <p className="text-title-md font-bold text-on-surface tabular-nums">{row.pct}%</p>
-                  <p className="text-label-md text-on-surface-variant tabular-nums">{row.detail}</p>
+                <div className="flex items-center gap-1 shrink-0">
+                  <div className="text-right">
+                    <p className="text-title-md font-bold text-on-surface tabular-nums">{row.pct}%</p>
+                    <p className="text-label-md text-on-surface-variant tabular-nums">{row.detail}</p>
+                  </div>
+                  {row.reset && (
+                    <ResetButton
+                      label={row.label.toLowerCase()}
+                      onClick={() => setResetTarget(row.reset!)}
+                    />
+                  )}
                 </div>
               </li>
             ))}
@@ -510,6 +554,13 @@ export default function DashboardPage() {
                 </div>
                 <p className="text-headline-sm font-bold text-on-surface tabular-nums">{row.pct}%</p>
                 <p className="text-label-sm text-on-surface-variant tabular-nums">{row.detail}</p>
+                {row.reset && (
+                  <ResetButton
+                    label={row.label.toLowerCase()}
+                    onClick={() => setResetTarget(row.reset!)}
+                    className="-ml-2.5 mt-0.5"
+                  />
+                )}
               </div>
             ))}
           </div>
@@ -619,6 +670,41 @@ export default function DashboardPage() {
         </div>
 
       </div>
+
+      {/* Every reset names what it clears before it clears it. */}
+      <ConfirmDialog
+        open={resetTarget !== null}
+        title={resetTarget ? resets[resetTarget].title : ''}
+        body={resetTarget ? resets[resetTarget].body : undefined}
+        confirmLabel={resetTarget ? resets[resetTarget].confirmLabel : 'Reset'}
+        onConfirm={() => {
+          if (resetTarget) resets[resetTarget].run()
+          setResetTarget(null)
+        }}
+        onCancel={() => setResetTarget(null)}
+      />
     </div>
+  )
+}
+
+/** The one shape a reset takes, wherever it sits. */
+function ResetButton({
+  label, onClick, text = 'Reset', className = '',
+}: {
+  label: string
+  onClick: () => void
+  text?: string
+  className?: string
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`inline-flex min-h-9 items-center gap-1.5 rounded-lg px-2.5 text-label-sm text-on-surface-variant hover:text-error hover:bg-error/8 transition-colors ${className}`}
+      title={`Reset ${label}`}
+      aria-label={`Reset ${label}`}
+    >
+      <RotateCcw size={13} />
+      {text}
+    </button>
   )
 }

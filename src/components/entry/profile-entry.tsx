@@ -1,15 +1,16 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import {
-  Plus, X, Trash2, PenLine, Pencil,
-  Home, Zap, Smartphone, Wifi, Shield, Car, Landmark, Tv, Baby, Dumbbell,
+  Plus, X, Trash2, Pencil, Check, CircleDollarSign, MoreHorizontal,
+  Home, Zap, Smartphone, Wifi, Shield, Car, Landmark, Tv, Baby, Dumbbell, Music,
   ShoppingCart, UtensilsCrossed, Fuel, Bus, ShoppingBag, Clapperboard,
   HeartPulse, Plane, PawPrint, Scissors,
   Briefcase, Laptop, Clock, Coins, Store, HeartHandshake, PiggyBank, Banknote,
   type LucideIcon,
 } from 'lucide-react'
 import { useFinancialData } from '@/contexts/financial-data-context'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import type { FinancialProfile } from '@/lib/finance/model'
 
 type Section = 'income' | 'fixed' | 'variable'
@@ -58,6 +59,7 @@ const TEMPLATES: Partial<Record<Section, { name: string; Icon: LucideIcon }[]>> 
     { name: 'Car payment',   Icon: Car        },
     { name: 'Loan payment',  Icon: Landmark   },
     { name: 'Subscriptions', Icon: Tv         },
+    { name: 'Music',         Icon: Music      },
     { name: 'Childcare',     Icon: Baby       },
     { name: 'Gym',           Icon: Dumbbell   },
   ],
@@ -68,6 +70,7 @@ const TEMPLATES: Partial<Record<Section, { name: string; Icon: LucideIcon }[]>> 
     { name: 'Transit',       Icon: Bus             },
     { name: 'Shopping',      Icon: ShoppingBag     },
     { name: 'Entertainment', Icon: Clapperboard    },
+    { name: 'Music',         Icon: Music           },
     { name: 'Health',        Icon: HeartPulse      },
     { name: 'Travel',        Icon: Plane           },
     { name: 'Pets',          Icon: PawPrint        },
@@ -88,6 +91,11 @@ export function ProfileEntry({ section }: { section: Section }) {
   const [prefilled, setPrefilled] = useState(false)
   /** A template name is a starting point — this opens it for editing. */
   const [editingName, setEditingName] = useState(false)
+  /** The row open for editing, and the figures being typed into it. */
+  const [editingIndex, setEditingIndex] = useState<number | null>(null)
+  const [editDraft, setEditDraft] = useState({ name: '', amount: '' })
+  /** A delete waits here until it is confirmed. */
+  const [pendingDelete, setPendingDelete] = useState<number | null>(null)
 
   const copy = COPY[section]
   const templates = TEMPLATES[section]
@@ -108,6 +116,27 @@ export function ProfileEntry({ section }: { section: Section }) {
   const remove = useCallback((index: number) => {
     saveProfile(profile => removeRow(profile, section, index))
   }, [section, saveProfile])
+
+  // ── Editing a row already recorded ──────────────────────────────────────
+  const startEdit = (index: number) => {
+    setEditingIndex(index)
+    setEditDraft({ name: rows[index].name, amount: String(rows[index].amount) })
+  }
+
+  const cancelEdit = () => {
+    setEditingIndex(null)
+    setEditDraft({ name: '', amount: '' })
+  }
+
+  const saveEdit = () => {
+    if (editingIndex === null) return
+    const value = parseFloat(editDraft.amount)
+    const trimmed = editDraft.name.trim()
+    if (!trimmed || isNaN(value)) return
+    const index = editingIndex
+    saveProfile(profile => updateRow(profile, section, index, trimmed, value))
+    cancelEdit()
+  }
 
   // Sections without templates go straight to the form.
   const openAdd = () => {
@@ -134,6 +163,8 @@ export function ProfileEntry({ section }: { section: Section }) {
     setStep('picking'); setName(''); setPrefilled(false); setEditingName(false)
   }
 
+  const pendingRow = pendingDelete !== null ? rows[pendingDelete] : undefined
+
   return (
     <div className="bg-surface-container-lowest rounded-2xl p-5 flex flex-col gap-4">
       <div>
@@ -152,24 +183,80 @@ export function ProfileEntry({ section }: { section: Section }) {
           {rows.map((row, i) => (
             <div
               key={`${row.name}-${i}`}
-              className="flex items-center justify-between gap-3 py-2.5 border-b border-outline-variant/30 last:border-0 group"
+              className="flex flex-col gap-2 py-2.5 border-b border-outline-variant/30 last:border-0"
             >
-              <span className="flex items-center gap-2.5 min-w-0">
-                <RowIcon section={section} name={row.name} />
-                <span className="text-body-md text-on-surface truncate">{row.name}</span>
-              </span>
-              <div className="flex items-center gap-3 shrink-0">
-                <span className="text-body-md text-on-surface tabular-nums">
-                  ${row.amount.toLocaleString('en-US', { maximumFractionDigits: 2 })}
-                </span>
-                <button
-                  onClick={() => remove(i)}
-                  className="text-on-surface-variant/50 hover:text-error transition-colors md:opacity-0 md:group-hover:opacity-100 focus:opacity-100"
-                  aria-label={`Remove ${row.name}`}
-                >
-                  <Trash2 size={14} />
-                </button>
-              </div>
+              {editingIndex === i ? (
+                // Edit in place. The fields stack on a phone and sit side by
+                // side once there is room, and the buttons are full tap targets
+                // rather than something to hit with a mouse.
+                <div className="flex flex-col gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-[1fr_120px] gap-2">
+                    <input
+                      autoFocus
+                      value={editDraft.name}
+                      onChange={e => setEditDraft(d => ({ ...d, name: e.target.value }))}
+                      onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit() }}
+                      placeholder={copy.namePlaceholder}
+                      className="rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-4 py-2.5 text-body-md text-on-surface outline-none transition-colors focus:border-on-surface/40 min-w-0"
+                      aria-label={`${copy.nameLabel} for ${row.name}`}
+                    />
+                    <input
+                      value={editDraft.amount}
+                      onChange={e => setEditDraft(d => ({ ...d, amount: e.target.value }))}
+                      onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit() }}
+                      inputMode="decimal"
+                      placeholder="0.00"
+                      className="rounded-2xl border border-on-surface/15 bg-surface-container-lowest px-4 py-2.5 text-body-md text-on-surface tabular-nums outline-none transition-colors focus:border-on-surface/40 w-full min-w-0"
+                      aria-label={`Monthly amount for ${row.name}`}
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={saveEdit}
+                      disabled={!editDraft.name.trim() || isNaN(parseFloat(editDraft.amount))}
+                      className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full px-4 text-label-lg font-semibold text-white bg-[#17171c] hover:bg-black transition-colors disabled:opacity-35"
+                    >
+                      <Check size={15} /> Save
+                    </button>
+                    <button
+                      onClick={cancelEdit}
+                      className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full px-4 text-label-lg text-on-surface-variant hover:text-on-surface hover:bg-on-surface/[0.06] transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between gap-3">
+                  <span className="flex items-center gap-2.5 min-w-0">
+                    <RowIcon section={section} name={row.name} />
+                    <span className="text-body-md text-on-surface truncate">{row.name}</span>
+                  </span>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <span className="text-body-md text-on-surface tabular-nums mr-1">
+                      ${row.amount.toLocaleString('en-US', { maximumFractionDigits: 2 })}
+                    </span>
+                    {/* Always on screen: on a phone there is no hover to
+                        reveal them with. */}
+                    <button
+                      onClick={() => startEdit(i)}
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-full text-on-surface-variant/70 hover:text-secondary hover:bg-on-surface/[0.06] transition-colors"
+                      aria-label={`Edit ${row.name}`}
+                      title="Edit"
+                    >
+                      <Pencil size={14} />
+                    </button>
+                    <button
+                      onClick={() => setPendingDelete(i)}
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-full text-on-surface-variant/70 hover:text-error hover:bg-error/[0.08] transition-colors"
+                      aria-label={`Remove ${row.name}`}
+                      title="Remove"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -206,7 +293,7 @@ export function ProfileEntry({ section }: { section: Section }) {
               onClick={pickCustom}
               className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-label-md font-medium text-secondary text-left hover:opacity-80 active:scale-[0.97] transition-all bg-secondary/10"
             >
-              <PenLine size={14} className="shrink-0" />
+              <MoreHorizontal size={14} className="shrink-0" />
               <span className="truncate">Something else</span>
             </button>
           </div>
@@ -290,14 +377,33 @@ export function ProfileEntry({ section }: { section: Section }) {
           <Plus size={15} /> Add {section === 'income' ? 'a source' : section === 'fixed' ? 'a fixed cost' : 'a category'}
         </button>
       )}
+
+      {/* Nothing is removed on a single tap — the row is named back here first. */}
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title={pendingRow ? `Remove "${pendingRow.name}"?` : 'Remove this entry?'}
+        body="It comes off your monthly figures right away. You can add it again at any time."
+        confirmLabel="Remove"
+        onConfirm={() => {
+          if (pendingDelete !== null) remove(pendingDelete)
+          setPendingDelete(null)
+          // Every row below the removed one shifts up, so an open editor is
+          // no longer pointing at the row it was opened on.
+          cancelEdit()
+        }}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   )
 }
 
-/** The template icon for a row, when its name matches one. */
+/**
+ * The template icon for a row, when its name matches one. Anything written in
+ * by hand wears a plain money mark — not a pencil, which reads as "edit me".
+ */
 function RowIcon({ section, name }: { section: Section; name: string }) {
   const match = TEMPLATES[section]?.find(t => t.name.toLowerCase() === name.trim().toLowerCase())
-  const Icon = match?.Icon ?? PenLine
+  const Icon = match?.Icon ?? CircleDollarSign
   return <Icon size={14} className="text-on-surface-variant/70 shrink-0" />
 }
 
@@ -318,6 +424,31 @@ function writeRow(profile: FinancialProfile, section: Section, name: string, amo
     return { ...profile, expenses_fixed: [...profile.expenses_fixed, { name, amount }] }
   }
   return { ...profile, expenses_variable: [...profile.expenses_variable, { category: name, amount }] }
+}
+
+function updateRow(
+  profile: FinancialProfile, section: Section, index: number, name: string, amount: number,
+): FinancialProfile {
+  if (section === 'income') {
+    return {
+      ...profile,
+      income: {
+        ...profile.income,
+        sources: profile.income.sources.map((s, i) => (i === index ? { ...s, name, amount } : s)),
+      },
+    }
+  }
+  if (section === 'fixed') {
+    return {
+      ...profile,
+      expenses_fixed: profile.expenses_fixed.map((e, i) => (i === index ? { ...e, name, amount } : e)),
+    }
+  }
+  return {
+    ...profile,
+    expenses_variable: profile.expenses_variable.map((e, i) =>
+      i === index ? { ...e, category: name, amount } : e),
+  }
 }
 
 function removeRow(profile: FinancialProfile, section: Section, index: number): FinancialProfile {

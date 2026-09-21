@@ -8,6 +8,7 @@ import { useAccounts, useDebts, type Account } from '@/hooks/use-data'
 import { useFinancialData } from '@/contexts/financial-data-context'
 import { SectionGate } from '@/components/learning/section-gate'
 import { AddAccountForm } from '@/components/entry/add-account-form'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 // ─── Inline edit form ──────────────────────────────────────────────────────────
 
@@ -123,9 +124,11 @@ function AccountCard({
           <CreditCard size={22} />
         </div>
 
-        <div className="flex-1 min-w-0">
-          <p className="text-label-sm text-on-surface-variant">{account.institution_name || 'Unknown Bank'}</p>
-          <p className="text-headline-sm font-semibold text-on-surface mt-0.5">
+        <div className="w-full sm:flex-1 min-w-0">
+          {account.institution_name && (
+            <p className="text-label-sm text-on-surface-variant">{account.institution_name}</p>
+          )}
+          <p className="text-headline-sm font-semibold text-on-surface">
             {account.name || account.official_name}
             {account.mask && (
               <span className="text-label-md text-on-surface-variant font-normal ml-2">···{account.mask}</span>
@@ -136,7 +139,7 @@ function AccountCard({
           </p>
         </div>
 
-        <div className="text-right flex-shrink-0">
+        <div className="flex-1 sm:flex-initial text-left sm:text-right flex-shrink-0">
           <p className="text-label-sm text-on-surface-variant">Current Balance</p>
           <p className="text-headline-sm font-bold text-on-surface mt-0.5">
             ${Number(account.current_balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -211,9 +214,11 @@ function DebtCard({
           <AlertCircle size={22} />
         </div>
 
-        <div className="flex-1 min-w-0">
-          <p className="text-label-sm text-on-surface-variant">{debt.institution_name || 'Unknown Bank'}</p>
-          <p className="text-headline-sm font-semibold text-on-surface mt-0.5">
+        <div className="w-full sm:flex-1 min-w-0">
+          {debt.institution_name && (
+            <p className="text-label-sm text-on-surface-variant">{debt.institution_name}</p>
+          )}
+          <p className="text-headline-sm font-semibold text-on-surface">
             {debt.name || debt.official_name}
             {debt.mask && (
               <span className="text-label-md text-on-surface-variant font-normal ml-2">···{debt.mask}</span>
@@ -224,7 +229,7 @@ function DebtCard({
           </p>
         </div>
 
-        <div className="text-right flex-shrink-0 sm:min-w-[200px]">
+        <div className="flex-1 sm:flex-initial text-left sm:text-right flex-shrink-0 sm:min-w-[200px]">
           <p className="text-label-sm text-on-surface-variant">Amount Owed</p>
           <p className="text-headline-sm font-bold text-sunset mt-0.5">
             ${Math.abs(Number(debt.current_balance)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -282,6 +287,8 @@ function AccountsPageTool() {
   } = useFinancialData()
 
   const [editingId, setEditingId] = useState<string | null>(null)
+  /** The account a remove was clicked on. It waits here to be confirmed. */
+  const [pendingRemove, setPendingRemove] = useState<Account | null>(null)
 
   // Every account is entered by hand, so every balance is editable
   const isReadOnly = useCallback((_id: string) => false, [])
@@ -301,10 +308,15 @@ function AccountsPageTool() {
     }
   }
 
-  function getRemoveHandler(account: Account) {
-    if (account.id.startsWith('manual_')) return () => { removeManualAccount(account.id); if (editingId === account.id) setEditingId(null) }
-    if (account.id.startsWith('acc_')) return () => { removeParsedAccount(account.id); if (editingId === account.id) setEditingId(null) }
-    return () => {}
+  // Removing an account is one tap away from a balance nobody can get back, so
+  // the tap opens the confirmation and the confirmation does the removing.
+  function confirmRemove() {
+    const account = pendingRemove
+    setPendingRemove(null)
+    if (!account) return
+    if (account.id.startsWith('manual_')) removeManualAccount(account.id)
+    else if (account.id.startsWith('acc_')) removeParsedAccount(account.id)
+    if (editingId === account.id) setEditingId(null)
   }
 
   if (accountsLoading || debtsLoading) {
@@ -369,7 +381,7 @@ function AccountsPageTool() {
                 key={account.id}
                 account={account}
                 onEdit={getEditHandler(account)}
-                onRemove={getRemoveHandler(account)}
+                onRemove={() => setPendingRemove(account)}
                 isEditing={editingId === account.id}
                 onEditSave={getSaveHandler(account)}
                 onEditCancel={() => setEditingId(null)}
@@ -401,7 +413,7 @@ function AccountsPageTool() {
                 key={debt.id}
                 debt={debt}
                 onEdit={getEditHandler(debt)}
-                onRemove={getRemoveHandler(debt)}
+                onRemove={() => setPendingRemove(debt)}
                 isEditing={editingId === debt.id}
                 onEditSave={getSaveHandler(debt)}
                 onEditCancel={() => setEditingId(null)}
@@ -442,6 +454,15 @@ function AccountsPageTool() {
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={pendingRemove !== null}
+        title={pendingRemove ? `Remove "${pendingRemove.name || pendingRemove.official_name || 'this account'}"?` : 'Remove this account?'}
+        body="The account and its balance come off your net worth. This cannot be undone."
+        confirmLabel="Remove account"
+        onConfirm={confirmRemove}
+        onCancel={() => setPendingRemove(null)}
+      />
     </div>
   )
 }

@@ -10,6 +10,7 @@ import {
   type InvestmentCategoryId,
 } from '@/lib/investing/categories'
 import { RISK_LABEL, RISK_RAMP, type RiskShade } from '@/lib/investing/risk-ramp'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 /** Other entries have no tier to colour them by, so they wear the brand's. */
 const CUSTOM_SHADE: RiskShade = { tint: '#eeedfb', stripe: '#4c49c9' }
@@ -127,8 +128,8 @@ export function AllocationList({
         <h2 className="text-headline-sm text-on-surface font-bold">Where it goes</h2>
         <p className="text-body-md text-on-surface-variant mt-1 leading-relaxed">
           Select the investments you want and set the share of your monthly income behind
-          each one. Drag the slider or type the number. Whatever you fund moves to the top.
-          Not listed? Add your own at the bottom.
+          each one. Drag the slider, or type the percent or the dollars a month. Whatever
+          you fund moves to the top. Not listed? Add your own at the bottom.
         </p>
       </div>
 
@@ -228,6 +229,9 @@ function AllocationRow({
 }) {
   const [open, setOpen] = useState(startOpen)
   const [draft, setDraft] = useState(String(pct || ''))
+  /** The same share, typed as dollars a month rather than as a percent. */
+  const [amountDraft, setAmountDraft] = useState('')
+  const [confirmingRemove, setConfirmingRemove] = useState(false)
   const active = pct > 0
   const amount = Math.round((pct / 100) * monthlyIncome)
 
@@ -238,7 +242,8 @@ function AllocationRow({
   // show the value that was actually kept, not the one that was typed.
   useEffect(() => {
     setDraft(String(pct || ''))
-  }, [pct])
+    setAmountDraft(pct > 0 ? String(Math.round((pct / 100) * monthlyIncome)) : '')
+  }, [pct, monthlyIncome])
 
   const set = (value: number) => {
     onSet(Math.max(0, Math.min(Math.round(value), ceiling)))
@@ -249,11 +254,24 @@ function AllocationRow({
     set(isNaN(parsed) ? 0 : parsed)
   }
 
+  // Dollars a month, for anyone who knows the figure they want to put in
+  // rather than the share of income it works out to.
+  const commitAmount = () => {
+    if (monthlyIncome <= 0) return
+    const parsed = parseFloat(amountDraft.replace(/[^0-9.]/g, ''))
+    set(isNaN(parsed) ? 0 : (parsed / monthlyIncome) * 100)
+  }
+
   // The tick confirms the row and puts the controls away. Without this it
   // committed a value the row already held, so it looked like nothing happened.
   const confirm = () => {
     commitTyped()
     setOpen(false)
+  }
+
+  const clearOrRemove = () => {
+    if (onRemove) setConfirmingRemove(true)
+    else { set(0); setOpen(false) }
   }
 
   const showControls = open && !disabled
@@ -329,7 +347,7 @@ function AllocationRow({
             className="w-full sm:flex-1 min-w-0 h-1.5 cursor-pointer accent-secondary"
             aria-label={`Percent of income for ${name}`}
           />
-          <div className="flex items-center gap-1.5 sm:shrink-0">
+          <div className="flex flex-wrap items-center gap-1.5 sm:shrink-0">
             {/* The field sits on a tinted row and on a plain one, so it carries
                 its own ground and its own outline rather than borrowing the
                 row's. White on white is invisible on a row nobody has funded
@@ -356,6 +374,29 @@ function AllocationRow({
               <span className="text-label-sm text-on-surface-variant">%</span>
             </div>
 
+            {/* The same share in dollars a month. A percent is the unit the
+                plan is kept in; a monthly figure is the one people actually
+                think in, so either one can be typed. */}
+            <div className="flex flex-1 sm:flex-none items-center gap-0.5 rounded-xl border border-on-surface/20 bg-white pl-2 pr-1.5 py-1.5 focus-within:border-on-surface/45 transition-colors">
+              <span className="text-label-sm text-on-surface-variant">$</span>
+              <input
+                inputMode="decimal"
+                value={amountDraft}
+                onChange={e => setAmountDraft(e.target.value)}
+                onBlur={commitAmount}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') { commitAmount(); setOpen(false) }
+                  if (e.key === 'Escape') {
+                    setAmountDraft(pct > 0 ? String(Math.round((pct / 100) * monthlyIncome)) : '')
+                  }
+                }}
+                placeholder="0"
+                className="w-full sm:w-20 bg-transparent text-body-md text-on-surface tabular-nums text-center outline-none"
+                aria-label={`Dollars a month for ${name}, typed`}
+              />
+              <span className="text-label-sm text-on-surface-variant">/mo</span>
+            </div>
+
             <button
               onMouseDown={e => e.preventDefault()}
               onClick={confirm}
@@ -367,10 +408,7 @@ function AllocationRow({
 
             {(active || onRemove) && (
               <button
-                onClick={() => {
-                  if (onRemove) onRemove()
-                  else { set(0); setOpen(false) }
-                }}
+                onClick={clearOrRemove}
                 className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-on-surface-variant hover:bg-on-surface/[0.06] transition-colors"
                 aria-label={onRemove ? `Remove ${name}` : `Clear ${name}`}
               >
@@ -380,6 +418,17 @@ function AllocationRow({
           </div>
         </div>
       )}
+
+      {/* Deleting the row itself is not undoable — clearing its share is, so
+          only the delete asks. */}
+      <ConfirmDialog
+        open={confirmingRemove}
+        title={`Remove "${name}"?`}
+        body="The investment and the share of income behind it come off your plan."
+        confirmLabel="Remove"
+        onConfirm={() => { setConfirmingRemove(false); onRemove?.() }}
+        onCancel={() => setConfirmingRemove(false)}
+      />
     </div>
   )
 }

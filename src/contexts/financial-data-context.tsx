@@ -186,7 +186,7 @@ function mapAccounts(data: FinancialProfile): { assets: Account[]; debts: Accoun
       available_balance: Math.abs(acc.balance),
       currency_code: 'USD',
       is_active: true,
-      institution_name: acc.institution ?? 'Your Bank',
+      institution_name: acc.institution ?? '',
       created_at: now,
       updated_at: now,
     }
@@ -305,8 +305,11 @@ interface FinancialDataContextValue {
   saveProfile: (update: (current: FinancialProfile) => FinancialProfile) => void
   clearData: () => void
 
-  // Reset all allocation settings to zero
+  // Reset allocations — one category at a time, or all of them
   resetAllocations: () => void
+  resetSpendingAllocation: () => void
+  resetSavingsAllocation: () => void
+  resetInvestingAllocation: () => void
 
   // Derived data (computed, ready for hooks to consume)
   dashboardSummary: DashboardSummary | null
@@ -559,11 +562,18 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
     persist(STORAGE_KEY_GENERAL_SAVINGS, pct)
   }, [])
 
-  // ── Reset all allocations ─────────────────────────────────────────────────
-  const resetAllocations = useCallback(() => {
+  // ── Resets ────────────────────────────────────────────────────────────────
+  // Each category clears on its own. A figure set against an income that has
+  // since changed is the reason these exist: the percentage it was locked at
+  // stays put until something clears it, so every category owns a way out.
+
+  const resetSpendingAllocation = useCallback(() => {
     setSpendingLimitState(null)
     forget(STORAGE_KEY_SPENDING_LIMIT)
+  }, [])
 
+  /** Both halves of savings: what each goal claims, and general savings. */
+  const resetSavingsAllocation = useCallback(() => {
     setSavingsGoals(prev => {
       const next = prev.map(g => ({ ...g, allocation_pct: 0, updated_at: new Date().toISOString() }))
       persist(STORAGE_KEY_SAVINGS_GOALS, next)
@@ -572,10 +582,18 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
 
     setGeneralSavingsPctState(0)
     persist(STORAGE_KEY_GENERAL_SAVINGS, 0)
+  }, [])
 
+  const resetInvestingAllocation = useCallback(() => {
     setInvestingGoalState(null)
     forget(STORAGE_KEY_INVESTING_GOAL)
   }, [])
+
+  const resetAllocations = useCallback(() => {
+    resetSpendingAllocation()
+    resetSavingsAllocation()
+    resetInvestingAllocation()
+  }, [resetSpendingAllocation, resetSavingsAllocation, resetInvestingAllocation])
 
   // ── Ledger CRUD ───────────────────────────────────────────────────────────
   const addLedgerTransaction = useCallback((tx: Omit<LedgerTransaction, 'id'>): LedgerTransaction => {
@@ -687,7 +705,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
       current_balance: isDebt ? -Math.abs(a.balance) : a.balance,
       currency_code: 'USD',
       mask: '',
-      institution_name: 'Manual Entry',
+      institution_name: '',
       is_active: true,
       created_at: a.createdAt,
       updated_at: a.createdAt,
@@ -740,6 +758,9 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
         saveProfile,
         clearData,
         resetAllocations,
+        resetSpendingAllocation,
+        resetSavingsAllocation,
+        resetInvestingAllocation,
         dashboardSummary,
         assetAccounts,
         debtAccounts,

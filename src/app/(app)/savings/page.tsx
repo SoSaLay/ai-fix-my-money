@@ -6,6 +6,7 @@ import { TopNav } from '@/components/layout/top-nav'
 import { EmptyState } from '@/components/layout/empty-state'
 import { CircularDial } from '@/components/savings/circular-dial'
 import { GoalsList } from '@/components/savings/goals-list'
+import { PctAmountFields } from '@/components/ui/pct-amount-fields'
 import { useDashboardSummary, useSavingsGoals } from '@/hooks/use-data'
 import { useFinancialData } from '@/contexts/financial-data-context'
 import { SectionGate } from '@/components/learning/section-gate'
@@ -150,6 +151,23 @@ function SavingsPageTool() {
               maxFreePct={maxGeneralPct}
               size={220}
             />
+
+            {/* Type it instead of dragging it. The dial is quick; a number is
+                exact, and someone who knows they want $400 a month should be
+                able to say so. */}
+            <div className="w-full">
+              <p className="text-label-md text-on-surface-variant mb-2">
+                Or set general savings by number
+              </p>
+              <PctAmountFields
+                pct={generalSavingsPct}
+                monthlyIncome={monthlyIncome}
+                maxPct={maxGeneralPct}
+                disabled={isLocked}
+                onChange={handleDialChange}
+                label="General savings"
+              />
+            </div>
 
             {/* Legend — always shows both tiers so users can see the two-part split */}
             <div className="w-full flex flex-col gap-2">
