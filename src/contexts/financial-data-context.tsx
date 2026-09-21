@@ -327,6 +327,8 @@ interface FinancialDataContextValue {
   createSavingsGoal: (goal: Omit<SavingsGoal, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => string
   updateSavingsGoal: (id: string, updates: Partial<SavingsGoal>) => void
   deleteSavingsGoal: (id: string) => void
+  /** Swaps two goals' places. The stored order is the order they are shown in. */
+  swapSavingsGoals: (idA: string, idB: string) => void
 
   // Investing goal (localStorage CRUD)
   investingGoal: InvestingGoal | null
@@ -526,6 +528,19 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
   const deleteSavingsGoal = useCallback((id: string) => {
     setSavingsGoals(prev => {
       const next = prev.filter(g => g.id !== id)
+      persist(STORAGE_KEY_SAVINGS_GOALS, next)
+      return next
+    })
+  }, [])
+
+  const swapSavingsGoals = useCallback((idA: string, idB: string) => {
+    setSavingsGoals(prev => {
+      const a = prev.findIndex(g => g.id === idA)
+      const b = prev.findIndex(g => g.id === idB)
+      if (a < 0 || b < 0 || a === b) return prev
+      const next = [...prev]
+      next[a] = prev[b]
+      next[b] = prev[a]
       persist(STORAGE_KEY_SAVINGS_GOALS, next)
       return next
     })
@@ -772,6 +787,7 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
         createSavingsGoal,
         updateSavingsGoal,
         deleteSavingsGoal,
+        swapSavingsGoals,
         investingGoal,
         setInvestingGoal,
         removeInvestingGoal,

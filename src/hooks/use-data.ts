@@ -295,6 +295,7 @@ export function useSavingsGoals() {
     createSavingsGoal,
     updateSavingsGoal,
     deleteSavingsGoal,
+    swapSavingsGoals,
   } = useFinancialData()
   const [updating, setUpdating] = useState(false)
 
@@ -355,6 +356,7 @@ export function useSavingsGoals() {
     createGoal,
     updateGoal,
     deleteGoal,
+    swapGoals: swapSavingsGoals,
   }
 }
 

@@ -3,7 +3,7 @@
 import { useState, useEffect, useId, useRef } from 'react'
 import {
   Pencil, Trash2, Check, X, Plus,
-  ChevronDown, ChevronRight, Target,
+  ChevronDown, ChevronRight, ChevronUp, Target,
 } from 'lucide-react'
 import type { SavingsGoal } from '@/hooks/use-data'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
@@ -39,6 +39,17 @@ function writeLocal<T>(key: string, value: T): void {
 interface GoalsListProps {
   goals: SavingsGoal[]
   monthlyIncome: number
+  /**
+   * The share of income savings may claim in total, after the spending limit
+   * and investing have taken theirs. Goals are bound by it exactly as the
+   * general-savings dial is — a goal that could claim 90% of an income with 7%
+   * free was writing a plan the money could not pay for.
+   */
+  maxTotalSavingsPct: number
+  /** What general savings already holds, which goals cannot have. */
+  generalSavingsPct: number
+  /** Moves a goal past its neighbour. The stored order is the shown order. */
+  onSwap: (idA: string, idB: string) => void
   onUpdate: (id: string, updates: { name?: string; target_amount?: number; allocation_pct?: number }) => Promise<boolean>
   onDelete: (id: string) => Promise<boolean>
   onCreate: (goal: { name: string; target_amount: number; allocation_pct?: number }) => Promise<string | false>
@@ -56,13 +67,21 @@ interface EditingState {
 function GoalRow({
   goal,
   monthlyIncome,
+  maxPct,
   onUpdate,
   onDelete,
+  onMoveUp,
+  onMoveDown,
 }: {
   goal: SavingsGoal
   monthlyIncome: number
+  /** The most this goal may claim: its own share plus whatever is still free. */
+  maxPct: number
   onUpdate: GoalsListProps['onUpdate']
   onDelete: GoalsListProps['onDelete']
+  /** Absent at the ends of the list, and when there is only one goal. */
+  onMoveUp?: () => void
+  onMoveDown?: () => void
 }) {
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -94,7 +113,8 @@ function GoalRow({
     const success = await onUpdate(goal.id, {
       name: form.name.trim() || goal.name,
       target_amount: targetNum,
-      allocation_pct: isNaN(allocNum) ? goal.allocation_pct : Math.max(0, Math.min(100, allocNum)),
+      // Bound by what is actually free, not by 100.
+      allocation_pct: isNaN(allocNum) ? goal.allocation_pct : Math.max(0, Math.min(maxPct, allocNum)),
     })
     setSaving(false)
     if (success) setEditing(false)
@@ -151,7 +171,7 @@ function GoalRow({
                 id={`${fieldId}-share`}
                 type="number"
                 min="0"
-                max="100"
+                max={maxPct}
                 step="1"
                 className="w-full bg-transparent text-body-lg text-on-surface tabular-nums outline-none"
                 value={form.allocation_pct}
@@ -160,6 +180,9 @@ function GoalRow({
               />
               <span className="text-body-lg text-on-surface-variant">%</span>
             </div>
+            <p className="text-label-sm text-on-surface-variant">
+              Up to {maxPct}% · ${Math.round((maxPct / 100) * monthlyIncome).toLocaleString()}/mo
+            </p>
           </div>
         </div>
 
@@ -220,6 +243,31 @@ function GoalRow({
         </div>
         <div className="flex items-center gap-1 shrink-0">
           <p className="text-body-lg font-semibold text-on-surface tabular-nums">{pct}%</p>
+
+          {/* Order is the learner's to set: what matters most goes on top. */}
+          {(onMoveUp || onMoveDown) && (
+            <span className="flex flex-col">
+              <button
+                onClick={onMoveUp}
+                disabled={!onMoveUp}
+                className="inline-flex h-6 w-8 items-center justify-center rounded text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface disabled:opacity-25 disabled:hover:bg-transparent"
+                aria-label={`Move ${goal.name} up`}
+                title="Move up"
+              >
+                <ChevronUp size={15} />
+              </button>
+              <button
+                onClick={onMoveDown}
+                disabled={!onMoveDown}
+                className="inline-flex h-6 w-8 items-center justify-center rounded text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface disabled:opacity-25 disabled:hover:bg-transparent"
+                aria-label={`Move ${goal.name} down`}
+                title="Move down"
+              >
+                <ChevronDown size={15} />
+              </button>
+            </span>
+          )}
+
           {/* Always reachable: a phone has no hover to reveal it with. */}
           <button
             onClick={() => setEditing(true)}
@@ -258,11 +306,14 @@ function GoalRow({
 
 function NewGoalForm({
   monthlyIncome,
+  maxPct,
   onCreate,
   onClose,
   label = 'New Savings Goal',
 }: {
   monthlyIncome: number
+  /** What is still free for a new goal to claim. */
+  maxPct: number
   onCreate: GoalsListProps['onCreate']
   onClose: (newId?: string) => void
   label?: string
@@ -281,7 +332,7 @@ function NewGoalForm({
     const result = await onCreate({
       name: form.name.trim(),
       target_amount: targetNum,
-      allocation_pct: isNaN(allocNum) ? 0 : Math.max(0, Math.min(100, allocNum)),
+      allocation_pct: isNaN(allocNum) ? 0 : Math.max(0, Math.min(maxPct, allocNum)),
     })
     setSaving(false)
     if (result) onClose(result)
@@ -326,7 +377,7 @@ function NewGoalForm({
               id={`${fieldId}-share`}
               type="number"
               min="0"
-              max="100"
+              max={maxPct}
               step="1"
               className="w-full bg-transparent text-body-lg text-on-surface tabular-nums outline-none"
               value={form.allocation_pct}
@@ -334,6 +385,9 @@ function NewGoalForm({
             />
             <span className="text-body-lg text-on-surface-variant">%</span>
           </div>
+          <p className="text-label-sm text-on-surface-variant">
+            Up to {maxPct}% · ${Math.round((maxPct / 100) * monthlyIncome).toLocaleString()}/mo
+          </p>
         </div>
       </div>
 
@@ -437,20 +491,28 @@ function FolderSection({
   folder,
   goals,
   monthlyIncome,
+  ceilingFor,
+  freePct,
   onUpdate,
   onDelete,
   onCreate,
   onDeleteFolder,
   onGoalCreated,
+  onSwap,
 }: {
   folder: GoalFolder
   goals: SavingsGoal[]
   monthlyIncome: number
+  /** The most a given goal may claim. */
+  ceilingFor: (goal: SavingsGoal) => number
+  /** What a goal that holds nothing yet may claim. */
+  freePct: number
   onUpdate: GoalsListProps['onUpdate']
   onDelete: GoalsListProps['onDelete']
   onCreate: GoalsListProps['onCreate']
   onDeleteFolder: (id: string) => void
   onGoalCreated: (goalId: string, folderId: string) => void
+  onSwap: GoalsListProps['onSwap']
 }) {
   const [collapsed, setCollapsed] = useState(false)
   const [addingGoal, setAddingGoal] = useState(false)
@@ -539,19 +601,23 @@ function FolderSection({
             </p>
           )}
 
-          {goals.map(goal => (
+          {goals.map((goal, i) => (
             <GoalRow
               key={goal.id}
               goal={goal}
               monthlyIncome={monthlyIncome}
+              maxPct={ceilingFor(goal)}
               onUpdate={onUpdate}
               onDelete={onDelete}
+              onMoveUp={i > 0 ? () => onSwap(goal.id, goals[i - 1].id) : undefined}
+              onMoveDown={i < goals.length - 1 ? () => onSwap(goal.id, goals[i + 1].id) : undefined}
             />
           ))}
 
           {addingGoal ? (
             <NewGoalForm
               monthlyIncome={monthlyIncome}
+              maxPct={freePct}
               onCreate={onCreate}
               onClose={handleGoalClose}
               label="Add goal to project"
@@ -630,14 +696,78 @@ function AddMenu({
   )
 }
 
+/** A stretch of months, said the way someone would say it out loud. */
+function humanMonths(months: number): string {
+  if (months < 24) return `${months} month${months === 1 ? '' : 's'}`
+  const years = Math.floor(months / 12)
+  const rest = months % 12
+  if (rest === 0) return `${years} years`
+  return `${years} years ${rest} month${rest === 1 ? '' : 's'}`
+}
+
+/**
+ * How long the list takes to fund, in a sentence — the arithmetic done for
+ * them rather than left as three figures to multiply in their head. It moves
+ * as the allocations move, so a share dragged here is answered here.
+ *
+ * It counts what is earmarked for the goals. Before anything is, it offers
+ * what the spending limit left free, which is the figure they would be
+ * choosing from anyway.
+ */
+function TimeToFund({
+  remaining, monthlyToGoals, monthlyFree,
+}: {
+  remaining: number
+  monthlyToGoals: number
+  monthlyFree: number
+}) {
+  const money = (n: number) => `$${Math.round(n).toLocaleString()}`
+  const figure = (text: string) => (
+    <span className="font-bold text-on-surface tabular-nums whitespace-nowrap">{text}</span>
+  )
+
+  let sentence: React.ReactNode
+
+  if (remaining <= 0) {
+    sentence = <>Every goal on this list is funded.</>
+  } else if (monthlyToGoals > 0) {
+    sentence = (
+      <>
+        At {figure(`${money(monthlyToGoals)}/mo`)}, everything on this list is saved for in{' '}
+        {figure(humanMonths(Math.ceil(remaining / monthlyToGoals)))}.
+      </>
+    )
+  } else if (monthlyFree > 0) {
+    sentence = (
+      <>
+        Your spending limit leaves {figure(`${money(monthlyFree)}/mo`)} free. All of it toward these
+        goals would cover them in {figure(humanMonths(Math.ceil(remaining / monthlyFree)))}.
+      </>
+    )
+  } else {
+    sentence = (
+      <>Your income is fully committed — lower the spending limit to put something toward these.</>
+    )
+  }
+
+  return (
+    <p className="text-body-md text-on-surface-variant leading-relaxed pt-2 border-t border-on-surface/[0.07]">
+      {sentence}
+    </p>
+  )
+}
+
 // ── GoalsList ──────────────────────────────────────────────────────────────
 
 export function GoalsList({
   goals,
   monthlyIncome,
+  maxTotalSavingsPct,
+  generalSavingsPct,
   onUpdate,
   onDelete,
   onCreate,
+  onSwap,
   updating,
 }: GoalsListProps) {
   const [folders, setFolders] = useState<GoalFolder[]>(() => readLocal(FOLDERS_KEY, []))
@@ -684,6 +814,21 @@ export function GoalsList({
     })
   }
 
+  // ── What is left to go round ────────────────────────────────────────────
+  // Savings as a whole is capped by what the spending limit and investing
+  // left behind. Inside that, every goal and the general-savings dial draw on
+  // the same pot, so a goal's ceiling is its own share plus whatever is free.
+  const allocatedToGoals = goals.reduce((sum, g) => sum + Number(g.allocation_pct || 0), 0)
+  const freePct = Math.max(0, maxTotalSavingsPct - generalSavingsPct - allocatedToGoals)
+  const ceilingFor = (goal: SavingsGoal) =>
+    Math.round(freePct + Number(goal.allocation_pct || 0))
+
+  // ── What the whole list comes to ────────────────────────────────────────
+  const totalTarget = goals.reduce((sum, g) => sum + Number(g.target_amount || 0), 0)
+  const totalSaved = goals.reduce((sum, g) => sum + Number(g.current_amount || 0), 0)
+  const totalMonthly = Math.round((allocatedToGoals / 100) * monthlyIncome)
+  const remaining = Math.max(0, totalTarget - totalSaved)
+
   const folderGoals = (folderId: string) =>
     goals.filter(g => goalFolderMap[g.id] === folderId)
 
@@ -729,21 +874,31 @@ export function GoalsList({
             folder={folder}
             goals={folderGoals(folder.id)}
             monthlyIncome={monthlyIncome}
+            ceilingFor={ceilingFor}
+            freePct={Math.round(freePct)}
             onUpdate={onUpdate}
             onDelete={onDelete}
             onCreate={onCreate}
             onDeleteFolder={handleDeleteFolder}
             onGoalCreated={handleGoalCreated}
+            onSwap={onSwap}
           />
         ))}
 
-        {standaloneGoals.map(goal => (
+        {/* A goal swaps with the one shown next to it, not with whatever sits
+            beside it in storage — folders take goals out of this list. */}
+        {standaloneGoals.map((goal, i) => (
           <GoalRow
             key={goal.id}
             goal={goal}
             monthlyIncome={monthlyIncome}
+            maxPct={ceilingFor(goal)}
             onUpdate={onUpdate}
             onDelete={onDelete}
+            onMoveUp={i > 0 ? () => onSwap(goal.id, standaloneGoals[i - 1].id) : undefined}
+            onMoveDown={i < standaloneGoals.length - 1
+              ? () => onSwap(goal.id, standaloneGoals[i + 1].id)
+              : undefined}
           />
         ))}
 
@@ -756,11 +911,49 @@ export function GoalsList({
         {addingType === 'goal' && (
           <NewGoalForm
             monthlyIncome={monthlyIncome}
+            maxPct={Math.round(freePct)}
             onCreate={onCreate}
             onClose={() => setAddingType(null)}
           />
         )}
       </div>
+
+      {/* Everything on the list, added up. One goal at a time says nothing
+          about whether the whole list is payable; this does. */}
+      {goals.length > 0 && (
+        <div className="flex flex-col gap-2 rounded-2xl bg-surface-container-low px-4 py-4 sm:px-5">
+          <div className="flex items-baseline justify-between gap-3">
+            <p className="text-title-md text-on-surface font-semibold">
+              All goals
+              <span className="text-label-md font-normal text-on-surface-variant"> ({goals.length})</span>
+            </p>
+            <p className="text-title-md font-bold text-on-surface tabular-nums">
+              ${totalTarget.toLocaleString()}
+            </p>
+          </div>
+
+          <dl className="flex flex-col gap-1.5 text-label-md">
+            <div className="flex items-baseline justify-between gap-3">
+              <dt className="text-on-surface-variant">Saved so far</dt>
+              <dd className="text-on-surface tabular-nums">
+                ${totalSaved.toLocaleString()} of ${totalTarget.toLocaleString()}
+              </dd>
+            </div>
+            <div className="flex items-baseline justify-between gap-3">
+              <dt className="text-on-surface-variant">Going in each month</dt>
+              <dd className="font-semibold text-on-surface tabular-nums">
+                {Math.round(allocatedToGoals)}% · ${totalMonthly.toLocaleString()}/mo
+              </dd>
+            </div>
+          </dl>
+
+          <TimeToFund
+            remaining={remaining}
+            monthlyToGoals={totalMonthly}
+            monthlyFree={Math.round((freePct / 100) * monthlyIncome)}
+          />
+        </div>
+      )}
     </div>
   )
 }

@@ -16,7 +16,7 @@ const GENERAL_COLOR = '#1a6b3a'
 
 function SavingsPageTool() {
   const { data: summary, loading: summaryLoading } = useDashboardSummary()
-  const { goals, loading: goalsLoading, updateGoal, deleteGoal, createGoal, updating } = useSavingsGoals()
+  const { goals, loading: goalsLoading, updateGoal, deleteGoal, createGoal, swapGoals, updating } = useSavingsGoals()
   const { generalSavingsPct: savedGeneralPct, setGeneralSavings } = useFinancialData()
 
   const [generalSavingsPct, setGeneralSavingsPct] = useState(0)
@@ -235,9 +235,12 @@ function SavingsPageTool() {
           <GoalsList
             goals={goals}
             monthlyIncome={monthlyIncome}
+            maxTotalSavingsPct={maxTotalSavingsPct}
+            generalSavingsPct={generalSavingsPct}
             onUpdate={updateGoal}
             onDelete={deleteGoal}
             onCreate={createGoal}
+            onSwap={swapGoals}
             updating={updating}
           />
         </div>
