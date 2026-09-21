@@ -124,15 +124,6 @@ export function AllocationList({
 
   return (
     <div className="flex flex-col gap-5">
-      <div>
-        <h2 className="text-headline-sm text-on-surface font-bold">Where it goes</h2>
-        <p className="text-body-md text-on-surface-variant mt-1 leading-relaxed">
-          Select the investments you want and set the share of your monthly income behind
-          each one. Drag the slider, or type the percent or the dollars a month. Whatever
-          you fund moves to the top. Not listed? Add your own at the bottom.
-        </p>
-      </div>
-
       {/* Catalog rows and write-ins rank together, so a write-in you fund
           rises past the listed investments you have not. */}
       <div className="flex flex-col gap-2.5">

@@ -9,6 +9,7 @@ import { AllocationList } from '@/components/investing/allocation-list'
 import { useDashboardSummary, useInvestingGoal } from '@/hooks/use-data'
 import { SectionGate } from '@/components/learning/section-gate'
 import {
+  INVESTMENT_CATEGORIES,
   knownAllocations,
   riskProfileFor,
   totalCategoryPct,
@@ -91,6 +92,15 @@ function InvestingPageTool() {
   const headroomPct = Math.max(0, maxInvestingPct - totalInvestingPct)
 
   const totalInvestingAmount = Math.round((totalInvestingPct / 100) * monthlyIncome)
+
+  /** Everything with a share behind it, largest first. */
+  const funded = [
+    ...INVESTMENT_CATEGORIES
+      .map(category => ({ id: category.id as string, name: category.name, pct: allocations[category.id] ?? 0 })),
+    ...custom.map(entry => ({ id: entry.id, name: entry.name, pct: Number(entry.pct) || 0 })),
+  ]
+    .filter(item => item.pct > 0)
+    .sort((a, b) => b.pct - a.pct)
 
   const handleCategoryChange = (id: InvestmentCategoryId, pct: number) => {
     setAllocations(prev => {
@@ -179,19 +189,30 @@ function InvestingPageTool() {
               size={220}
             />
 
+            {/* What the dial is made of: every investment with money behind
+                it, named, rather than one figure standing for all of them. */}
             <div className="w-full flex flex-col gap-2">
-              <div className="flex items-center justify-between gap-3 flex-wrap text-label-md">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="inline-block w-3 h-3 rounded-full shrink-0" style={{ background: CATEGORIES_COLOR }} />
-                  <span className="text-on-surface-variant">Selected investments</span>
+              {funded.length === 0 ? (
+                <div className="flex items-center justify-between gap-3 flex-wrap text-label-md">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="inline-block w-3 h-3 rounded-full shrink-0" style={{ background: CATEGORIES_COLOR }} />
+                    <span className="text-on-surface-variant">Investments</span>
+                  </div>
+                  <span className="text-on-surface-variant">Not set — select one →</span>
                 </div>
-                <span className="font-semibold text-on-surface tabular-nums text-right">
-                  {totalInvestingPct > 0
-                    ? `${totalInvestingPct}% · $${totalInvestingAmount.toLocaleString()}/mo`
-                    : <span className="text-on-surface-variant font-normal">Not set — select one →</span>
-                  }
-                </span>
-              </div>
+              ) : (
+                funded.map(item => (
+                  <div key={item.id} className="flex items-center justify-between gap-3 text-label-md">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="inline-block w-3 h-3 rounded-full shrink-0" style={{ background: CATEGORIES_COLOR }} />
+                      <span className="text-on-surface-variant truncate">{item.name}</span>
+                    </div>
+                    <span className="font-semibold text-on-surface tabular-nums text-right shrink-0">
+                      {item.pct}% · ${Math.round((item.pct / 100) * monthlyIncome).toLocaleString()}/mo
+                    </span>
+                  </div>
+                ))
+              )}
             </div>
 
             <CommittedAllocations
