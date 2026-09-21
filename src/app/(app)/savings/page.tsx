@@ -6,7 +6,7 @@ import { TopNav } from '@/components/layout/top-nav'
 import { EmptyState } from '@/components/layout/empty-state'
 import { CircularDial } from '@/components/savings/circular-dial'
 import { GoalsList } from '@/components/savings/goals-list'
-import { MonthlyAmountField } from '@/components/ui/monthly-amount-field'
+import { ShareField } from '@/components/ui/share-field'
 import { useDashboardSummary, useSavingsGoals } from '@/hooks/use-data'
 import { useFinancialData } from '@/contexts/financial-data-context'
 import { SectionGate } from '@/components/learning/section-gate'
@@ -157,7 +157,7 @@ function SavingsPageTool() {
                 able to say so. */}
             <div className="w-full flex flex-col gap-2">
               <p className="text-label-md text-on-surface-variant">Enter manually</p>
-              <MonthlyAmountField
+              <ShareField
                 pct={generalSavingsPct}
                 monthlyIncome={monthlyIncome}
                 maxPct={maxGeneralPct}
@@ -195,7 +195,7 @@ function SavingsPageTool() {
                 <span className="font-semibold text-on-surface tabular-nums text-right">
                   {generalSavingsPct > 0
                     ? `${generalSavingsPct}% · $${generalAmount.toLocaleString()}`
-                    : <span className="text-on-surface-variant font-normal">Drag the dial to set</span>
+                    : <span className="text-on-surface-variant font-normal">Not set — enter it below</span>
                   }
                 </span>
               </div>
