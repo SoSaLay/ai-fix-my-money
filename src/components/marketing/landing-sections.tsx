@@ -21,6 +21,10 @@ const CTA_BASE =
 export const CTA_CLASS = `${CTA_BASE} px-7 py-3.5`
 export const CTA_SMALL_CLASS = `${CTA_BASE} px-5 py-2.5`
 
+/** Sits beside the call to action without competing with it. */
+export const CTA_SECONDARY_CLASS =
+  'inline-flex items-center justify-center gap-2 rounded-full border border-[#17171c]/20 text-[#17171c] text-label-lg px-7 py-3.5 cursor-pointer transition-colors duration-200 hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#17171c]'
+
 // ─── Numbers ─────────────────────────────────────────────────────────────────
 
 export interface LandingStats {

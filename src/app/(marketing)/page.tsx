@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react'
 import { VideoReel, type ReelVideo } from '@/components/marketing/video-reel'
 import { TrackTabs, type TrackSummary } from '@/components/marketing/track-tabs'
 import {
-  CTA_CLASS, CTA_SMALL_CLASS, Faq, FinalCta, Footer, HowItWorks, StatsStrip, Why, YourData, type LandingStats,
+  CTA_CLASS, CTA_SECONDARY_CLASS, CTA_SMALL_CLASS, Faq, FinalCta, Footer, HowItWorks, StatsStrip, Why, YourData, type LandingStats,
 } from '@/components/marketing/landing-sections'
 import { PASS_THRESHOLD, TRACKS } from '@/lib/learning/tracks'
 import { liveVideos } from '@/lib/learning/video-pool/pool'
@@ -133,9 +133,14 @@ export default function MarketingPage() {
               with finance content, see what you really know?
             </p>
 
-            <Link href="/learning" className={CTA_CLASS}>
-              Get started <ArrowRight size={16} aria-hidden />
-            </Link>
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3">
+              <Link href="/learning" className={CTA_CLASS}>
+                Get started <ArrowRight size={16} aria-hidden />
+              </Link>
+              <Link href="/preview" className={CTA_SECONDARY_CLASS}>
+                What can I unlock?
+              </Link>
+            </div>
           </div>
         </div>
 

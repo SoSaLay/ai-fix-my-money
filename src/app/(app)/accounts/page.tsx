@@ -8,6 +8,7 @@ import { useFinancialData } from '@/contexts/financial-data-context'
 import { SectionGate } from '@/components/learning/section-gate'
 import { AddAccountForm } from '@/components/entry/add-account-form'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { usePreview } from '@/contexts/preview-context'
 
 const money = (n: number) =>
   `$${Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -197,8 +198,19 @@ function AccountRow({
   )
 }
 
-/** A section's name, how many it holds, and what they come to. */
-function SectionHeader({ title, count, total, tone }: { title: string; count: number; total: number; tone?: 'debt' }) {
+/**
+ * A section's name, how many it holds, and what they come to. The preview
+ * shows its totals at the top of the page, so there it is only the count.
+ */
+function SectionHeader({ title, count, total, tone, noun }: { title: string; count: number; total: number; tone?: 'debt'; noun: string }) {
+  if (usePreview()) {
+    return (
+      <p className="text-body-md text-on-surface-variant px-1">
+        {count} {noun}{count !== 1 ? 's' : ''}
+      </p>
+    )
+  }
+
   return (
     <div className="flex items-baseline justify-between gap-3 px-1">
       <h3 className="text-title-md font-semibold text-on-surface">
@@ -223,6 +235,7 @@ function AccountsPageTool() {
     updateParsedAccount,
     removeParsedAccount,
   } = useFinancialData()
+  const preview = usePreview()
 
   const [editingId, setEditingId] = useState<string | null>(null)
   /** The account a remove was clicked on. It waits here to be confirmed. */
@@ -303,14 +316,16 @@ function AccountsPageTool() {
       <TopNav title="Accounts" />
 
       <div className="flex-1 px-4 sm:px-8 pb-10 flex flex-col gap-5">
-        <div className="flex justify-end">
-          <AddAccountForm />
-        </div>
+        {!preview && (
+          <div className="flex justify-end">
+            <AddAccountForm />
+          </div>
+        )}
 
         {/* Assets — one list, one line each, so the balances stack into a
             column that can be read down. */}
         <div className="flex flex-col gap-2">
-          <SectionHeader title="Accounts" count={depositoryAccounts.length} total={totalAssets} />
+          <SectionHeader title="Accounts" noun="account" count={depositoryAccounts.length} total={totalAssets} />
           {depositoryAccounts.length > 0 ? (
             <div className="bg-surface-container-lowest rounded-2xl shadow-card divide-y divide-outline-variant/25 overflow-hidden">
               {depositoryAccounts.map(account => (
@@ -338,7 +353,7 @@ function AccountsPageTool() {
 
         {/* Debts */}
         <div className="flex flex-col gap-2">
-          <SectionHeader title="Debts owed" count={debts.length} total={totalDebts} tone="debt" />
+          <SectionHeader title="Debts owed" noun="debt account" count={debts.length} total={totalDebts} tone="debt" />
           {debts.length > 0 ? (
             <div className="bg-surface-container-lowest rounded-2xl shadow-card divide-y divide-outline-variant/25 overflow-hidden">
               {debts.map(debt => (
@@ -363,8 +378,9 @@ function AccountsPageTool() {
         </div>
 
         {/* The one subtraction the two lists exist for. Their totals are in the
-            headers above, so this states the result and how it was reached. */}
-        <div className="bg-surface-container-lowest rounded-2xl shadow-card p-5 flex items-end justify-between gap-4 flex-wrap">
+            headers above, so this states the result and how it was reached.
+            The preview shows it at the top of the page instead. */}
+        {!preview && <div className="bg-surface-container-lowest rounded-2xl shadow-card p-5 flex items-end justify-between gap-4 flex-wrap">
           <div>
             <p className="text-label-sm text-on-surface-variant uppercase tracking-wider">Net worth</p>
             <p className={`text-headline-lg sm:text-display-sm font-bold tabular-nums mt-0.5 ${netWorth < 0 ? 'text-error' : 'text-success'}`}>
@@ -374,7 +390,7 @@ function AccountsPageTool() {
           <p className="text-label-md text-on-surface-variant tabular-nums">
             {money(totalAssets)} assets − {money(totalDebts)} debt
           </p>
-        </div>
+        </div>}
       </div>
 
       <ConfirmDialog

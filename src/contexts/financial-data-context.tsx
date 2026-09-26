@@ -283,12 +283,26 @@ function deriveDashboardSummary(
 // Stored shapes for settings
 // ============================================================================
 
-interface StoredSpendingLimit {
+export interface StoredSpendingLimit {
   id: string
   amount: number
   period: 'monthly' | 'yearly'
   created_at: string
   updated_at: string
+}
+
+/**
+ * A ready-made set of figures to start from instead of this browser's storage.
+ * Used by the preview, which shows an example person's numbers: a seeded
+ * provider never reads or writes local storage, so anything changed on screen
+ * lasts only until the page is left, and the visitor's own data is untouched.
+ */
+export interface FinancialSeed {
+  profile: FinancialProfile
+  spendingLimit: StoredSpendingLimit | null
+  savingsGoals: SavingsGoal[]
+  investingGoal: InvestingGoal | null
+  generalSavingsPct: number
 }
 
 // ============================================================================
@@ -383,27 +397,30 @@ function ledgerTxToTransaction(tx: LedgerTransaction): Transaction {
   }
 }
 
-export function FinancialDataProvider({ children }: { children: ReactNode }) {
-  const [financialData, setFinancialData] = useState<FinancialProfile | null>(null)
-  const [spendingLimit, setSpendingLimitState] = useState<StoredSpendingLimit | null>(null)
-  const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([])
-  const [investingGoal, setInvestingGoalState] = useState<InvestingGoal | null>(null)
-  const [generalSavingsPct, setGeneralSavingsPctState] = useState<number>(0)
+export function FinancialDataProvider({ children, seed }: { children: ReactNode; seed?: FinancialSeed }) {
+  const [financialData, setFinancialData] = useState<FinancialProfile | null>(
+    () => (seed ? recomputeSummary(seed.profile) : null),
+  )
+  const [spendingLimit, setSpendingLimitState] = useState<StoredSpendingLimit | null>(seed?.spendingLimit ?? null)
+  const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>(seed?.savingsGoals ?? [])
+  const [investingGoal, setInvestingGoalState] = useState<InvestingGoal | null>(seed?.investingGoal ?? null)
+  const [generalSavingsPct, setGeneralSavingsPctState] = useState<number>(seed?.generalSavingsPct ?? 0)
   const [ledger, setLedger] = useState<LedgerTransaction[]>([])
   const [manualAccounts, setManualAccounts] = useState<ManualAccount[]>([])
 
   // ── Persistence ───────────────────────────────────────────────────────────
   // Local storage is the store, not a cache: there is nowhere else for this to
   // go. Every setter below writes through synchronously, so a reload shows what
-  // the screen showed.
+  // the screen showed. A seeded provider is in memory only — see FinancialSeed.
+  const inMemory = !!seed
 
   const persist = useCallback((key: string, value: unknown) => {
-    writeLocal(key, value)
-  }, [])
+    if (!inMemory) writeLocal(key, value)
+  }, [inMemory])
 
   const forget = useCallback((key: string) => {
-    removeLocal(key)
-  }, [])
+    if (!inMemory) removeLocal(key)
+  }, [inMemory])
 
   // ── Hydration ─────────────────────────────────────────────────────────────
   // Paint from the cache immediately, then reconcile with the server. Runs
@@ -437,13 +454,14 @@ export function FinancialDataProvider({ children }: { children: ReactNode }) {
   // Read once on mount. localStorage is not available during the server render,
   // so the first paint is empty and this is what fills it.
   useEffect(() => {
+    if (inMemory) return
     const stored: Partial<Record<string, unknown>> = {}
     for (const key of OWNED_KEYS) {
       const value = readLocal<unknown>(key)
       if (value !== null) stored[key] = value
     }
     applyValues(stored)
-  }, [applyValues])
+  }, [applyValues, inMemory])
 
   // ── Profile ───────────────────────────────────────────────────────────────
   // The profile is built up by hand as the user works through a learning track.

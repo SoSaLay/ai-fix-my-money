@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { CheckCircle2, Sparkles } from 'lucide-react'
 import { useLearning } from '@/contexts/learning-context'
+import { usePreview } from '@/contexts/preview-context'
 import { getTrack, type TrackId } from '@/lib/learning/tracks'
 
 /**
@@ -11,8 +12,16 @@ import { getTrack, type TrackId } from '@/lib/learning/tracks'
  * A tool opens permanently once its track is finished. Before that, the only
  * way in is a practice step, which hands the learner a pass for one loop —
  * they arrive with a task rather than an empty screen.
+ *
+ * The preview shows every tool open, so there is no gate there.
  */
-export function SectionGate({
+export function SectionGate(props: { trackId: TrackId; children: React.ReactNode }) {
+  const preview = usePreview()
+  if (preview) return <>{props.children}</>
+  return <Gate {...props} />
+}
+
+function Gate({
   trackId,
   children,
 }: {
@@ -89,6 +98,12 @@ export function SectionGate({
         </p>
         <Link href="/learning" className="btn-action items-center justify-center mt-8">
           Go to Learning
+        </Link>
+        <Link
+          href={`/preview#${trackId}`}
+          className="mt-4 text-label-lg font-semibold text-secondary hover:underline underline-offset-2"
+        >
+          What can I unlock?
         </Link>
       </div>
     </div>
