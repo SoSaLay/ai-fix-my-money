@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import type { SavingsGoal } from '@/hooks/use-data'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { usePreview } from '@/contexts/preview-context'
 
 // ── Local types ────────────────────────────────────────────────────────────
 
@@ -896,9 +897,15 @@ export function GoalsList({
   onSwap,
   updating,
 }: GoalsListProps) {
-  const [folders, setFolders] = useState<GoalFolder[]>(() => readLocal(FOLDERS_KEY, []))
-  const [goalFolderMap, setGoalFolderMap] = useState<Record<string, string>>(() => readLocal(FOLDER_MAP_KEY, {}))
-  const [layout, setLayout] = useState<string[]>(() => readLocal(LAYOUT_KEY, []))
+  // The preview shows an example person's goals, so it neither reads the
+  // visitor's own projects and order nor writes anything back over them.
+  const preview = usePreview()
+  const load = <T,>(key: string, fallback: T): T => (preview ? fallback : readLocal(key, fallback))
+  const save = <T,>(key: string, value: T) => { if (!preview) writeLocal(key, value) }
+
+  const [folders, setFolders] = useState<GoalFolder[]>(() => load(FOLDERS_KEY, []))
+  const [goalFolderMap, setGoalFolderMap] = useState<Record<string, string>>(() => load(FOLDER_MAP_KEY, {}))
+  const [layout, setLayout] = useState<string[]>(() => load(LAYOUT_KEY, []))
   const [showAddMenu, setShowAddMenu] = useState(false)
   const [addingType, setAddingType] = useState<'folder' | 'goal' | null>(null)
 
@@ -911,7 +918,7 @@ export function GoalsList({
     const newFolder: GoalFolder = { id: `folder_${Date.now()}`, name }
     setFolders(prev => {
       const next = [...prev, newFolder]
-      writeLocal(FOLDERS_KEY, next)
+      save(FOLDERS_KEY, next)
       return next
     })
     setAddingType(null)
@@ -920,7 +927,7 @@ export function GoalsList({
   const handleDeleteFolder = (folderId: string) => {
     setFolders(prev => {
       const next = prev.filter(f => f.id !== folderId)
-      writeLocal(FOLDERS_KEY, next)
+      save(FOLDERS_KEY, next)
       return next
     })
     setGoalFolderMap(prev => {
@@ -928,7 +935,7 @@ export function GoalsList({
       Object.keys(next).forEach(goalId => {
         if (next[goalId] === folderId) delete next[goalId]
       })
-      writeLocal(FOLDER_MAP_KEY, next)
+      save(FOLDER_MAP_KEY, next)
       return next
     })
   }
@@ -936,7 +943,7 @@ export function GoalsList({
   const handleGoalCreated = (goalId: string, folderId: string) => {
     setGoalFolderMap(prev => {
       const next = { ...prev, [goalId]: folderId }
-      writeLocal(FOLDER_MAP_KEY, next)
+      save(FOLDER_MAP_KEY, next)
       return next
     })
   }
@@ -995,7 +1002,7 @@ export function GoalsList({
 
   const handleReorder = (next: string[]) => {
     setLayout(next)
-    writeLocal(LAYOUT_KEY, next)
+    save(LAYOUT_KEY, next)
   }
 
   const labelFor = (key: string) => {
